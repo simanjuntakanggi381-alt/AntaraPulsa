@@ -167,6 +167,30 @@ func (s *Store) Products() []model.Product {
 	defer s.mu.RUnlock()
 	return append([]model.Product(nil), s.products...)
 }
+
+// ReplaceProducts atomically refreshes the display catalog from the active provider catalog.
+func (s *Store) ReplaceProducts(products []model.Product) error {
+	if s.db != nil {
+		tx, err := s.db.Begin()
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+		if _, err = tx.Exec(`DELETE FROM products`); err != nil {
+			return err
+		}
+		for _, product := range products {
+			if _, err = tx.Exec(`INSERT INTO products (id,provider,name,type,price,color) VALUES ($1,$2,$3,$4,$5,$6)`, product.ID, product.Provider, product.Name, product.Type, product.Price, product.Color); err != nil {
+				return err
+			}
+		}
+		return tx.Commit()
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.products = append([]model.Product(nil), products...)
+	return nil
+}
 func (s *Store) Transactions(uid int64) []model.Transaction {
 	if s.db != nil {
 		rows, err := s.db.Query(`SELECT id,user_id,type,provider,product,target,amount,status,created_at FROM transactions WHERE user_id=$1 ORDER BY created_at DESC`, uid)
