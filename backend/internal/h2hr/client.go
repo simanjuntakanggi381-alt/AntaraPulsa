@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -40,7 +41,13 @@ type Client struct {
 }
 
 func New(config Config) *Client {
-	return &Client{config: config, http: &http.Client{Timeout: 20 * time.Second}}
+	// Pulsa24Jam whitelist is configured with the server's public IPv4 address.
+	// Force this provider connection over IPv4 so dual-stack DNS cannot bypass it.
+	dialer := &net.Dialer{Timeout: 10 * time.Second, KeepAlive: 30 * time.Second}
+	transport := &http.Transport{DialContext: func(ctx context.Context, _, address string) (net.Conn, error) {
+		return dialer.DialContext(ctx, "tcp4", address)
+	}}
+	return &Client{config: config, http: &http.Client{Timeout: 20 * time.Second, Transport: transport}}
 }
 
 type Request struct {
