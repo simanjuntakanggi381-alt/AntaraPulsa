@@ -1,0 +1,15 @@
+{
+  "name": "antarapulsa-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "preview": "vite preview --port 3000"
+  },
+  "devDependencies": {
+    "vite": "^7.1.3"
+  }
+}
+

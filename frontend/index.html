@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071d18">
+  <title>AntaraPulsa — Semua Transaksi, Satu Kendali</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/app.css">
+</head>
+<body>
+  <div class="noise"></div>
+  <section id="loginView" class="login-shell">
+    <div class="login-visual">
+      <a class="brand brand-light" href="#"><svg class="logo-symbol" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="13"/><path d="M11 27 18.2 12h3.6L29 27M14.2 21h11.6"/><path class="logo-pulse" d="m26.5 10 2 2 3-3"/></svg><span>antara<span>pulsa</span></span></a>
+      <div class="visual-copy">
+        <div class="eyebrow"><span></span> PLATFORM AGEN PULSA #1</div>
+        <h1>Transaksi kilat.<br><em>Untung berlipat.</em></h1>
+        <p>Satu dashboard untuk semua kebutuhan digitalmu. Cepat, aman, dan selalu siap 24 jam.</p>
+        <div class="visual-stats">
+          <div><strong>99.9%</strong><small>Uptime server</small></div>
+          <div><strong>&lt; 3 detik</strong><small>Proses transaksi</small></div>
+          <div><strong>24/7</strong><small>Dukungan penuh</small></div>
+        </div>
+      </div>
+      <div class="orb orb-one"></div><div class="orb orb-two"></div>
+      <div class="signal-card"><span class="pulse-dot"></span><div><b>Server online</b><small>Semua sistem normal</small></div></div>
+    </div>
+    <div class="login-panel">
+      <div class="mobile-brand"><svg class="logo-symbol" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="13"/><path d="M11 27 18.2 12h3.6L29 27M14.2 21h11.6"/><path class="logo-pulse" d="m26.5 10 2 2 3-3"/></svg><span>antara<b>pulsa</b></span></div>
+      <div class="login-showcase"><img src="/assets/login-hero.png" alt="AntaraPulsa"><h1>Antara<span>Pulsa</span></h1><p>Mudah, Cepat &amp; Terpercaya</p></div>
+      <div class="login-box">
+        <span class="welcome-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/><path d="m18.5 16 .7 2.1 2.1.7-2.1.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1Z"/></svg></span>
+        <h2>Selamat datang kembali</h2>
+        <p>Masuk untuk melanjutkan transaksi kamu.</p>
+        <button type="button" class="google-login"><b aria-hidden="true">G</b><span>Login dengan Google</span></button>
+        <div class="login-divider"><span>atau masuk dengan akun</span></div>
+        <form id="loginForm">
+          <label>Nomor handphone</label>
+          <div class="field"><span class="field-icon">+62</span><input id="loginPhone" value="081234567890" autocomplete="tel" inputmode="numeric" required></div>
+          <label>Kata sandi</label>
+          <div class="field"><span class="field-icon lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/></svg></span><input id="loginPassword" type="password" value="pulsa123" autocomplete="current-password" required><button type="button" id="togglePassword" aria-label="Lihat sandi"><svg viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
+          <div class="form-row"><label class="check"><input type="checkbox" checked><span></span> Ingat saya</label><a href="#">Lupa kata sandi?</a></div>
+          <button class="primary-btn" type="submit"><span>Masuk ke dashboard</span><b>→</b></button>
+          <div id="loginError" class="form-error"></div>
+        </form>
+        <p class="register">Belum punya akun? <a href="#">Daftar jadi agen</a></p>
+        <div class="secure-note">◈ &nbsp; Data kamu terlindungi enkripsi 256-bit</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="appView" class="app hidden">
+    <aside class="sidebar">
+      <a class="brand" href="#"><svg class="logo-symbol" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="13"/><path d="M11 27 18.2 12h3.6L29 27M14.2 21h11.6"/><path class="logo-pulse" d="m26.5 10 2 2 3-3"/></svg><span>antara<span>pulsa</span></span></a>
+      <nav>
+        <small>MENU UTAMA</small>
+        <button class="nav-item active" data-page="dashboard"><span>⌂</span> Dashboard</button>
+        <button class="nav-item" data-page="transaction"><span>↯</span> Transaksi</button>
+        <button class="nav-item" data-page="history"><span>↻</span> Riwayat <b>4</b></button>
+        <small>AKUN</small>
+        <button class="nav-item" data-page="account"><span>♙</span> Profil Saya</button>
+        <button class="nav-item" data-page="help"><span>?</span> Pusat Bantuan</button>
+      </nav>
+      <div class="upgrade-card"><span>♛</span><b>Naik ke Platinum</b><p>Dapatkan harga produk yang lebih murah.</p><button data-page="account">Lihat benefit →</button></div>
+      <button id="logoutBtn" class="logout"><span>↪</span> Keluar</button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <div class="app-wordmark"><img class="app-logo-img" src="/assets/brand-mark.png" alt="Logo AntaraPulsa"><b>Antara<span>Pulsa</span></b><small>Digital partner</small></div>
+        <div class="search"><span>⌕</span><input placeholder="Cari produk atau transaksi..."><kbd>⌘ K</kbd></div>
+        <div class="top-actions"><button class="icon-btn" aria-label="Notifikasi"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i></button><button class="icon-btn chat-head" data-page="help" aria-label="Chat bantuan"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H6l-4 2 1.3-4A9 9 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></button><div class="user-mini"><div class="avatar">MP</div><div><b id="miniName">Mikael Putra</b><small>Gold Partner</small></div><span>⌄</span></div></div>
+      </header>
+
+      <div id="pageContainer">
+        <section id="dashboardPage" class="page active-page">
+          <div class="mobile-welcome">
+            <div><p id="greeting">Halo, Mikael 👋</p><h1>Selamat datang kembali!</h1></div>
+            <button class="scan-button" aria-label="Pindai QR"><svg viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4M9 9h6v6H9z"/></svg></button>
+          </div>
+          <div class="wallet-card">
+            <div class="wallet-orbit orbit-a"></div><div class="wallet-orbit orbit-b"></div>
+            <img class="wallet-art" src="/assets/wallet-3d.png" alt="Dompet digital">
+            <div class="wallet-head"><div><span>Saldo Anda</span><b><i></i> Akun aktif</b></div></div>
+            <div class="wallet-value"><small>Rp</small><strong id="balance">2.847.500</strong><button id="hideBalance" aria-label="Sembunyikan saldo"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button></div>
+            <div class="wallet-detail"><div><span>Saldo utama</span><strong id="mainBalanceDetail">Rp 2.847.500</strong></div><div><span>Saldo bonus</span><strong>Rp 0</strong></div><div class="member-detail"><b>♛ &nbsp; GOLD</b><span>Member sejak<br>12 Jan 2024</span></div></div>
+            <button id="walletTopupBtn" class="wallet-topup">Isi Saldo <b>＋</b></button>
+          </div>
+          <div class="cashback-card">
+            <div><span>🔥 Promo Spesial Hari Ini</span><h2>CASHBACK 10%</h2><p>Setiap transaksi pulsa &amp;<br>paket data</p><button data-page="transaction">Lihat Promo</button></div>
+            <img src="/assets/promo-gift.png" alt="Promo cashback">
+            <div class="promo-dots"><i></i><i></i><i></i></div>
+          </div>
+          <div class="money-actions">
+            <button id="topupBtn"><span><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><b>Isi Saldo</b><small>Top up cepat</small></button>
+            <button data-page="transaction"><span><svg viewBox="0 0 24 24"><path d="m8 7 4-4 4 4M12 3v12M16 17l-4 4-4-4M12 21V9"/></svg></span><b>Kirim Saldo</b><small>Transfer mudah</small></button>
+            <button data-page="history"><span><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg></span><b>Riwayat</b><small>Cek transaksi</small></button>
+            <button data-page="account"><span><svg viewBox="0 0 24 24"><path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H7"/></svg></span><b>Komisi</b><small>Lihat komisi</small></button>
+          </div>
+
+          <div class="section-head modern-title"><div><h2>Layanan favorit</h2><p>Transaksi cepat dalam sekali sentuh</p></div><button id="allServices">Lainnya</button></div>
+          <div class="service-grid modern-services">
+            <button class="service-card" data-type="Pulsa"><span class="service-icon green"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M10 5h4M11 18.5h2"/></svg></span><div><b>Pulsa</b><small>Semua operator</small></div></button>
+            <button class="service-card" data-type="Paket Data"><span class="service-icon blue"><svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8 16a5.8 5.8 0 0 1 8 0M11 19.5a1.5 1.5 0 0 1 2 0"/></svg></span><div><b>Paket Data</b><small>Internet hemat</small></div></button>
+            <button class="service-card" data-type="Token PLN"><span class="service-icon yellow"><svg viewBox="0 0 24 24"><path d="m13.5 2-8 12h6L10.5 22l8-12h-6z"/></svg></span><div><b>Token PLN</b><small>Listrik prabayar</small></div></button>
+            <button class="service-card" data-type="E-Wallet"><span class="service-icon purple"><svg viewBox="0 0 24 24"><path d="M4 6.5h14a2 2 0 0 1 2 2v10H5a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12M15 12h5"/><circle cx="16" cy="12" r=".7"/></svg></span><div><b>E-Wallet</b><small>Top up instan</small></div></button>
+            <button class="service-card" data-type="PPOB"><span class="service-icon cyan"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l7-5 7 5v12M8 12h2v2H8zM14 12h2v2h-2zM10 21v-4h4v4"/></svg></span><div><b>PPOB</b><small>Bayar tagihan</small></div></button>
+            <button class="service-card" data-type="Lainnya"><span class="service-icon aqua"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/></svg></span><div><b>Lainnya</b><small>Semua layanan</small></div></button>
+            <button class="service-card" data-type="Game"><span class="service-icon coral"><svg viewBox="0 0 24 24"><path d="M8 7h8a6 6 0 0 1 5.5 8.4l-1.2 2.8a2 2 0 0 1-3.2.7L15 17H9l-2.1 1.9a2 2 0 0 1-3.2-.7l-1.2-2.8A6 6 0 0 1 8 7Z"/><path d="M7 12v4M5 14h4M16.5 12.5h.01M18.5 15h.01"/></svg></span><div><b>Top Up Game</b><small>Diamond instan</small></div></button>
+            <button class="service-card" data-type="Voucher"><span class="service-icon pink"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z"/><path d="M13 8.5v1M13 12v1M13 15.5v1"/></svg></span><div><b>Voucher</b><small>Digital & hiburan</small></div></button>
+            <button class="service-card" data-type="Telepon"><span class="service-icon mint"><svg viewBox="0 0 24 24"><path d="M21 16.5v3a2 2 0 0 1-2.2 2 19.7 19.7 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.7 19.7 0 0 1 1.1 3.8 2 2 0 0 1 3.1 1.6h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L7 9.5a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/></svg></span><div><b>TELP & SMS</b><small>Paket telepon</small></div></button>
+            <button class="service-card" data-type="Lainnya"><span class="service-icon neutral"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></span><div><b>Lainnya</b><small>Semua layanan</small></div></button>
+          </div>
+          <div class="benefit-grid">
+            <div><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2M4.9 4.9A10 10 0 1 1 2 12M2 5v5h5"/></svg></span><b>Transaksi<br>Cepat</b><small>Mudah &amp; Kilat</small></div>
+            <div><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M12 21s8-3.5 8-10V5l-8-3-8 3v6c0 6.5 8 10 8 10Z"/><path d="m8.5 11.5 2.2 2.2 4.8-5"/></svg></span><b>Aman<br>Terjamin</b><small>100% Aman</small></div>
+            <div><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M5 9h14l-1.3 11H6.3L5 9ZM8 9a4 4 0 0 1 8 0"/><path d="m9 13 2 2 4-4"/></svg></span><b>Harga<br>Terbaik</b><small>Termurah</small></div>
+            <div><span class="benefit-icon"><svg viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3M4 14H2v5h5v-5H4ZM20 14h2v5h-5v-5h3ZM17 19c-1 2-3 2-5 2"/></svg></span><b>Layanan<br>24/7</b><small>Siap Bantu</small></div>
+          </div>
+          <div class="promo-banner">
+            <div class="promo-art"><img src="/assets/referral-team.png" alt="Ajak teman"></div>
+            <div class="promo-copy"><span>BONUS REFERRAL</span><strong>Ajak Teman,<br>Dapatkan Bonus!</strong><p>Dapatkan saldo gratis hingga Rp25.000.</p></div>
+            <button data-page="account">Ajak Sekarang <b>›</b></button>
+          </div>
+          <div class="content-row">
+            <div class="panel transaction-panel"><div class="panel-head"><div><h2>Aktivitas terbaru</h2><p>Transaksi terakhir kamu</p></div><button data-page="history">Lihat semua</button></div><div id="recentTransactions" class="transaction-list"></div></div>
+            <div class="panel chart-panel"><div class="panel-head"><div><h2>Performa penjualan</h2><p>7 hari terakhir</p></div><button>Mingguan⌄</button></div><div class="chart-total"><strong>Rp 2,4 jt</strong><span>↑ 18.2%</span></div><div class="chart"><div class="y-labels"><i>800k</i><i>600k</i><i>400k</i><i>200k</i><i>0</i></div><svg viewBox="0 0 500 190" preserveAspectRatio="none"><defs><linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22b887" stop-opacity=".3"/><stop offset="1" stop-color="#22b887" stop-opacity="0"/></linearGradient></defs><path class="area" d="M0 145 C45 130 65 120 100 132 S155 105 195 112 S245 75 285 85 S340 43 380 67 S440 22 500 38 L500 190 L0 190Z"/><path class="line" d="M0 145 C45 130 65 120 100 132 S155 105 195 112 S245 75 285 85 S340 43 380 67 S440 22 500 38"/><g><circle cx="0" cy="145" r="4"/><circle cx="100" cy="132" r="4"/><circle cx="195" cy="112" r="4"/><circle cx="285" cy="85" r="4"/><circle cx="380" cy="67" r="4"/><circle cx="500" cy="38" r="4"/></g></svg><div class="x-labels"><i>Sen</i><i>Sel</i><i>Rab</i><i>Kam</i><i>Jum</i><i>Sab</i><i>Min</i></div></div></div>
+          </div>
+          <div class="help-banner"><div><h3>Butuh Bantuan?</h3><p>Customer service kami siap<br>membantu Anda 24/7</p><button data-page="help">Chat Sekarang</button></div><span><svg viewBox="0 0 64 64"><path d="M13 35v-7a19 19 0 0 1 38 0v7M13 35H9a4 4 0 0 0-4 4v9a4 4 0 0 0 4 4h7V35h-3ZM51 35h4a4 4 0 0 1 4 4v9a4 4 0 0 1-4 4h-7V35h3ZM48 52c-2 5-7 7-13 7h-5"/><circle cx="28" cy="59" r="3"/></svg></span></div>
+        </section>
+
+        <section id="servicesPage" class="page services-page"><div class="simple-head"><span>SEMUA LAYANAN</span><h1>Layanan lainnya.</h1><p>Pilih kebutuhan digital yang ingin kamu gunakan.</p></div><div class="service-grid extra-services"><button class="service-card" data-type="Game"><span class="service-icon coral">🎮</span><div><b>Top Up Game</b><small>Diamond & voucher game</small></div></button><button class="service-card" data-type="Voucher"><span class="service-icon pink">🎟</span><div><b>Voucher Digital</b><small>Hiburan dan belanja</small></div></button><button class="service-card" data-type="Telepon"><span class="service-icon mint">☎</span><div><b>Telepon & SMS</b><small>Paket komunikasi</small></div></button><button class="service-card" data-type="PPOB"><span class="service-icon cyan">⌂</span><div><b>Bayar Tagihan</b><small>Listrik, air, dan lainnya</small></div></button></div></section>
+        <section id="transactionPage" class="page"><div class="simple-head"><span>TRANSAKSI BARU</span><h1>Isi kebutuhan digitalmu.</h1><p>Pilih produk, masukkan tujuan, lalu selesaikan dalam hitungan detik.</p></div><div class="purchase-layout"><div class="panel"><div class="filter-tabs"><button class="active" data-filter="all">Semua</button><button data-filter="Pulsa">Pulsa</button><button data-filter="Paket Data">Paket Data</button><button data-filter="Token PLN">Token PLN</button></div><div id="productGrid" class="product-grid"></div></div><div class="panel checkout-card"><div class="step-badge">RINGKASAN PESANAN</div><div id="selectedEmpty" class="empty-state"><span>⌁</span><b>Belum ada produk</b><p>Pilih salah satu produk di samping.</p></div><div id="selectedProduct" class="hidden"><div class="selected-info"><span id="selectedLogo">T</span><div><small>PRODUK DIPILIH</small><b id="selectedName">-</b><p id="selectedProvider">-</p></div></div><label>Nomor tujuan / ID pelanggan</label><input id="targetInput" class="normal-input" placeholder="Contoh: 081234567890"><div class="price-row"><span>Total pembayaran</span><strong id="selectedPrice">Rp 0</strong></div><button id="payBtn" class="primary-btn">Bayar sekarang <b>→</b></button></div></div></div></section>
+
+        <section id="historyPage" class="page"><div class="simple-head"><span>AKTIVITAS</span><h1>Riwayat transaksi.</h1><p>Semua transaksi tercatat rapi dan mudah ditemukan.</p></div><div class="panel history-panel"><div class="history-toolbar"><div class="search history-search"><span>⌕</span><input id="historySearch" placeholder="Cari nomor atau ID transaksi"></div><div class="history-status-wrap"><div class="history-statuses" aria-label="Filter status transaksi"><button class="active" data-history-status="">Semua</button><button data-history-status="Pending">Pending</button><button data-history-status="Dibayar">Dibayar</button><button data-history-status="Diproses">Diproses</button><button data-history-status="Berhasil">Berhasil</button><button data-history-status="Gagal">Gagal</button><button data-history-status="Expired">Expired</button><button data-history-status="Batal">Batal</button><button data-history-status="Refund">Refund</button></div></div><div class="history-date"><span>▣</span><input id="historyDate" type="date" aria-label="Pilih tanggal"><i>⌄</i></div><select id="statusFilter" aria-hidden="true" tabindex="-1"><option value="">Semua status</option><option>Pending</option><option>Dibayar</option><option>Diproses</option><option>Berhasil</option><option>Gagal</option><option>Expired</option><option>Batal</option><option>Refund</option></select></div><div id="historyTable" class="history-table"></div></div></section>
+
+        <section id="accountPage" class="page account-page"><div class="account-hero"><div class="profile-avatar">MP</div><div><span>AKUN ANTARAPULSA</span><h1 id="profileName">Mikael Putra</h1><p id="accountHandle">Agen terpercaya</p></div><b><i></i> Aktif</b></div><form id="profileForm" class="account-info-card"><div class="account-card-head"><h2>Informasi pribadi</h2><span>✎ Edit</span></div><div class="account-field"><span>♙</span><div><small>Nama lengkap</small><input id="profileNameInput" class="account-input"></div></div><div class="account-field"><span>☎</span><div><small>Nomor handphone</small><input id="profilePhone" class="account-input" disabled></div></div><div class="account-field"><span>✉</span><div><small>Email</small><input id="profileEmail" type="email" class="account-input" placeholder="Tambahkan email"></div></div><button class="account-save" type="submit">Simpan perubahan</button></form><section class="account-menu"><h2>Menu akun</h2><button><span class="account-menu-icon balance-icon">⇄</span><div><b>Mutasi saldo</b><small>Lihat pemasukan dan pengeluaran saldo</small></div><i>›</i></button><button id="topupBtn"><span class="account-menu-icon topup-icon">▣</span><div><b>Isi saldo</b><small>Tambahkan saldo akun AntaraPulsa</small></div><i>›</i></button><button data-page="help"><span class="account-menu-icon help-icon">?</span><div><b>Pusat bantuan</b><small>Kami siap membantu kapan saja</small></div><i>›</i></button></section><div class="account-help"><span>?</span><div><b>Butuh bantuan?</b><small>Hubungi tim AntaraPulsa jika ada kendala.</small></div><button data-page="help">Hubungi</button></div><button id="accountLogout" class="account-logout" type="button">Keluar dari akun</button></section>
+
+        <section id="helpPage" class="page"><div class="simple-head"><span>BANTUAN 24/7</span><h1>Ada yang bisa dibantu?</h1><p>Temukan jawaban cepat atau hubungi tim kami.</p></div><div class="help-grid"><button class="panel help-card"><span>◌</span><h3>Panduan transaksi</h3><p>Cara membeli pulsa dan produk digital.</p></button><button class="panel help-card"><span>⌁</span><h3>Transaksi bermasalah</h3><p>Kami bantu cek status transaksi.</p></button><button class="panel help-card"><span>◉</span><h3>Hubungi support</h3><p>Chat langsung dengan tim AntaraPulsa.</p></button></div></section>
+      </div>
+    </main>
+    <nav class="bottom-nav" aria-label="Navigasi utama">
+      <button class="bottom-nav-item active" data-page="dashboard"><span><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg></span><small>Beranda</small></button>
+      <button class="bottom-nav-item" data-page="history"><span><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg></span><small>Riwayat</small><i>4</i></button>
+      <button class="bottom-nav-item center-action" data-page="transaction"><span><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><small>Top Up</small></button>
+      <button class="bottom-nav-item" data-page="help"><span><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H6l-4 2 1.3-4A9 9 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></span><small>Chat</small></button>
+      <button class="bottom-nav-item" data-page="account"><span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><small>Akun</small></button>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast"><span>✓</span><div><b id="toastTitle">Berhasil</b><p id="toastMessage">Aksi berhasil dilakukan.</p></div></div>
+  <div id="modal" class="modal"><div class="modal-card"><button id="closeModal">×</button><span class="success-ring">✓</span><h2>Transaksi berhasil!</h2><p>Produk telah dikirim ke nomor tujuan.</p><div id="modalDetail" class="receipt"></div><button id="doneBtn" class="primary-btn">Kembali ke dashboard</button></div></div>
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>

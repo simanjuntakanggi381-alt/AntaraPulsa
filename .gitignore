@@ -1,0 +1,20 @@
+# Build output
+/antarapulsa
+/antarapulsa.exe
+/bin/
+/.gocache/
+backend/.gocache/
+frontend/node_modules/
+frontend/dist/
+frontend/.npm-cache/
+
+# Local configuration
+.env
+**/.env
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

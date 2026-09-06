@@ -1,0 +1,59 @@
+/* AntaraPulsa premium green theme — final visual layer */
+:root{--brand:#07984f;--brand-dark:#006a3d;--brand-light:#49d547}
+body{background:#06251c}
+.login-shell,.app{box-shadow:0 0 70px rgba(0,0,0,.35)}
+
+/* Login */
+.login-shell{background:radial-gradient(circle at 50% 15%,rgba(255,255,255,.98),rgba(247,252,248,.97) 55%,rgba(227,246,229,.98));position:relative;overflow:hidden}
+.login-shell:before,.login-shell:after{content:"";position:absolute;border-radius:50%;filter:blur(1px);pointer-events:none}
+.login-shell:before{width:270px;height:140px;left:-70px;bottom:-45px;background:linear-gradient(25deg,#087944,#42bb45);transform:rotate(12deg);box-shadow:100px -14px 0 rgba(41,164,67,.25)}
+.login-shell:after{width:180px;height:180px;right:-105px;top:90px;background:radial-gradient(circle,rgba(70,190,80,.15),transparent 70%)}
+.login-panel{padding:22px 22px 30px;position:relative;z-index:2;display:block}
+.login-panel>.mobile-brand{display:none}
+.login-showcase{height:335px;text-align:center;display:flex;flex-direction:column;align-items:center;position:relative}
+.login-showcase img{width:270px;height:235px;object-fit:contain;margin-top:-12px;filter:drop-shadow(0 22px 22px rgba(0,100,47,.18))}
+.login-showcase h1{font:800 32px/1 Manrope;margin:-2px 0 8px;letter-spacing:-1.7px;color:#111d1a}.login-showcase h1 span{color:#0a9c50}
+.login-showcase p{margin:0;color:#697873;font-size:12px}.login-showcase p:after{content:"";display:block;width:45px;height:2px;margin:18px auto 0;background:#16a45d;border-radius:2px}
+.login-box{margin:0;padding:23px 18px 20px;border:1px solid rgba(218,231,222,.9);border-radius:22px;background:rgba(255,255,255,.91);box-shadow:0 16px 45px rgba(19,62,43,.11);backdrop-filter:blur(15px)}
+.login-box .welcome-icon{display:none}.login-box h2{text-align:center;font-size:20px;margin:0 0 6px;letter-spacing:-.6px}.login-box>p{text-align:center;font-size:10px;margin:0 0 16px}
+.google-login{width:100%;height:46px;border:0;border-radius:11px;background:linear-gradient(100deg,#12944e,#3bc840);color:#fff;font-weight:700;font-size:12px;box-shadow:0 7px 16px rgba(16,159,74,.18)}
+.google-login b{display:inline-grid;place-items:center;width:23px;height:23px;margin-right:9px;border-radius:50%;background:#fff;color:#4285f4;font:800 14px Arial}
+.login-divider{height:38px;display:flex;align-items:center;gap:9px;color:#909a96;font-size:8px}.login-divider:before,.login-divider:after{content:"";height:1px;background:#e1e6e3;flex:1}.login-divider span{white-space:nowrap}
+.login-box label{font-size:10px;margin:10px 0 6px}.login-box .field{height:46px;border-radius:10px;background:#fbfcfb}.login-box .form-row{margin:14px 0 17px;font-size:9px}.login-box .primary-btn{height:47px;border-radius:11px;background:linear-gradient(100deg,#11944d,#27b95b)}
+.login-box .register{font-size:9px;margin:18px 0 5px!important}.login-box .secure-note{display:none}
+
+/* Green app header */
+.app{background:#f8faf8}.app .topbar{height:70px;background:linear-gradient(135deg,#057842,#079c50);border:0;box-shadow:none;color:#fff}
+.app-wordmark>b{color:#fff;font-size:18px}.app-wordmark>b span{color:#d5ffcd}.app-wordmark>small{color:rgba(255,255,255,.68)}
+.app .logo-symbol rect{fill:rgba(255,255,255,.18)}.app .logo-symbol path{stroke:#fff}.app .logo-symbol .logo-pulse{stroke:#d9ff79}
+.app .icon-btn{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.15);color:#fff}.app .avatar{background:rgba(255,255,255,.16);color:#fff}.app .user-mini{gap:7px}
+
+/* Dashboard hero */
+#dashboardPage{padding:10px 14px 28px!important;background:linear-gradient(180deg,#079c50 0,#087f45 145px,#f7faf7 250px,#f7faf7 100%)}
+#dashboardPage .mobile-welcome{margin:4px 3px 14px;color:#fff}#dashboardPage .mobile-welcome p{color:#fff;font-size:13px;font-weight:700}#dashboardPage .mobile-welcome h1{font:500 10px DM Sans;color:rgba(255,255,255,.83);letter-spacing:0}
+#dashboardPage .scan-button{display:none}
+#dashboardPage .wallet-card{height:176px;padding:20px;border:1px solid rgba(198,255,174,.42);border-radius:18px;background:linear-gradient(135deg,rgba(24,165,69,.96),rgba(4,126,58,.96));box-shadow:0 14px 30px rgba(0,90,42,.2);overflow:hidden}
+#dashboardPage .wallet-art{display:block;position:absolute;z-index:2;width:156px;height:156px;object-fit:contain;right:-1px;bottom:-11px;filter:drop-shadow(0 12px 12px rgba(0,47,20,.25))}
+#dashboardPage .wallet-orbit{z-index:1}#dashboardPage .wallet-head,#dashboardPage .wallet-value{z-index:3;position:relative;width:58%}
+#dashboardPage .wallet-head>div>b{display:none}#dashboardPage .wallet-head button{display:none}#dashboardPage .wallet-head>div>span{font-size:10px}
+#dashboardPage .wallet-value{height:auto;margin:14px 0 15px}#dashboardPage .wallet-value strong{font-size:25px;letter-spacing:-1px}#dashboardPage .wallet-value small{font-size:11px;margin-top:6px}
+#dashboardPage .wallet-detail{border:0;padding:0;height:auto;display:block;position:relative;z-index:4}#dashboardPage .wallet-detail>div{display:none}#dashboardPage .wallet-detail:after{content:"Isi Saldo    +";display:inline-block;padding:10px 14px;border-radius:10px;background:#fff;color:#078b48;font-size:10px;font-weight:800;word-spacing:7px;box-shadow:0 5px 12px rgba(0,60,30,.12)}
+
+#dashboardPage .money-actions{display:none}
+#dashboardPage .section-head.modern-title{margin:18px 2px 10px}#dashboardPage .section-head.modern-title h2{font-size:15px}#dashboardPage .section-head.modern-title p{display:none}#dashboardPage .section-head.modern-title button{background:none;padding:0;color:#078b48;font-size:9px}
+#dashboardPage .service-grid.modern-services{grid-template-columns:repeat(3,1fr);gap:9px;padding:11px;background:#fff;border:1px solid #e7eee9;border-radius:18px;box-shadow:0 9px 25px rgba(25,62,45,.06)}
+#dashboardPage .modern-services .service-card{height:83px;border:0;background:transparent;box-shadow:none;gap:6px}#dashboardPage .modern-services .service-card:nth-child(n+7){display:none}
+#dashboardPage .modern-services .service-icon{width:49px;height:49px;flex-basis:49px;border-radius:16px;box-shadow:0 7px 14px rgba(18,92,55,.08)}#dashboardPage .modern-services .service-card b{font-size:9px}
+
+#dashboardPage .dashboard-stats{margin-top:12px;padding:11px 5px;background:linear-gradient(120deg,#eff9ef,#f7fbf5);border:1px solid #e3ede3;border-radius:16px;grid-template-columns:repeat(3,1fr)}
+#dashboardPage .dashboard-stats>div{height:65px;padding:8px;background:transparent;border:0;border-radius:0;box-shadow:none}#dashboardPage .dashboard-stats>div+div{border-left:1px solid #dde8df}#dashboardPage .dashboard-stats strong{font-size:11px;margin:6px 0}#dashboardPage .dashboard-stats svg{width:35px;height:20px}
+
+#dashboardPage .promo-banner{height:127px;margin-top:13px;grid-template-columns:1fr 145px;padding:18px;background:linear-gradient(130deg,#05763f,#08a354);border:0;color:#fff;box-shadow:0 10px 22px rgba(2,112,53,.17)}
+#dashboardPage .promo-art{grid-column:2;grid-row:1;width:145px;height:120px;position:absolute;right:-12px;bottom:-14px}#dashboardPage .promo-art img{width:145px;height:130px;object-fit:contain;filter:drop-shadow(0 10px 10px rgba(0,50,24,.2))}
+#dashboardPage .promo-copy{grid-column:1;grid-row:1;z-index:2;align-self:start}#dashboardPage .promo-copy>span{color:#dfff9f;font-size:8px}#dashboardPage .promo-copy>strong{font-size:14px;margin:9px 0 6px}#dashboardPage .promo-copy>p{color:rgba(255,255,255,.75);font-size:8px;max-width:170px}
+#dashboardPage .promo-banner>button{left:18px;right:auto;bottom:15px;background:#fff;color:#078746}
+#dashboardPage .content-row{margin-top:14px}#dashboardPage .transaction-panel{box-shadow:0 8px 24px rgba(27,60,45,.06)}
+
+.bottom-nav{height:68px;border-radius:18px 18px 0 0}.bottom-nav-item.active{background:transparent}.bottom-nav-item.active>span{color:#0aa254}.bottom-nav-item:nth-child(2){position:relative}.bottom-nav-item:nth-child(2):after{content:"+";position:absolute;top:-28px;width:49px;height:49px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#39d65d,#079c4c);border:5px solid #f7faf7;color:#fff;font:400 30px Arial;box-shadow:0 8px 18px rgba(5,142,67,.25)}
+
+@media(max-height:760px){.login-showcase{height:265px}.login-showcase img{width:210px;height:175px}.login-box{padding-top:18px}.login-box label{margin-top:7px}}
