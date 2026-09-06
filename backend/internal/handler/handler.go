@@ -19,16 +19,18 @@ import (
 )
 
 type Handler struct {
-	store    *store.Store
-	sessions *auth.SessionManager
-	google   googleOAuth
-	h2hr     *h2hr.Client
+	store      *store.Store
+	sessions   *auth.SessionManager
+	google     googleOAuth
+	h2hr       *h2hr.Client
+	h2hrConfig h2hr.Config
 }
 
 type googleOAuth struct{ clientID, clientSecret, redirectURL string }
 
 func New(st *store.Store, sessions *auth.SessionManager) *Handler {
-	return &Handler{store: st, sessions: sessions, google: googleOAuth{clientID: os.Getenv("GOOGLE_CLIENT_ID"), clientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"), redirectURL: os.Getenv("GOOGLE_REDIRECT_URL")}, h2hr: h2hr.New(h2hr.ConfigFromEnv())}
+	config := h2hr.ConfigFromEnv()
+	return &Handler{store: st, sessions: sessions, google: googleOAuth{clientID: os.Getenv("GOOGLE_CLIENT_ID"), clientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"), redirectURL: os.Getenv("GOOGLE_REDIRECT_URL")}, h2hr: h2hr.New(config), h2hrConfig: config}
 }
 
 func (h *Handler) Routes() http.Handler {
@@ -43,11 +45,37 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("GET /api/transactions", h.withAuth(h.transactions))
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
+	mux.HandleFunc("POST /api/h2hr/callback/{token}", h.h2hrCallback)
 	mux.HandleFunc("POST /api/purchase", h.withAuth(h.purchase))
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
 		respond(w, 200, map[string]string{"status": "ok", "service": "antarapulsa-api"})
 	})
 	return securityHeaders(mux)
+}
+
+func (h *Handler) h2hrCallback(w http.ResponseWriter, r *http.Request) {
+	if h.h2hrConfig.CallbackToken == "" || r.PathValue("token") != h.h2hrConfig.CallbackToken {
+		http.NotFound(w, r)
+		return
+	}
+	payload, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
+	if err != nil {
+		http.Error(w, "payload tidak dapat dibaca", http.StatusBadRequest)
+		return
+	}
+	var callback struct {
+		RefID  string `json:"refid"`
+		Status string `json:"status"`
+	}
+	if err = json.Unmarshal(payload, &callback); err != nil || strings.TrimSpace(callback.RefID) == "" {
+		http.Error(w, "callback tidak valid", http.StatusBadRequest)
+		return
+	}
+	if err = h.store.RecordH2HRCallback(callback.RefID, callback.Status, payload); err != nil {
+		http.Error(w, "callback tidak dapat disimpan", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) h2hrSaldo(w http.ResponseWriter, r *http.Request, _ int64) {

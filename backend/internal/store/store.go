@@ -66,6 +66,7 @@ func (s *Store) migrate(ctx context.Context) error {
 		`CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, provider TEXT NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, price BIGINT NOT NULL, color TEXT NOT NULL)`,
 		`CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), type TEXT NOT NULL, provider TEXT NOT NULL, product TEXT NOT NULL, target TEXT NOT NULL, amount BIGINT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
 		`CREATE INDEX IF NOT EXISTS transactions_user_created_idx ON transactions (user_id, created_at DESC)`,
+		`CREATE TABLE IF NOT EXISTS h2hr_callbacks (refid TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT '', payload JSONB NOT NULL, received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
 	} {
 		if _, err := s.db.ExecContext(ctx, q); err != nil {
 			return fmt.Errorf("migrasi database: %w", err)
@@ -80,6 +81,14 @@ func (s *Store) migrate(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (s *Store) RecordH2HRCallback(refID, status string, payload []byte) error {
+	if s.db == nil {
+		return nil
+	}
+	_, err := s.db.Exec(`INSERT INTO h2hr_callbacks (refid,status,payload) VALUES ($1,$2,$3::jsonb) ON CONFLICT (refid) DO UPDATE SET status=EXCLUDED.status,payload=EXCLUDED.payload,updated_at=NOW()`, refID, status, string(payload))
+	return err
 }
 
 // FindOrCreateGoogleUser returns the account tied to Google's immutable subject.

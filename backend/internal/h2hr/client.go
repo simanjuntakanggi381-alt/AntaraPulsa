@@ -17,10 +17,11 @@ import (
 const DefaultURL = "https://api.pulsa24jam.net/v2/trx"
 
 type Config struct {
-	URL     string
-	APIKey  string
-	PIN     string
-	Enabled bool
+	URL           string
+	APIKey        string
+	PIN           string
+	CallbackToken string
+	Enabled       bool
 }
 
 func ConfigFromEnv() Config {
@@ -28,7 +29,7 @@ func ConfigFromEnv() Config {
 	if url == "" {
 		url = DefaultURL
 	}
-	return Config{URL: url, APIKey: strings.TrimSpace(os.Getenv("PULSA24JAM_H2HR_API_KEY")), PIN: strings.TrimSpace(os.Getenv("PULSA24JAM_H2HR_PIN")), Enabled: os.Getenv("PULSA24JAM_H2HR_ENABLED") == "true"}
+	return Config{URL: url, APIKey: strings.TrimSpace(os.Getenv("PULSA24JAM_H2HR_API_KEY")), PIN: strings.TrimSpace(os.Getenv("PULSA24JAM_H2HR_PIN")), CallbackToken: strings.TrimSpace(os.Getenv("PULSA24JAM_H2HR_CALLBACK_TOKEN")), Enabled: os.Getenv("PULSA24JAM_H2HR_ENABLED") == "true"}
 }
 
 func (c Config) Ready() bool { return c.Enabled && c.URL != "" && c.APIKey != "" && c.PIN != "" }

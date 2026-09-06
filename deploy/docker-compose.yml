@@ -31,6 +31,7 @@ services:
       PULSA24JAM_H2HR_URL: ${PULSA24JAM_H2HR_URL:-https://api.pulsa24jam.net/v2/trx}
       PULSA24JAM_H2HR_API_KEY: ${PULSA24JAM_H2HR_API_KEY:-}
       PULSA24JAM_H2HR_PIN: ${PULSA24JAM_H2HR_PIN:-}
+      PULSA24JAM_H2HR_CALLBACK_TOKEN: ${PULSA24JAM_H2HR_CALLBACK_TOKEN:-}
     depends_on:
       postgres:
         condition: service_healthy
