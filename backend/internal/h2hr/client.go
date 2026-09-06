@@ -68,7 +68,20 @@ type Response struct {
 	RefID       string          `json:"refid"`
 	Existing    bool            `json:"existing"`
 	Transaction Transaction     `json:"transaksi_member"`
+	Items       []Product       `json:"items"`
 	Raw         json.RawMessage `json:"-"`
+}
+
+type Product struct {
+	ID            int64  `json:"id"`
+	SKU           string `json:"sku"`
+	Name          string `json:"nama"`
+	Group         string `json:"group_name"`
+	Category      string `json:"kategori_nama"`
+	Brand         string `json:"brand_nama"`
+	PriceType     string `json:"tipe_harga"`
+	Price         int64  `json:"harga"`
+	AdditionalFee int64  `json:"fee_tambahan"`
 }
 
 func (c *Client) Call(ctx context.Context, request Request) (Response, error) {

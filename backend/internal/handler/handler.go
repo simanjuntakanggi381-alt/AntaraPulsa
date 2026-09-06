@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"antarapulsa/backend/internal/auth"
+	"antarapulsa/backend/internal/h2hr"
 	"antarapulsa/backend/internal/store"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -21,12 +22,13 @@ type Handler struct {
 	store    *store.Store
 	sessions *auth.SessionManager
 	google   googleOAuth
+	h2hr     *h2hr.Client
 }
 
 type googleOAuth struct{ clientID, clientSecret, redirectURL string }
 
 func New(st *store.Store, sessions *auth.SessionManager) *Handler {
-	return &Handler{store: st, sessions: sessions, google: googleOAuth{clientID: os.Getenv("GOOGLE_CLIENT_ID"), clientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"), redirectURL: os.Getenv("GOOGLE_REDIRECT_URL")}}
+	return &Handler{store: st, sessions: sessions, google: googleOAuth{clientID: os.Getenv("GOOGLE_CLIENT_ID"), clientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"), redirectURL: os.Getenv("GOOGLE_REDIRECT_URL")}, h2hr: h2hr.New(h2hr.ConfigFromEnv())}
 }
 
 func (h *Handler) Routes() http.Handler {
@@ -39,11 +41,31 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("PATCH /api/me", h.withAuth(h.updateMe))
 	mux.HandleFunc("GET /api/products", h.withAuth(h.products))
 	mux.HandleFunc("GET /api/transactions", h.withAuth(h.transactions))
+	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
+	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
 	mux.HandleFunc("POST /api/purchase", h.withAuth(h.purchase))
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
 		respond(w, 200, map[string]string{"status": "ok", "service": "antarapulsa-api"})
 	})
 	return securityHeaders(mux)
+}
+
+func (h *Handler) h2hrSaldo(w http.ResponseWriter, r *http.Request, _ int64) {
+	result, err := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "SALDO"})
+	if err != nil {
+		respond(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, http.StatusOK, result)
+}
+
+func (h *Handler) h2hrProducts(w http.ResponseWriter, r *http.Request, _ int64) {
+	result, err := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PRODUK", Product: strings.TrimSpace(r.URL.Query().Get("product"))})
+	if err != nil {
+		respond(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, http.StatusOK, result)
 }
 
 func (h *Handler) googleEnabled() bool {
