@@ -174,7 +174,7 @@ func (s *Store) Transactions(uid int64) []model.Transaction {
 			return nil
 		}
 		defer rows.Close()
-		var out []model.Transaction
+		out := make([]model.Transaction, 0)
 		for rows.Next() {
 			var x model.Transaction
 			if rows.Scan(&x.ID, &x.UserID, &x.Type, &x.Provider, &x.Product, &x.Target, &x.Amount, &x.Status, &x.CreatedAt) == nil {
@@ -185,7 +185,7 @@ func (s *Store) Transactions(uid int64) []model.Transaction {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	var out []model.Transaction
+	out := make([]model.Transaction, 0)
 	for _, x := range s.transactions {
 		if x.UserID == uid {
 			out = append(out, x)

@@ -23,7 +23,7 @@ function setUser(user) {
 
 async function loadApp() {
   const [user, products, transactions] = await Promise.all([api('/api/me'), api('/api/products'), api('/api/transactions')]);
-  setUser(user); state.products = products; state.transactions = transactions;
+  setUser(user); state.products = products || []; state.transactions = transactions || [];
   renderProducts(); renderRecent(); renderHistory();
 }
 
