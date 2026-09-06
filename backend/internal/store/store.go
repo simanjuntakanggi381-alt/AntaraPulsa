@@ -8,6 +8,7 @@ import (
 	"fmt"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 )
@@ -18,12 +19,13 @@ type Store struct {
 	mu           sync.RWMutex
 	users        map[int64]*model.User
 	byPhone      map[string]int64
+	byGoogle     map[string]int64
 	transactions []model.Transaction
 	products     []model.Product
 }
 
 func New() *Store {
-	s := &Store{users: map[int64]*model.User{}, byPhone: map[string]int64{}, products: seedProducts()}
+	s := &Store{users: map[int64]*model.User{}, byPhone: map[string]int64{}, byGoogle: map[string]int64{}, products: seedProducts()}
 	// Akun awal tidak diberi saldo contoh. Saldo hanya bertambah melalui top up
 	// atau data yang benar-benar tersimpan dari transaksi.
 	u := &model.User{ID: 1, Name: "Mikael Putra", Phone: "081234567890", Email: "mikael@antarapulsa.id", Password: "pulsa123", Balance: 0, Level: "Gold Partner"}
@@ -57,7 +59,10 @@ func (s *Store) Close() error {
 }
 func (s *Store) migrate(ctx context.Context) error {
 	for _, q := range []string{
-		`CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password TEXT NOT NULL, balance BIGINT NOT NULL DEFAULT 0, level TEXT NOT NULL)`,
+		`CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password TEXT NOT NULL, balance BIGINT NOT NULL DEFAULT 0, level TEXT NOT NULL, google_sub TEXT UNIQUE)`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS google_sub TEXT UNIQUE`,
+		`CREATE SEQUENCE IF NOT EXISTS users_id_seq`,
+		`SELECT setval('users_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM users), 0), 1), true)`,
 		`CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, provider TEXT NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, price BIGINT NOT NULL, color TEXT NOT NULL)`,
 		`CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), type TEXT NOT NULL, provider TEXT NOT NULL, product TEXT NOT NULL, target TEXT NOT NULL, amount BIGINT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
 		`CREATE INDEX IF NOT EXISTS transactions_user_created_idx ON transactions (user_id, created_at DESC)`,
@@ -76,6 +81,39 @@ func (s *Store) migrate(ctx context.Context) error {
 	}
 	return nil
 }
+
+// FindOrCreateGoogleUser returns the account tied to Google's immutable subject.
+func (s *Store) FindOrCreateGoogleUser(googleSub, name, email string) (*model.User, error) {
+	if googleSub == "" || email == "" {
+		return nil, errors.New("data akun Google tidak lengkap")
+	}
+	if name == "" {
+		name = strings.Split(email, "@")[0]
+	}
+	phone := "google:" + googleSub
+	if s.db != nil {
+		u := &model.User{}
+		err := s.db.QueryRow(`INSERT INTO users (id,name,phone,email,password,balance,level,google_sub) VALUES (nextval('users_id_seq'),$1,$2,$3,'',0,'Member',$4) ON CONFLICT (google_sub) DO UPDATE SET name=EXCLUDED.name,email=EXCLUDED.email RETURNING id,name,phone,email,password,balance,level`, name, phone, email, googleSub).Scan(&u.ID, &u.Name, &u.Phone, &u.Email, &u.Password, &u.Balance, &u.Level)
+		return u, err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if id, ok := s.byGoogle[googleSub]; ok {
+		u := s.users[id]
+		u.Name, u.Email = name, email
+		copy := *u
+		return &copy, nil
+	}
+	var id int64 = 1
+	for used := true; used; id++ {
+		_, used = s.users[id]
+	}
+	u := &model.User{ID: id, Name: name, Phone: phone, Email: email, Balance: 0, Level: "Member"}
+	s.users[id], s.byPhone[phone], s.byGoogle[googleSub] = u, id, id
+	copy := *u
+	return &copy, nil
+}
+
 func seedProducts() []model.Product {
 	return []model.Product{{"tsel-10", "Telkomsel", "Pulsa 10.000", "Pulsa", 11200, "#ef3340"}, {"tsel-50", "Telkomsel", "Pulsa 50.000", "Pulsa", 50200, "#ef3340"}, {"tsel-100", "Telkomsel", "Pulsa 100.000", "Pulsa", 98500, "#ef3340"}, {"isat-25gb", "Indosat", "Freedom 25 GB", "Paket Data", 62500, "#f6c700"}, {"xl-15gb", "XL", "Xtra Combo 15 GB", "Paket Data", 54750, "#2f49d1"}, {"tri-20gb", "Tri", "Happy 20 GB", "Paket Data", 48900, "#ff6b35"}, {"pln-100", "PLN", "Token 100.000", "Token PLN", 101500, "#19a7ce"}, {"pln-200", "PLN", "Token 200.000", "Token PLN", 201500, "#19a7ce"}}
 }

@@ -4,6 +4,8 @@ import "testing"
 
 func TestPurchaseDeductsBalance(t *testing.T) {
 	s := New()
+	// Saldo hanya disiapkan untuk skenario test; akun baru di aplikasi tetap Rp0.
+	s.users[1].Balance = 100_000
 	before, _ := s.User(1)
 	tx, err := s.Purchase(1, "tsel-10", "081299999999")
 	if err != nil {

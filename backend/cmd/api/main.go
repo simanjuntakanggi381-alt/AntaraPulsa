@@ -34,7 +34,7 @@ func main() {
 		dataStore = store.New()
 		log.Printf("DATABASE_URL belum diatur; memakai penyimpanan sementara")
 	}
-	app := handler.New(dataStore, auth.New())
+	app := handler.New(dataStore, auth.New(os.Getenv("AUTH_SECURE_COOKIES") == "true"))
 	log.Printf("AntaraPulsa API aktif di http://localhost:%s", port)
 	if err := http.ListenAndServe(":"+port, app.Routes()); err != nil {
 		log.Fatal(err)

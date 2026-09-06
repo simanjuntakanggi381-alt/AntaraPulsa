@@ -1,28 +1,40 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/url"
+	"os"
 	"strings"
+	"time"
 
 	"antarapulsa/backend/internal/auth"
 	"antarapulsa/backend/internal/store"
+
+	"github.com/coreos/go-oidc/v3/oidc"
+	"golang.org/x/oauth2"
 )
 
 type Handler struct {
 	store    *store.Store
 	sessions *auth.SessionManager
+	google   googleOAuth
 }
 
+type googleOAuth struct{ clientID, clientSecret, redirectURL string }
+
 func New(st *store.Store, sessions *auth.SessionManager) *Handler {
-	return &Handler{store: st, sessions: sessions}
+	return &Handler{store: st, sessions: sessions, google: googleOAuth{clientID: os.Getenv("GOOGLE_CLIENT_ID"), clientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"), redirectURL: os.Getenv("GOOGLE_REDIRECT_URL")}}
 }
 
 func (h *Handler) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/login", h.login)
 	mux.HandleFunc("POST /api/logout", h.logout)
+	mux.HandleFunc("GET /api/auth/google/login", h.googleLogin)
+	mux.HandleFunc("GET /api/auth/google/callback", h.googleCallback)
 	mux.HandleFunc("GET /api/me", h.withAuth(h.me))
 	mux.HandleFunc("PATCH /api/me", h.withAuth(h.updateMe))
 	mux.HandleFunc("GET /api/products", h.withAuth(h.products))
@@ -32,6 +44,71 @@ func (h *Handler) Routes() http.Handler {
 		respond(w, 200, map[string]string{"status": "ok", "service": "antarapulsa-api"})
 	})
 	return securityHeaders(mux)
+}
+
+func (h *Handler) googleEnabled() bool {
+	return h.google.clientID != "" && h.google.clientSecret != "" && h.google.redirectURL != ""
+}
+
+func (h *Handler) googleLogin(w http.ResponseWriter, r *http.Request) {
+	if !h.googleEnabled() {
+		http.Error(w, "Google Login belum dikonfigurasi", http.StatusServiceUnavailable)
+		return
+	}
+	state := h.sessions.CreateOAuthState(w)
+	q := url.Values{"client_id": {h.google.clientID}, "redirect_uri": {h.google.redirectURL}, "response_type": {"code"}, "scope": {"openid email profile"}, "state": {state}, "prompt": {"select_account"}}
+	http.Redirect(w, r, "https://accounts.google.com/o/oauth2/v2/auth?"+q.Encode(), http.StatusFound)
+}
+
+func (h *Handler) googleCallback(w http.ResponseWriter, r *http.Request) {
+	if !h.googleEnabled() || !h.sessions.ConsumeOAuthState(w, r, r.URL.Query().Get("state")) {
+		http.Error(w, "Login Google tidak valid atau telah kedaluwarsa", http.StatusBadRequest)
+		return
+	}
+	if errCode := r.URL.Query().Get("error"); errCode != "" {
+		http.Error(w, "Login Google dibatalkan: "+errCode, http.StatusUnauthorized)
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
+	provider, err := oidc.NewProvider(ctx, "https://accounts.google.com")
+	if err != nil {
+		http.Error(w, "Tidak dapat terhubung ke Google", http.StatusBadGateway)
+		return
+	}
+	config := oauth2.Config{ClientID: h.google.clientID, ClientSecret: h.google.clientSecret, RedirectURL: h.google.redirectURL, Endpoint: provider.Endpoint(), Scopes: []string{oidc.ScopeOpenID, "email", "profile"}}
+	token, err := config.Exchange(ctx, r.URL.Query().Get("code"))
+	if err != nil {
+		http.Error(w, "Kode login Google tidak valid", http.StatusUnauthorized)
+		return
+	}
+	rawIDToken, ok := token.Extra("id_token").(string)
+	if !ok {
+		http.Error(w, "Google tidak mengirim identitas akun", http.StatusUnauthorized)
+		return
+	}
+	idToken, err := provider.Verifier(&oidc.Config{ClientID: h.google.clientID}).Verify(ctx, rawIDToken)
+	if err != nil {
+		http.Error(w, "Identitas Google tidak dapat diverifikasi", http.StatusUnauthorized)
+		return
+	}
+	var claims struct {
+		Subject       string `json:"sub"`
+		Email         string `json:"email"`
+		EmailVerified bool   `json:"email_verified"`
+		Name          string `json:"name"`
+	}
+	if err = idToken.Claims(&claims); err != nil || !claims.EmailVerified {
+		http.Error(w, "Email Google belum terverifikasi", http.StatusUnauthorized)
+		return
+	}
+	u, err := h.store.FindOrCreateGoogleUser(claims.Subject, claims.Name, claims.Email)
+	if err != nil {
+		http.Error(w, "Akun Google tidak dapat dibuat", http.StatusInternalServerError)
+		return
+	}
+	h.sessions.Create(w, u.ID)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func securityHeaders(next http.Handler) http.Handler {

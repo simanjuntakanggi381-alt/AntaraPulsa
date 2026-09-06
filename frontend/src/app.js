@@ -54,6 +54,7 @@ $('#loginForm').addEventListener('submit', async e => {
 });
 
 $('#togglePassword').onclick = () => { const input = $('#loginPassword'); input.type = input.type === 'password' ? 'text' : 'password'; };
+$('.google-login').onclick = () => { window.location.assign('/api/auth/google/login'); };
 $('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showLogin(); showPage('dashboard'); };
 $('#accountLogout').onclick = () => $('#logoutBtn').click();
 
