@@ -102,6 +102,10 @@ $$('.service-card').forEach(btn => btn.onclick = () => {
   showPage('transaction');
   const tab = $(`.filter-tabs [data-filter="${type}"]`);
   if (tab) tab.click();
+  else {
+    $$('.filter-tabs button').forEach(button => button.classList.remove('active'));
+    renderProducts(type);
+  }
 });
 $('#allServices').onclick = () => showPage('services');
 
