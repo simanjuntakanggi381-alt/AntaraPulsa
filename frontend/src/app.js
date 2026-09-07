@@ -1,13 +1,13 @@
 import './styles/app.css';
 import './styles/dashboard-final.css';
-import { api } from './services/api.js';
+import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
 
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
-const state = { user: null, products: [], transactions: [], selected: null, balanceVisible: true };
+const state = { user: null, products: [], transactions: [], selected: null, balanceVisible: true, returnPage: 'dashboard' };
 const showToast = createToast('#toast');
 
 function setUser(user) {
@@ -55,7 +55,7 @@ $('#loginForm').addEventListener('submit', async e => {
 
 $('#togglePassword').onclick = () => { const input = $('#loginPassword'); input.type = input.type === 'password' ? 'text' : 'password'; };
 $('.google-login').onclick = () => { window.location.assign('/api/auth/google/login'); };
-$('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showLogin(); showPage('dashboard'); };
+$('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showLogin(); showPage('dashboard', { replace: true }); };
 $('#accountLogout').onclick = () => $('#logoutBtn').click();
 
 const showPage = createNavigation();
@@ -98,6 +98,7 @@ $$('.filter-tabs button').forEach(btn => btn.onclick = () => { $$('.filter-tabs 
 $$('.service-card').forEach(btn => btn.onclick = () => {
   const type = btn.dataset.type;
   if (type === 'Lainnya') { showPage('services'); return; }
+  state.returnPage = showPage.current();
   showPage('transaction');
   const tab = $(`.filter-tabs [data-filter="${type}"]`);
   if (tab) tab.click();
@@ -117,7 +118,7 @@ $('#payBtn').onclick = async () => {
 };
 
 $('#closeModal').onclick = () => $('#modal').classList.remove('show');
-$('#doneBtn').onclick = () => { $('#modal').classList.remove('show'); showPage('dashboard'); };
+$('#doneBtn').onclick = () => { $('#modal').classList.remove('show'); showPage(state.returnPage || 'transaction'); };
 $('#profileForm').addEventListener('submit', async e => { e.preventDefault(); try { const user = await api('/api/me', {method:'PATCH',body:JSON.stringify({Name:$('#profileNameInput').value,Email:$('#profileEmail').value})}); setUser(user); showToast('Profil tersimpan', 'Informasi akun berhasil diperbarui.'); } catch(err) { showToast('Gagal menyimpan', err.message); } });
 $('#hideBalance').onclick = () => { state.balanceVisible = !state.balanceVisible; $('#balance').textContent = state.balanceVisible ? money(state.user.balance) : '••••••••'; $('#mainBalanceDetail').textContent = state.balanceVisible ? `Rp ${money(state.user.balance)}` : 'Rp ••••••••'; };
 $('#topupBtn').onclick = () => showToast('Isi saldo', 'Fitur deposit otomatis segera tersedia.');
@@ -126,4 +127,16 @@ $('#walletTopupBtn').onclick = () => showToast('Isi saldo', 'Fitur deposit otoma
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 
-(async function boot() { try { await loadApp(); showApp(); } catch { showLogin(); } })();
+(async function boot() {
+  try {
+    await loadApp(); showApp();
+  } catch (err) {
+    // A temporary API/catalog error must never throw a signed-in user back to login.
+    if (err instanceof APIError && err.status === 401) {
+      showLogin();
+      return;
+    }
+    showApp();
+    showToast('Koneksi terganggu', 'Halaman tetap dibuka. Tarik untuk memuat ulang saat koneksi stabil.');
+  }
+})();
