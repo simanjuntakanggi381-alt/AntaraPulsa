@@ -71,7 +71,7 @@
     <main class="main">
       <header class="topbar">
         <button id="menuBtn" class="menu-btn">☰</button>
-        <div class="app-wordmark"><img class="app-logo-img" src="/assets/brand-mark.png?v=2db3846" alt="Logo AntaraPulsa"><b>Antara<span>Pulsa</span></b><small>Digital partner</small></div>
+        <div class="app-wordmark"><svg class="antara-mark" viewBox="0 0 40 40" aria-label="Logo AntaraPulsa"><rect width="40" height="40" rx="12"/><path d="M10.5 28 18.3 11h3.5l7.7 17M14 21.5h12"/><path d="m26 10 2 2 2.8-3"/></svg><b>Antara<span>Pulsa</span></b><small>Digital partner</small></div>
         <div class="search"><span>⌕</span><input placeholder="Cari produk atau transaksi..."><kbd>⌘ K</kbd></div>
         <div class="top-actions"><button class="icon-btn" aria-label="Notifikasi"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><i></i></button><button class="icon-btn chat-head" data-page="help" aria-label="Chat bantuan"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H6l-4 2 1.3-4A9 9 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></button><div class="user-mini"><div class="avatar">MP</div><div><b id="miniName">Mikael Putra</b><small>Gold Partner</small></div><span>⌄</span></div></div>
       </header>
@@ -84,16 +84,15 @@
           </div>
           <div class="wallet-card">
             <div class="wallet-orbit orbit-a"></div><div class="wallet-orbit orbit-b"></div>
-            <img class="wallet-art" src="/assets/wallet-3d.png?v=2db3846" alt="Dompet digital">
+            <div class="wallet-visual" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
             <div class="wallet-head"><div><span>Saldo Anda</span><b><i></i> Akun aktif</b></div></div>
             <div class="wallet-value"><small>Rp</small><strong id="balance">2.847.500</strong><button id="hideBalance" aria-label="Sembunyikan saldo"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button></div>
             <div class="wallet-detail"><div><span>Saldo utama</span><strong id="mainBalanceDetail">Rp 2.847.500</strong></div><div><span>Saldo bonus</span><strong>Rp 0</strong></div><div class="member-detail"><b>♛ &nbsp; GOLD</b><span>Member sejak<br>12 Jan 2024</span></div></div>
             <button id="walletTopupBtn" class="wallet-topup">Isi Saldo <b>＋</b></button>
           </div>
-          <div class="cashback-card">
-            <div><span>🔥 Promo Spesial Hari Ini</span><h2>CASHBACK 10%</h2><p>Setiap transaksi pulsa &amp;<br>paket data</p><button data-page="transaction">Lihat Promo</button></div>
-            <img src="/assets/promo-gift.png?v=2db3846" alt="Promo cashback">
-            <div class="promo-dots"><i></i><i></i><i></i></div>
+          <div class="cashback-card ready-card">
+            <div><span>PUSAT TRANSAKSI</span><h2>Semua kebutuhan,<br>sekali akses.</h2><p>Pilih layanan digital sesuai kebutuhanmu.</p><button data-page="transaction">Mulai transaksi <b>→</b></button></div>
+            <div class="ready-symbol" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="44"/><path d="M60 31v58M31 60h58"/><circle cx="60" cy="60" r="17"/></svg></div>
           </div>
           <div class="money-actions">
             <button id="topupBtn"><span><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><b>Isi Saldo</b><small>Top up cepat</small></button>
