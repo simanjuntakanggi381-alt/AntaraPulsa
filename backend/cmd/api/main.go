@@ -37,7 +37,7 @@ func main() {
 		log.Printf("DATABASE_URL belum diatur; memakai penyimpanan sementara")
 	}
 	syncH2HRProducts(dataStore)
-	app := handler.New(dataStore, auth.New(os.Getenv("AUTH_SECURE_COOKIES") == "true"))
+	app := handler.New(dataStore, auth.New(os.Getenv("AUTH_SECURE_COOKIES") == "true", os.Getenv("AUTH_SESSION_SECRET")))
 	log.Printf("AntaraPulsa API aktif di http://localhost:%s", port)
 	if err := http.ListenAndServe(":"+port, app.Routes()); err != nil {
 		log.Fatal(err)
