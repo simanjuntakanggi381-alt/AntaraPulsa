@@ -1,5 +1,6 @@
 import './styles/app.css';
 import './styles/dashboard-final.css';
+import './styles/dashboard-v5.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
