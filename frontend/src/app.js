@@ -1,6 +1,7 @@
 import './styles/app.css';
 import './styles/dashboard-final.css';
 import './styles/dashboard-v5.css';
+import './styles/dashboard-v6.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -19,7 +20,7 @@ function setUser(user) {
   $('#profilePhone').value = user.phone; $('#profileEmail').value = user.email;
   $$('.avatar, .profile-avatar').forEach(el => el.textContent = initials(user.name));
   const first = user.name.split(' ')[0];
-  $('#greeting').textContent = `Halo, ${first} 👋`;
+  $('#greeting').textContent = `Halo, ${first}`;
 }
 
 async function loadApp() {
