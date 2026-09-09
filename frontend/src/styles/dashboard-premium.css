@@ -156,3 +156,18 @@ body{background:#dce7e2}
   #dashboardPage .transaction-panel .tx-row{padding:13px 0!important}
   #dashboardPage .transaction-panel .panel-head button{background:#edf6f2!important}
 }
+
+/* Professional white trust section with a readable vertical flow. */
+.trust-showcase{color:var(--ap-ink);background:#fff;box-shadow:none}
+.trust-head>span{color:#08785e}.trust-head h2{color:#153b32}.trust-head p{max-width:340px;color:#6f857c;font-size:10px;line-height:1.65}
+.trust-list:before{left:17px;top:35px;bottom:35px;background:linear-gradient(180deg,#76bda9,#dcece5)}
+.trust-list>div{min-height:58px;padding:11px 0}.trust-list>div>span{border:1px solid #cfe5dc;background:#e8f5ef;color:#08785e;box-shadow:0 0 0 4px #fff}.trust-list b{color:#173d33;font-size:11px}.trust-list small{color:#789087;font-size:9px;line-height:1.5}
+.trust-showcase>button{height:36px;padding:0 15px;background:#08785e;color:#fff;box-shadow:none}
+@media(max-width:520px){
+  #dashboardPage .trust-showcase{padding:26px 18px 24px!important;border-top:1px solid #e4ece8!important;border-bottom:1px solid #e4ece8!important;background:#fff!important;color:var(--ap-ink)!important}
+  #dashboardPage .trust-head h2{font-size:22px!important;line-height:1.12!important}
+  #dashboardPage .trust-head p{font-size:10px!important;line-height:1.65!important}
+  #dashboardPage .trust-list{margin:19px 0 18px!important}
+  #dashboardPage .trust-list>div{padding:12px 0!important}
+  #dashboardPage .trust-showcase>button{width:100%!important;justify-content:center!important;height:39px!important;border-radius:11px!important;background:#08785e!important;color:#fff!important}
+}
