@@ -4,6 +4,7 @@ import './styles/dashboard-v5.css';
 import './styles/dashboard-v6.css';
 import './styles/dashboard-v7.css';
 import './styles/dashboard-premium.css';
+import './styles/mobile-polish.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -17,6 +18,22 @@ const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const state = { user: null, products: [], transactions: [], selected: null, balanceVisible: true, returnPage: 'dashboard' };
 const showToast = createToast('#toast');
+
+const appIcons = {
+  game: '<path d="M8 7h8a6 6 0 0 1 5.5 8.4l-1.2 2.8a2 2 0 0 1-3.2.7L15 17H9l-2.1 1.9a2 2 0 0 1-3.2-.7l-1.2-2.8A6 6 0 0 1 8 7Z"/><path d="M7 12v4M5 14h4M16.5 12.5h.01M18.5 15h.01"/>',
+  ticket: '<path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z"/><path d="M13 8.5v1M13 12v1M13 15.5v1"/>',
+  phone: '<path d="M21 16.5v3a2 2 0 0 1-2.2 2 19.7 19.7 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.7 19.7 0 0 1 1.1 3.8 2 2 0 0 1 3.1 1.6h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.8a2 2 0 0 1-.5 2.1L7 9.5a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1Z"/>',
+  bill: '<path d="M3 21h18M5 21V9l7-5 7 5v12M8 12h2v2H8zM14 12h2v2h-2zM10 21v-4h4v4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+  swap: '<path d="m7 7 3-3 3 3M10 4v12M17 17l-3 3-3-3M14 20V8"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  guide: '<path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>',
+  shield: '<path d="M12 22s8-3.5 8-10V6l-8-3-8 3v6c0 6.5 8 10 8 10Z"/><path d="M12 8v5M12 16h.01"/>',
+  chat: '<path d="M21 12a8 8 0 0 1-8 8H6l-4 2 1.3-4A9 9 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>'
+};
+const installIcon = (selector, name) => document.querySelectorAll(selector).forEach(el => { el.classList.add('svg-icon'); el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${appIcons[name]}</svg>`; });
+[['.extra-services .service-card:nth-child(1) .service-icon','game'],['.extra-services .service-card:nth-child(2) .service-icon','ticket'],['.extra-services .service-card:nth-child(3) .service-icon','phone'],['.extra-services .service-card:nth-child(4) .service-icon','bill'],['.account-field:nth-child(2)>span','user'],['.account-field:nth-child(3)>span','phone'],['.account-field:nth-child(4)>span','mail'],['.account-menu button:nth-of-type(1) .account-menu-icon','swap'],['.account-menu .topup-icon','plus'],['.account-menu .help-icon','chat'],['.help-card:nth-child(1)>span','guide'],['.help-card:nth-child(2)>span','shield'],['.help-card:nth-child(3)>span','chat']].forEach(([selector,name]) => installIcon(selector,name));
 
 function setUser(user) {
   state.user = user;
