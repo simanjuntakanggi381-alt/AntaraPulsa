@@ -137,3 +137,22 @@ body{background:#dce7e2}
   #historyPage .history-panel,#historyPage .history-row:not(.header),.account-hero,.account-info-card,.account-menu,.account-help,.help-card,.purchase-layout>.panel,.checkout-card{box-shadow:none!important}
   .quick-services,.wallet-showcase,.daily-card,.transaction-panel{box-shadow:0 2px 8px rgba(10,67,50,.035)!important}
 }
+
+/* Dashboard as one continuous phone canvas, not a stack of floating cards. */
+@media(max-width:520px){
+  #dashboardPage.active-page{padding:0 14px 96px!important;background:#fff!important}
+  #dashboardPage .mobile-welcome{min-height:72px!important;margin:0!important;padding:10px 1px 8px!important;border-bottom:1px solid #edf2ef!important}
+  #dashboardPage .quick-services{width:calc(100% + 28px)!important;margin:0 -14px!important;padding:13px 12px 12px!important;border:0!important;border-bottom:1px solid #e8efeb!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+  #dashboardPage .quick-services .service-card{height:68px!important}
+  #dashboardPage .quick-services .service-card span,#dashboardPage .quick-services .service-card:nth-child(even) span{width:38px!important;height:38px!important;border:1px solid #dcece5!important;border-radius:12px!important;background:#edf7f3!important;color:#08785e!important}
+  #dashboardPage .pulse-showcase{width:calc(100% + 28px)!important;min-height:171px!important;margin:0 -14px!important;padding:19px 16px 15px!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  #dashboardPage .wallet-showcase{width:calc(100% + 28px)!important;min-height:198px!important;margin:0 -14px!important;padding:23px 17px!important;border:0!important;border-bottom:1px solid #e6eeea!important;border-radius:0!important;background:radial-gradient(circle at 100% 100%,rgba(8,120,94,.075),transparent 40%),#fff!important;box-shadow:none!important}
+  #dashboardPage .daily-section{width:calc(100% + 28px)!important;margin:0 -14px!important;padding:22px 14px!important;border-bottom:1px solid #e6eeea!important;background:#f8faf9!important}
+  #dashboardPage .daily-heading{margin:0 1px 13px!important}
+  #dashboardPage .daily-card{min-height:139px!important;border:1px solid #e1eae6!important;border-radius:15px!important;box-shadow:none!important}
+  #dashboardPage .trust-showcase{width:calc(100% + 28px)!important;margin:0 -14px!important;padding:24px 18px 22px!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  #dashboardPage .content-row{width:calc(100% + 28px)!important;margin:0 -14px!important;padding:21px 14px 7px!important;border-bottom:1px solid #e6eeea!important;background:#fff!important}
+  #dashboardPage .transaction-panel{padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  #dashboardPage .transaction-panel .tx-row{padding:13px 0!important}
+  #dashboardPage .transaction-panel .panel-head button{background:#edf6f2!important}
+}
