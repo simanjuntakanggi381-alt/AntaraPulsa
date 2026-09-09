@@ -15,6 +15,17 @@
   .extra-services .service-icon,.account-menu-icon,.account-field>span,.help-card>span{width:44px!important;height:44px!important;flex:0 0 44px!important;border-radius:14px!important}.svg-icon svg{width:22px!important;height:22px!important}
 }
 
+/* AntaraPulsa category emblems — product marks instead of generic line icons. */
+@media(max-width:520px){
+  #dashboardPage .quick-services .service-card>span.service-emblem{width:46px!important;height:46px!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:0 6px 13px rgba(7,91,68,.13)!important}
+  #dashboardPage .quick-services .service-emblem svg{width:46px!important;height:46px!important;overflow:visible!important}
+  .service-emblem .emblem-disc{fill:#087b60!important;stroke:rgba(255,255,255,.5)!important;stroke-width:1!important}
+  .service-emblem rect:not(.tile-fill),.service-emblem path:not(.bolt-fill){fill:none!important;stroke:#fff!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+  .service-emblem .emblem-dot,.service-emblem .bolt-fill,.service-emblem .tile-fill{fill:#fff!important;stroke:none!important}
+  .data-emblem .emblem-disc{fill:#0a846b!important}.wallet-emblem .emblem-disc{fill:#08735c!important}.power-emblem .emblem-disc{fill:#397e69!important}.more-emblem .emblem-disc{fill:#557970!important}
+  #dashboardPage .quick-services .service-card:nth-child(2)>span svg{transform:none!important}
+}
+
 /* Optical alignment for the five primary service icons. */
 @media(max-width:520px){
   #dashboardPage .quick-services{grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:start!important}
