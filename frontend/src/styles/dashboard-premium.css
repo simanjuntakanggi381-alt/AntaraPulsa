@@ -73,6 +73,28 @@ body{background:#dce7e2}
   .account-info-card,.account-menu,.account-help{width:100%;max-width:100%}.account-field{min-width:0}.account-field div{min-width:0}.account-input{width:100%;min-width:0}
   .help-grid{grid-template-columns:1fr!important}.help-card{width:100%;min-height:82px}.modal-card{width:min(398px,100%);max-height:calc(100dvh - 28px);overflow-y:auto}
 }
+
+/* Edge-anchored mobile shell: no floating phone frame or detached pages. */
+@media(max-width:520px){
+  html,body{width:100%;min-width:0;min-height:100%;margin:0;background:#f5f8f6;overflow-x:hidden}
+  body{overscroll-behavior-x:none}
+  .app,.login-shell{width:100%!important;max-width:none!important;min-height:100dvh!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  .main{width:100%!important;min-height:100dvh!important;margin:0!important;background:#f5f8f6!important}
+  .app .topbar{left:0!important;right:0!important;top:0!important;width:100%!important;padding-left:max(14px,env(safe-area-inset-left))!important;padding-right:max(14px,env(safe-area-inset-right))!important;border-radius:0!important;box-shadow:0 1px 0 rgba(255,255,255,.12)!important}
+  #pageContainer{width:100%!important;min-width:0!important;margin:0!important;padding:0!important}
+  .page,#dashboardPage.active-page,#transactionPage,#historyPage,#helpPage,.account-page,.services-page{box-sizing:border-box!important;width:100%!important;max-width:none!important;margin:0!important;padding-left:14px!important;padding-right:14px!important;border-radius:0!important}
+  #dashboardPage.active-page{padding-top:16px!important;background:linear-gradient(180deg,#edf6f2 0,#f6f9f7 270px)!important}
+  .quick-services,.pulse-showcase,.wallet-showcase,.daily-card,.trust-showcase,.transaction-panel,.history-panel,.account-hero,.account-info-card,.account-menu,.account-help,.help-card,.purchase-layout>.panel,.checkout-card{box-shadow:0 3px 12px rgba(10,67,50,.045)!important}
+  .quick-services,.wallet-showcase,.daily-card,.transaction-panel,.history-panel,.account-info-card,.account-menu,.account-help,.help-card,.purchase-layout>.panel,.checkout-card{border-color:#e1eae6!important}
+  .pulse-showcase,.trust-showcase{box-shadow:0 6px 17px rgba(5,72,57,.13)!important}
+  .mobile-welcome{margin-left:1px!important;margin-right:1px!important}
+  .content-row{width:100%!important}.panel{width:100%!important;margin-left:0!important;margin-right:0!important}
+  #historyPage .history-panel{box-shadow:none!important}.history-row:not(.header){box-shadow:none!important}
+  .account-hero,.account-info-card,.account-menu,.account-help,.account-logout{margin-left:0!important;margin-right:0!important}.account-hero{box-shadow:none!important}
+  .bottom-nav{left:0!important;right:0!important;bottom:0!important;transform:none!important;width:100%!important;max-width:none!important;margin:0!important;padding-left:max(7px,env(safe-area-inset-left))!important;padding-right:max(7px,env(safe-area-inset-right))!important;border-left:0!important;border-right:0!important;border-bottom:0!important;border-radius:18px 18px 0 0!important;box-shadow:0 -3px 14px rgba(9,62,46,.07)!important}
+  .toast{width:calc(100% - 28px)!important;max-width:402px!important}
+}
+@media(min-width:521px){body{background:#dce7e2}.app,.login-shell{max-width:430px}}
 @media(max-width:370px){.brand-logo-shell{width:39px;height:39px;flex-basis:39px}.app .brand-logo-shell .app-logo-img{width:34px!important;height:34px!important}.bottom-nav{padding-left:5px!important;padding-right:5px!important}.bottom-nav-item small,.bottom-nav-item.center-action small{font-size:7px!important}}
 
 /* Integrated logo and a clean vertical trust story. */
@@ -109,4 +131,9 @@ body{background:#dce7e2}
   #historyPage .history-row:not(.header)>span:nth-child(3){display:none!important}
   #historyPage .history-row:not(.header)>.status{grid-area:status!important;display:inline-flex!important;align-items:center!important;justify-self:end!important;margin:0!important;height:19px!important;padding:0 7px!important;font-size:7px!important}
   #historyPage .history-row:not(.header)>strong{grid-area:amount!important;display:block!important;align-self:center!important;color:#153b32!important;font:800 10px Manrope!important;white-space:nowrap!important}
+}
+
+@media(max-width:520px){
+  #historyPage .history-panel,#historyPage .history-row:not(.header),.account-hero,.account-info-card,.account-menu,.account-help,.help-card,.purchase-layout>.panel,.checkout-card{box-shadow:none!important}
+  .quick-services,.wallet-showcase,.daily-card,.transaction-panel{box-shadow:0 2px 8px rgba(10,67,50,.035)!important}
 }
