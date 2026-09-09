@@ -14,3 +14,13 @@
   .topup-card-head h2{font-size:15px!important}.topup-card-head p,.topup-form-card>label{font-size:10px!important}.topup-input input{font-size:14px!important}.topup-presets button,.topup-summary div,.topup-summary b,.qris-note b{font-size:10px!important}.qris-note p,.topup-empty p{font-size:9px!important}.create-qris,.topup-empty b{font-size:11px!important}.bottom-nav-item small,.bottom-nav-item.center-action small{font-size:9px!important}
   .extra-services .service-icon,.account-menu-icon,.account-field>span,.help-card>span{width:44px!important;height:44px!important;flex:0 0 44px!important;border-radius:14px!important}.svg-icon svg{width:22px!important;height:22px!important}
 }
+
+/* Optical alignment for the five primary service icons. */
+@media(max-width:520px){
+  #dashboardPage .quick-services{grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:start!important}
+  #dashboardPage .quick-services .service-card{box-sizing:border-box!important;height:78px!important;min-width:0!important;padding:4px 0 2px!important;display:grid!important;grid-template-rows:46px 16px!important;align-content:start!important;justify-items:center!important;gap:5px!important}
+  #dashboardPage .quick-services .service-card>span,#dashboardPage .quick-services .service-card:nth-child(even)>span{box-sizing:border-box!important;width:44px!important;height:44px!important;margin:0!important;display:grid!important;place-items:center!important;align-self:start!important;border:1px solid #d7e9e1!important;border-radius:14px!important;background:linear-gradient(145deg,#eff9f5,#e4f3ed)!important;color:#08785e!important;box-shadow:inset 0 1px #fff,0 4px 10px rgba(8,92,68,.055)!important}
+  #dashboardPage .quick-services .service-card>span svg{display:block!important;width:22px!important;height:22px!important;margin:0!important;transform:none!important;overflow:visible!important;fill:none!important;stroke:currentColor!important;stroke-width:1.85!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+  #dashboardPage .quick-services .service-card:nth-child(2)>span svg{transform:translateY(-1px)!important}
+  #dashboardPage .quick-services .service-card>b{display:block!important;width:100%!important;margin:0!important;color:#24453b!important;font:700 10px/16px 'DM Sans',sans-serif!important;text-align:center!important;white-space:nowrap!important}
+}
