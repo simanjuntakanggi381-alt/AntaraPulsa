@@ -15,6 +15,12 @@
   .extra-services .service-icon,.account-menu-icon,.account-field>span,.help-card>span{width:44px!important;height:44px!important;flex:0 0 44px!important;border-radius:14px!important}.svg-icon svg{width:22px!important;height:22px!important}
 }
 
+@media(max-width:520px){
+  #dashboardPage .quick-services .service-card>span.service-3d{width:50px!important;height:50px!important;margin:-2px 0 0!important;display:grid!important;place-items:center!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+  #dashboardPage .quick-services .service-3d img{display:block;width:50px;height:50px;object-fit:contain;filter:drop-shadow(0 5px 6px rgba(6,53,54,.16))}
+  #dashboardPage .quick-services .service-card{grid-template-rows:50px 16px!important;height:82px!important;gap:3px!important}
+}
+
 /* AntaraPulsa category emblems — product marks instead of generic line icons. */
 @media(max-width:520px){
   #dashboardPage .quick-services .service-card>span.service-emblem{width:46px!important;height:46px!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:0 6px 13px rgba(7,91,68,.13)!important}
