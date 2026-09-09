@@ -74,3 +74,8 @@ body{background:#dce7e2}
   .help-grid{grid-template-columns:1fr!important}.help-card{width:100%;min-height:82px}.modal-card{width:min(398px,100%);max-height:calc(100dvh - 28px);overflow-y:auto}
 }
 @media(max-width:370px){.brand-logo-shell{width:39px;height:39px;flex-basis:39px}.app .brand-logo-shell .app-logo-img{width:34px!important;height:34px!important}.bottom-nav{padding-left:5px!important;padding-right:5px!important}.bottom-nav-item small,.bottom-nav-item.center-action small{font-size:7px!important}}
+
+/* Integrated logo and a clean vertical trust story. */
+.brand-logo-shell{width:43px;height:43px;flex-basis:43px;overflow:visible;border:0;background:transparent;box-shadow:none}.app .brand-logo-shell .app-logo-img{width:43px!important;height:43px!important;filter:drop-shadow(0 5px 8px rgba(0,35,29,.28))}
+.trust-list{position:relative;gap:0;margin:18px 0 17px;padding-left:2px}.trust-list:before{content:"";position:absolute;left:17px;top:32px;bottom:32px;width:1px;background:linear-gradient(180deg,rgba(221,249,172,.5),rgba(221,249,172,.12))}.trust-list>div{position:relative;display:flex;align-items:flex-start;gap:12px;padding:10px 0;border:0;border-radius:0;background:transparent}.trust-list>div>span{position:relative;z-index:1;width:32px;height:32px;flex:0 0 32px;border:1px solid rgba(221,249,172,.22);border-radius:10px;background:#0b715a;color:#ddf9ac}.trust-list>div>div{padding-top:2px}.trust-list b{font-size:10px}.trust-list small{margin-top:4px;font-size:8px;line-height:1.4}.trust-showcase>button{margin-top:1px}
+@media(max-width:370px){.brand-logo-shell{width:39px;height:39px;flex-basis:39px}.app .brand-logo-shell .app-logo-img{width:39px!important;height:39px!important}}

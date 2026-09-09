@@ -9,6 +9,10 @@ import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const state = { user: null, products: [], transactions: [], selected: null, balanceVisible: true, returnPage: 'dashboard' };
