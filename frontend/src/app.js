@@ -133,9 +133,23 @@ $('#closeModal').onclick = () => $('#modal').classList.remove('show');
 $('#doneBtn').onclick = () => { $('#modal').classList.remove('show'); showPage(state.returnPage || 'transaction'); };
 $('#profileForm').addEventListener('submit', async e => { e.preventDefault(); try { const user = await api('/api/me', {method:'PATCH',body:JSON.stringify({Name:$('#profileNameInput').value,Email:$('#profileEmail').value})}); setUser(user); showToast('Profil tersimpan', 'Informasi akun berhasil diperbarui.'); } catch(err) { showToast('Gagal menyimpan', err.message); } });
 $('#hideBalance').onclick = () => { state.balanceVisible = !state.balanceVisible; $('#balance').textContent = state.balanceVisible ? money(state.user.balance) : '••••••••'; $('#mainBalanceDetail').textContent = state.balanceVisible ? `Rp ${money(state.user.balance)}` : 'Rp ••••••••'; };
-$('#topupBtn').onclick = () => showToast('Isi saldo', 'Fitur deposit otomatis segera tersedia.');
-$('#accountPage #topupBtn').onclick = () => showToast('Isi saldo', 'Fitur deposit otomatis segera tersedia.');
-$('#walletTopupBtn').onclick = () => showToast('Isi saldo', 'Fitur deposit otomatis segera tersedia.');
+const updateTopupSummary = () => {
+  const amount = Number($('#topupAmount').value.replace(/\D/g, '')) || 0;
+  $('#topupAmount').value = amount ? money(amount) : '';
+  $('#topupNet').textContent = `Rp ${money(amount)}`;
+  $('#topupFee').textContent = 'Rp 0';
+  $('#topupTotal').textContent = `Rp ${money(amount)}`;
+  $('#clearTopup').classList.toggle('visible', amount > 0);
+  $('#createQrisBtn').disabled = amount < 10000;
+};
+$('#topupAmount').addEventListener('input', updateTopupSummary);
+$$('[data-topup]').forEach(btn => btn.onclick = () => { $('#topupAmount').value = btn.dataset.topup; updateTopupSummary(); });
+$('#clearTopup').onclick = () => { $('#topupAmount').value = ''; updateTopupSummary(); $('#topupAmount').focus(); };
+$('#qrisTopupForm').addEventListener('submit', e => { e.preventDefault(); showToast('QRIS segera tersedia', 'Integrasi mitra pembayaran sedang dipersiapkan.'); });
+$('#refreshTopup').onclick = () => showToast('Riwayat diperbarui', 'Belum ada top up QRIS pada akun ini.');
+$('#topupBtn').onclick = () => showPage('topup');
+$('#accountPage #topupBtn').onclick = () => showPage('topup');
+$('#walletTopupBtn').onclick = () => showPage('topup');
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 
