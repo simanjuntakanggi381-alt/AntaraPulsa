@@ -1,4 +1,8 @@
 import './styles/app.css';
+import './styles/dashboard-final.css';
+import './styles/dashboard-v5.css';
+import './styles/dashboard-v6.css';
+import './styles/dashboard-v7.css';
 import './styles/dashboard-premium.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
