@@ -79,3 +79,34 @@ body{background:#dce7e2}
 .brand-logo-shell{width:43px;height:43px;flex-basis:43px;overflow:visible;border:0;background:transparent;box-shadow:none}.app .brand-logo-shell .app-logo-img{width:43px!important;height:43px!important;filter:drop-shadow(0 5px 8px rgba(0,35,29,.28))}
 .trust-list{position:relative;gap:0;margin:18px 0 17px;padding-left:2px}.trust-list:before{content:"";position:absolute;left:17px;top:32px;bottom:32px;width:1px;background:linear-gradient(180deg,rgba(221,249,172,.5),rgba(221,249,172,.12))}.trust-list>div{position:relative;display:flex;align-items:flex-start;gap:12px;padding:10px 0;border:0;border-radius:0;background:transparent}.trust-list>div>span{position:relative;z-index:1;width:32px;height:32px;flex:0 0 32px;border:1px solid rgba(221,249,172,.22);border-radius:10px;background:#0b715a;color:#ddf9ac}.trust-list>div>div{padding-top:2px}.trust-list b{font-size:10px}.trust-list small{margin-top:4px;font-size:8px;line-height:1.4}.trust-showcase>button{margin-top:1px}
 @media(max-width:370px){.brand-logo-shell{width:39px;height:39px;flex-basis:39px}.app .brand-logo-shell .app-logo-img{width:39px!important;height:39px!important}}
+
+/* Mobile transaction history: swipeable filters and a clear date control. */
+@media(max-width:520px){
+  #historyPage .history-panel{padding:14px!important;overflow:visible!important;border:1px solid var(--ap-line)!important;border-radius:20px!important;background:#fff!important;box-shadow:0 8px 22px rgba(10,70,52,.055)!important}
+  #historyPage .history-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;width:100%!important;min-width:0!important;margin:0!important}
+  #historyPage .history-search{width:100%!important;height:46px!important;flex:0 0 46px!important;border:1px solid #dfeae5!important;border-radius:13px!important;background:#f9fbfa!important}
+  #historyPage .history-search input{font-size:11px!important}
+  #historyPage .history-status-wrap{display:block!important;width:auto!important;max-width:none!important;margin:12px -14px 0!important;padding:0!important;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x!important;scrollbar-width:none!important}
+  #historyPage .history-status-wrap::-webkit-scrollbar{display:none!important}
+  #historyPage .history-status-wrap:after{display:none!important}
+  #historyPage .history-statuses{display:flex!important;width:max-content!important;min-width:max-content!important;gap:7px!important;padding:1px 30px 9px 14px!important;overflow:visible!important;scrollbar-width:none!important}
+  #historyPage .history-statuses button{height:32px!important;padding:0 13px!important;flex:0 0 auto!important;border:1px solid #dfeae5!important;border-radius:16px!important;background:#fff!important;color:#647a71!important;font:700 9px 'DM Sans'!important;scroll-snap-align:start!important}
+  #historyPage .history-statuses button.active{border-color:#08785e!important;background:#08785e!important;color:#fff!important;box-shadow:0 5px 12px rgba(8,120,94,.2)!important}
+  #historyPage .history-date{position:relative!important;box-sizing:border-box!important;width:100%!important;max-width:none!important;height:58px!important;margin:4px 0 0!important;padding:19px 42px 5px 43px!important;display:flex!important;align-items:center!important;border:1px solid #dfeae5!important;border-radius:14px!important;background:#f8fbf9!important;color:#08785e!important}
+  #historyPage .history-date:before{content:"TANGGAL TRANSAKSI";position:absolute;left:43px;top:9px;color:#84978f;font:800 7px 'DM Sans';letter-spacing:.8px}
+  #historyPage .history-date>span{position:absolute;left:12px;top:50%;display:grid!important;place-items:center;width:23px;height:23px;transform:translateY(-50%);overflow:hidden;font-size:0!important;border-radius:8px;background:#e5f4ee;color:#08785e!important}
+  #historyPage .history-date>span:before{content:"▣";font-size:13px!important;line-height:1}
+  #historyPage .history-date input{width:100%!important;height:30px!important;padding:0!important;color:#27473d!important;font:700 11px 'DM Sans'!important}
+  #historyPage .history-date i{position:absolute;right:13px;color:#08785e!important}
+  #historyPage .history-date:focus-within{border-color:#71bca7!important;box-shadow:0 0 0 3px rgba(8,120,94,.08)!important;background:#fff!important}
+  #historyPage .history-table{margin-top:16px!important;padding-top:10px!important;overflow:visible!important;border-top:1px solid #edf2ef!important}
+  #historyPage .history-row.header{display:none!important}
+  #historyPage .history-row:not(.header){display:grid!important;grid-template-columns:1fr auto!important;grid-template-areas:"product amount" "meta status"!important;gap:8px 10px!important;margin-bottom:9px!important;padding:13px!important;border:1px solid #e5eee9!important;border-radius:15px!important;background:#fff!important;box-shadow:0 5px 14px rgba(13,67,51,.04)!important}
+  #historyPage .history-row:not(.header)>div:first-child{grid-area:meta!important;display:block!important;color:#80928b!important;font-size:8px!important}
+  #historyPage .history-row:not(.header)>.history-product{grid-area:product!important;display:flex!important;min-width:0!important}
+  #historyPage .history-row:not(.header)>.history-product b{font-size:10px!important}
+  #historyPage .history-row:not(.header)>.history-product small{font-size:8px!important;color:#82938c!important}
+  #historyPage .history-row:not(.header)>span:nth-child(3){display:none!important}
+  #historyPage .history-row:not(.header)>.status{grid-area:status!important;display:inline-flex!important;align-items:center!important;justify-self:end!important;margin:0!important;height:19px!important;padding:0 7px!important;font-size:7px!important}
+  #historyPage .history-row:not(.header)>strong{grid-area:amount!important;display:block!important;align-self:center!important;color:#153b32!important;font:800 10px Manrope!important;white-space:nowrap!important}
+}
