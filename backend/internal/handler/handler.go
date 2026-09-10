@@ -162,13 +162,17 @@ func (h *Handler) googleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func securityHeaders(next http.Handler) http.Handler {
+	allowedOrigin := strings.TrimSpace(os.Getenv("CORS_ALLOWED_ORIGIN"))
+	if allowedOrigin == "" {
+		allowedOrigin = "http://localhost:3000"
+	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Session-aware API responses must never be cached by a browser or proxy.
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			w.Header().Set("Cache-Control", "no-store, private")
 			w.Header().Set("Vary", "Cookie")
 		}
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
