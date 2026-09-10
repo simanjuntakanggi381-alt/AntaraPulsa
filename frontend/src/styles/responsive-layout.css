@@ -9,12 +9,12 @@
   #dashboardPage .quick-services {
     box-sizing: border-box !important;
     width: 100% !important;
-    min-height: 82px !important;
+    min-height: 94px !important;
     margin: 0 !important;
-    padding: 1px 0 3px !important;
+    padding: 4px 0 6px !important;
     display: grid !important;
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-    gap: 7px !important;
+    gap: 5px !important;
     overflow: visible !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -25,17 +25,17 @@
   #dashboardPage .quick-services .service-card {
     box-sizing: border-box !important;
     min-width: 0 !important;
-    height: 76px !important;
+    height: 84px !important;
     margin: 0 !important;
-    padding: 5px 2px 3px !important;
+    padding: 6px 2px 4px !important;
     display: grid !important;
-    grid-template-rows: 44px 18px !important;
+    grid-template-rows: 52px 18px !important;
     align-content: start !important;
     justify-items: center !important;
     gap: 3px !important;
     overflow: hidden !important;
     border: 1px solid rgba(210,230,221,.9) !important;
-    border-radius: 16px !important;
+    border-radius: 14px !important;
     background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,248,244,.94)) !important;
     box-shadow: 0 5px 12px rgba(7,75,55,.055) !important;
     transform: none !important;
@@ -44,8 +44,8 @@
   #dashboardPage .quick-services .service-card > .service-3d,
   #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d {
     box-sizing: border-box !important;
-    width: 44px !important;
-    height: 44px !important;
+    width: 52px !important;
+    height: 52px !important;
     margin: 0 !important;
     padding: 0 !important;
     display: grid !important;
@@ -59,10 +59,10 @@
 
   #dashboardPage .quick-services .service-card > .service-3d > img {
     display: block !important;
-    width: 40px !important;
-    height: 40px !important;
-    max-width: 40px !important;
-    max-height: 40px !important;
+    width: 43px !important;
+    height: 43px !important;
+    max-width: 43px !important;
+    max-height: 43px !important;
     margin: 0 !important;
     object-fit: contain !important;
     object-position: center !important;
@@ -85,13 +85,13 @@
     border: 0 !important;
     background: transparent !important;
     color: #183d33 !important;
-    font: 700 8.5px/18px 'DM Sans', sans-serif !important;
+    font: 700 8px/18px 'DM Sans', sans-serif !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
 
-  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
-  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 38px !important; height: 38px !important; max-width: 38px !important; max-height: 38px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 45px !important; height: 45px !important; max-width: 45px !important; max-height: 45px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 41px !important; height: 41px !important; max-width: 41px !important; max-height: 41px !important; }
 }
 
 /* Keep the product as a centered phone app on tablets and computers. */
@@ -155,20 +155,20 @@
 .service-category-card {
   box-sizing: border-box;
   min-width: 0;
-  min-height: 73px;
-  padding: 0 2px;
+  min-height: 88px;
+  padding: 7px 3px 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
   overflow: hidden;
-  border: 0;
-  border-radius: 13px;
-  background: transparent;
+  border: 1px solid #e1ece7;
+  border-radius: 14px;
+  background: linear-gradient(145deg,#fff,#f5faf7);
   color: #173d32;
   text-align: center;
-  box-shadow: none;
+  box-shadow: 0 4px 10px rgba(7,74,54,.045);
 }
 .service-category-card:active { transform: scale(.985); background: #f6faf8; }
 .service-category-logo {
@@ -204,17 +204,10 @@
   background-position: var(--sprite-x) var(--sprite-y) !important;
   filter: drop-shadow(0 3px 3px rgba(4,65,55,.08));
 }
-.service-category-logo-3d.sprite-row-1::after,
-.service-category-logo-3d.sprite-row-2::after,
-.service-category-logo-3d.sprite-row-3::after {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 8px;
-  background: linear-gradient(#fff 45%,rgba(255,255,255,.96) 70%,transparent);
-  pointer-events: none;
-}
-.service-category-card:has(.service-category-logo-3d) { min-height: 77px; gap: 4px; }
+.service-category-logo-3d.sprite-row-1,
+.service-category-logo-3d.sprite-row-2 { clip-path: inset(10px 0 0); }
+.service-category-logo-3d.sprite-row-3 { clip-path: inset(6px 0 0); }
+.service-category-card:has(.service-category-logo-3d) { min-height: 88px; gap: 4px; }
 .service-catalog-empty { padding: 48px 20px; border:1px solid #e1eae6; border-radius:18px; background:#fff; text-align:center; }
 .service-catalog-empty b { color:#173d32; font:800 13px Manrope; }.service-catalog-empty p{color:#80918a;font-size:9px}
 
