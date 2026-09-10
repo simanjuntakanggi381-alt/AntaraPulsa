@@ -227,7 +227,7 @@ function serviceCategoryVisual(service) {
   if (Number.isInteger(service.sprite)) {
     const column = service.sprite % 6;
     const row = Math.floor(service.sprite / 6);
-    return `<span class="service-category-logo service-category-logo-3d" style="--sprite-x:${column * 20}%;--sprite-y:${row * (100 / 3)}%" aria-hidden="true"></span>`;
+    return `<span class="service-category-logo service-category-logo-3d sprite-row-${row}" style="--sprite-x:${column * 20}%;--sprite-y:${row * (100 / 3)}%" aria-hidden="true"></span>`;
   }
   return `<span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(service.label)}</svg></span>`;
 }
