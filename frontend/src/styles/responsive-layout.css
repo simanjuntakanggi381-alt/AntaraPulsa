@@ -1,0 +1,226 @@
+/*
+ * Final responsive contract.
+ * This file intentionally loads last so legacy dashboard themes cannot
+ * collapse the desktop app into a narrow phone preview.
+ */
+
+@media (max-width: 520px) {
+  #dashboardPage .quick-services {
+    box-sizing: border-box !important;
+    width: calc(100% + 28px) !important;
+    min-height: 126px !important;
+    margin: 0 -14px !important;
+    padding: 15px 10px 14px !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    border-bottom: 1px solid #e5eee9 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+  }
+
+  #dashboardPage .quick-services .service-card {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    height: 96px !important;
+    margin: 0 !important;
+    padding: 3px 0 0 !important;
+    display: grid !important;
+    grid-template-rows: 62px 22px !important;
+    align-content: start !important;
+    justify-items: center !important;
+    gap: 7px !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  #dashboardPage .quick-services .service-card > .service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d {
+    box-sizing: border-box !important;
+    width: 60px !important;
+    height: 60px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border: 1px solid #d9e9e2 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #f8fcfa, #eaf5f0) !important;
+    box-shadow: inset 0 1px #fff, 0 5px 13px rgba(8, 91, 67, .07) !important;
+  }
+
+  #dashboardPage .quick-services .service-card > .service-3d > img {
+    display: block !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: drop-shadow(0 3px 4px rgba(3, 62, 48, .16)) !important;
+  }
+
+  #dashboardPage .quick-services .service-card > b {
+    position: relative !important;
+    z-index: 5 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 22px !important;
+    margin: 0 !important;
+    padding: 0 1px !important;
+    display: block !important;
+    overflow: hidden !important;
+    border: 0 !important;
+    background: #fff !important;
+    color: #183d33 !important;
+    font: 700 9px/22px 'DM Sans', sans-serif !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 38px !important; height: 38px !important; max-width: 38px !important; max-height: 38px !important; }
+}
+
+/* Tablet: use the full screen instead of a 430px phone frame. */
+@media (min-width: 521px) and (max-width: 899px) {
+  body { background: #f3f7f5 !important; }
+  .app, .login-shell { width: 100% !important; max-width: none !important; margin: 0 !important; }
+  .main { width: 100% !important; margin: 0 !important; }
+  .page { width: 100% !important; max-width: 760px !important; padding: 28px 24px 104px !important; }
+  .topbar { width: 100% !important; }
+}
+
+/* Desktop dashboard: genuine application layout with sidebar and content grid. */
+@media (min-width: 900px) {
+  html, body { min-width: 900px; background: #f3f7f5 !important; }
+  body { overflow-x: hidden; }
+  .app { width: 100% !important; max-width: none !important; min-height: 100vh !important; margin: 0 !important; background: #f3f7f5 !important; }
+  .app .sidebar {
+    box-sizing: border-box !important;
+    width: 240px !important;
+    padding: 28px 20px !important;
+    display: flex !important;
+    transform: none !important;
+    background: #fff !important;
+    border-right: 1px solid #e1ebe6 !important;
+    box-shadow: 8px 0 28px rgba(11, 67, 50, .035) !important;
+  }
+  .app .sidebar .brand { display: flex !important; }
+  .app .main { width: auto !important; min-height: 100vh !important; margin-left: 240px !important; background: #f3f7f5 !important; }
+  .app .topbar {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 74px !important;
+    padding: 0 34px !important;
+    display: flex !important;
+    border-bottom: 1px solid #dfe9e4 !important;
+    background: rgba(255, 255, 255, .96) !important;
+    color: #173c32 !important;
+    box-shadow: 0 3px 16px rgba(10, 67, 50, .04) !important;
+  }
+  .app .topbar .app-wordmark { display: none !important; }
+  .app .topbar .search { display: flex !important; }
+  .app .top-actions .icon-btn { color: #08785e !important; background: #f4faf7 !important; border-color: #dceae4 !important; }
+  .app .user-mini { display: flex !important; }
+  .app .user-mini div:nth-child(2), .app .user-mini > span { display: flex !important; }
+  .app .bottom-nav { display: none !important; }
+  #pageContainer { width: 100% !important; }
+  .page {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 1320px !important;
+    margin: 0 auto !important;
+    padding: 34px 38px 56px !important;
+  }
+  #dashboardPage.active-page {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 22px !important;
+    background: transparent !important;
+  }
+  #dashboardPage .mobile-welcome { grid-column: 1 / -1 !important; min-height: auto !important; margin: 0 !important; padding: 0 2px 4px !important; }
+  #dashboardPage .mobile-welcome p { font-size: 24px !important; }
+  #dashboardPage .mobile-welcome h1 { font-size: 13px !important; }
+  #dashboardPage .scan-button { display: none !important; }
+  #dashboardPage .quick-services {
+    grid-column: 1 / -1 !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-height: 132px !important;
+    margin: 0 !important;
+    padding: 18px 22px !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 14px !important;
+    border: 1px solid #deebe5 !important;
+    border-radius: 22px !important;
+    background: #fff !important;
+    box-shadow: 0 10px 28px rgba(10, 67, 50, .055) !important;
+  }
+  #dashboardPage .quick-services .service-card {
+    box-sizing: border-box !important;
+    height: 94px !important;
+    padding: 10px 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 13px !important;
+    overflow: hidden !important;
+    border: 1px solid #e2ece7 !important;
+    border-radius: 17px !important;
+    background: #f8fbf9 !important;
+    box-shadow: none !important;
+  }
+  #dashboardPage .quick-services .service-card:hover { border-color: #9ccdbd !important; background: #f0f8f4 !important; transform: translateY(-2px) !important; }
+  #dashboardPage .quick-services .service-card > .service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d {
+    width: 64px !important;
+    height: 64px !important;
+    flex: 0 0 64px !important;
+    margin: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border: 1px solid #d9e9e2 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(145deg, #fff, #eaf5f0) !important;
+  }
+  #dashboardPage .quick-services .service-3d > img { width: 48px !important; height: 48px !important; max-width: 48px !important; max-height: 48px !important; object-fit: contain !important; transform: none !important; }
+  #dashboardPage .quick-services .service-card > b { margin: 0 !important; color: #173d32 !important; font: 800 13px/1.2 Manrope, sans-serif !important; white-space: nowrap !important; }
+  #dashboardPage .pulse-showcase { grid-column: span 7 !important; min-height: 230px !important; margin: 0 !important; padding: 28px !important; border-radius: 24px !important; }
+  #dashboardPage .wallet-showcase { grid-column: span 5 !important; min-height: 230px !important; margin: 0 !important; padding: 28px !important; border-radius: 24px !important; }
+  #dashboardPage .pulse-showcase h2, #dashboardPage .wallet-showcase h2 { font-size: 27px !important; }
+  #dashboardPage .pulse-showcase p, #dashboardPage .wallet-showcase p { font-size: 12px !important; }
+  #dashboardPage .wallet-showcase > img { width: 210px !important; right: -24px !important; }
+  #dashboardPage .daily-section { grid-column: span 7 !important; margin: 0 !important; padding: 26px !important; border: 1px solid #deebe5 !important; border-radius: 24px !important; background: #fff !important; }
+  #dashboardPage .trust-showcase { grid-column: span 5 !important; margin: 0 !important; padding: 28px !important; border: 1px solid #deebe5 !important; border-radius: 24px !important; background: #fff !important; }
+  #dashboardPage .content-row { grid-column: 1 / -1 !important; width: 100% !important; margin: 0 !important; }
+  #dashboardPage .transaction-panel { border-radius: 22px !important; }
+  #dashboardPage .wallet-card, #dashboardPage .cashback-card, #dashboardPage .featured-products,
+  #dashboardPage .money-actions, #dashboardPage .modern-title, #dashboardPage .modern-services,
+  #dashboardPage .benefit-grid, #dashboardPage .promo-banner { display: none !important; }
+  #transactionPage, #historyPage, #accountPage, #helpPage, .topup-page { max-width: 1320px !important; }
+}
+
+@media (min-width: 900px) and (max-width: 1120px) {
+  .app .sidebar { width: 210px !important; }
+  .app .main { margin-left: 210px !important; }
+  .page { padding-right: 24px !important; padding-left: 24px !important; }
+  #dashboardPage .quick-services .service-card { padding: 9px !important; gap: 8px !important; }
+  #dashboardPage .quick-services .service-card > .service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d { width: 54px !important; height: 54px !important; flex-basis: 54px !important; }
+  #dashboardPage .quick-services .service-3d > img { width: 42px !important; height: 42px !important; }
+  #dashboardPage .quick-services .service-card > b { font-size: 11px !important; }
+}
