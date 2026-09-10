@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator) {
 
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
-const state = { user: null, products: [], transactions: [], selected: null, balanceVisible: true, returnPage: 'dashboard' };
+const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', balanceVisible: true, returnPage: 'dashboard' };
 const showToast = createToast('#toast');
 
 const appIcons = {
@@ -50,7 +50,7 @@ function setUser(user) {
 async function loadApp() {
   const [user, products, transactions] = await Promise.all([api('/api/me'), api('/api/products'), api('/api/transactions')]);
   setUser(user); state.products = products || []; state.transactions = transactions || []; renderServiceCategories();
-  renderProducts(); renderRecent(); renderHistory();
+  prepareProductFinder('Pulsa'); renderRecent(); renderHistory();
 }
 
 function resetViewport() {
@@ -108,10 +108,71 @@ function renderHistory() {
 $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter').addEventListener('change', renderHistory); $('#historyDate').addEventListener('change', renderHistory);
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
-function renderProducts(filter = 'all') {
-  const list = state.products.filter(p => filter === 'all' || p.type === filter);
+function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
+  const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider.toLowerCase().includes(provider.toLowerCase())));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${p.provider}</small><b>${p.name}</b><strong>Rp ${money(p.price)}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
+  $('#productResultCount').textContent = `${list.length} produk`;
+  $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
+}
+
+const operatorPrefixes = [
+  ['Telkomsel', ['0811','0812','0813','0821','0822','0823','0851','0852','0853']],
+  ['Indosat', ['0814','0815','0816','0855','0856','0857','0858']],
+  ['XL', ['0817','0818','0819','0859','0877','0878']],
+  ['Axis', ['0831','0832','0833','0838']],
+  ['Tri', ['0895','0896','0897','0898','0899']],
+  ['Smartfren', ['0881','0882','0883','0884','0885','0886','0887','0888','0889']]
+];
+
+function normalizedPhone(value) {
+  let phone = value.replace(/\D/g, '');
+  if (phone.startsWith('62')) phone = `0${phone.slice(2)}`;
+  return phone;
+}
+
+function detectOperator(value) {
+  const phone = normalizedPhone(value);
+  return operatorPrefixes.find(([, prefixes]) => prefixes.some(prefix => phone.startsWith(prefix)))?.[0] || '';
+}
+
+function availableProviders(type) {
+  return [...new Set(state.products.filter(product => product.type === type).map(product => product.provider))]
+    .sort((a, b) => a.localeCompare(b, 'id'));
+}
+
+function updateProviderDetection(provider = '') {
+  state.selectedProvider = provider;
+  $('#detectedProvider').textContent = provider || (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Nomor belum dikenali' : 'Pilih provider di bawah');
+  $('#providerIndicator').textContent = provider ? providerLetter(provider) : '?';
+  $('#detectionStatus').textContent = provider ? 'Terpilih' : 'Otomatis';
+  $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
+}
+
+function renderProviderChoices() {
+  const providers = availableProviders(state.selectedType);
+  $('#providerChoices').innerHTML = providers.map(provider => `<button type="button" data-provider="${escapeText(provider)}"><span style="--provider-color:${providerColor(provider)}">${providerLetter(provider)}</span><b>${escapeText(provider)}</b></button>`).join('');
+  $$('#providerChoices button').forEach(button => button.onclick = () => updateProviderDetection(button.dataset.provider));
+}
+
+function prepareProductFinder(type) {
+  state.selectedType = type || 'Pulsa';
+  state.selected = null;
+  state.selectedProvider = '';
+  $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === state.selectedType));
+  $('#productResults').classList.add('hidden');
+  $('#selectedProduct').classList.add('hidden');
+  $('#selectedEmpty').classList.remove('hidden');
+  $('#targetInput').value = '';
+  renderProviderChoices();
+  updateProviderDetection('');
+}
+
+function openTransaction(type) {
+  state.returnPage = showPage.current();
+  showPage('transaction');
+  prepareProductFinder(type);
+  setTimeout(() => $('#targetInput').focus(), 0);
 }
 
 const serviceSymbols = {
@@ -159,35 +220,41 @@ function renderServiceCategories() {
   }, {});
   const categories = Object.entries(counts).sort(([a], [b]) => a.localeCompare(b, 'id'));
   grid.innerHTML = categories.map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><div><b>${escapeText(category)}</b><small>${count} produk aktif</small></div><i>›</i></button>`).join('');
-  $$('[data-service-category]', grid).forEach(button => button.onclick = () => {
-    state.returnPage = 'services';
-    showPage('transaction');
-    $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === button.dataset.serviceCategory));
-    renderProducts(button.dataset.serviceCategory);
-  });
+  $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 function selectProduct(id) {
   state.selected = state.products.find(p => p.id === id);
-  renderProducts($('.filter-tabs .active')?.dataset.filter || state.selected?.type || 'all');
+  renderProducts(state.selectedType, state.selectedProvider);
   $('#selectedEmpty').classList.add('hidden'); $('#selectedProduct').classList.remove('hidden');
   $('#selectedLogo').textContent = providerLetter(state.selected.provider); $('#selectedLogo').style.background = state.selected.color;
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
-  $('#selectedPrice').textContent = `Rp ${money(state.selected.price)}`; $('#targetInput').focus();
+  $('#selectedPrice').textContent = `Rp ${money(state.selected.price)}`;
+  $('#checkoutTarget').textContent = $('#targetInput').value.trim();
+  $('.checkout-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
-$$('.filter-tabs button').forEach(btn => btn.onclick = () => { $$('.filter-tabs button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderProducts(btn.dataset.filter); });
+$$('.filter-tabs button').forEach(btn => btn.onclick = () => prepareProductFinder(btn.dataset.filter));
 $$('.service-card').forEach(btn => btn.onclick = () => {
   const type = btn.dataset.type;
   if (type === 'Lainnya') { showPage('services'); return; }
-  state.returnPage = showPage.current();
-  showPage('transaction');
-  const tab = $(`.filter-tabs [data-filter="${type}"]`);
-  if (tab) tab.click();
-  else {
-    $$('.filter-tabs button').forEach(button => button.classList.remove('active'));
-    renderProducts(type);
-  }
+  openTransaction(type);
 });
 $('#allServices').onclick = () => showPage('services');
+
+$('#targetInput').addEventListener('input', event => {
+  if (!['Pulsa','Paket Data'].includes(state.selectedType)) return;
+  updateProviderDetection(detectOperator(event.target.value));
+});
+
+$('#showProductsBtn').onclick = () => {
+  const target = $('#targetInput').value.trim();
+  if (!target) { showToast('Tujuan belum diisi', 'Masukkan nomor tujuan atau ID pelanggan terlebih dahulu.'); return; }
+  if (['Pulsa','Paket Data'].includes(state.selectedType) && !state.selectedProvider) {
+    showToast('Provider belum dikenali', 'Periksa nomor atau pilih provider secara manual.'); return;
+  }
+  $('#productResults').classList.remove('hidden');
+  renderProducts(state.selectedType, state.selectedProvider);
+  $('#productResults').scrollIntoView({ behavior:'smooth', block:'start' });
+};
 
 $('#payBtn').onclick = async () => {
   const target = $('#targetInput').value.trim(); if (!target) { showToast('Nomor belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
