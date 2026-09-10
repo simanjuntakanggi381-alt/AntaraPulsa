@@ -41,3 +41,72 @@
   #dashboardPage .quick-services .service-card:nth-child(2)>span svg{transform:translateY(-1px)!important}
   #dashboardPage .quick-services .service-card>b{display:block!important;width:100%!important;margin:0!important;color:#24453b!important;font:700 10px/16px 'DM Sans',sans-serif!important;text-align:center!important;white-space:nowrap!important}
 }
+
+/* Final mobile override: the primary services use illustrated PNG marks, not SVG tiles. */
+@media(max-width:520px){
+  #dashboardPage .quick-services{
+    min-height:112px!important;
+    padding:13px 7px 11px!important;
+    align-items:center!important;
+    overflow:visible!important;
+  }
+  #dashboardPage .quick-services .service-card{
+    height:88px!important;
+    padding:2px 0 0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:5px!important;
+    overflow:visible!important;
+  }
+  #dashboardPage .quick-services .service-card>span.service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{
+    box-sizing:border-box!important;
+    width:58px!important;
+    height:58px!important;
+    flex:0 0 58px!important;
+    margin:0 auto!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  #dashboardPage .quick-services .service-card>span.service-3d>img{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:58px!important;
+    height:58px!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    object-fit:contain!important;
+    object-position:center!important;
+    transform:none!important;
+    filter:drop-shadow(0 5px 7px rgba(3,66,52,.18))!important;
+  }
+  #dashboardPage .quick-services .service-card>b{
+    min-height:17px!important;
+    color:#173d32!important;
+    font:700 10px/17px 'DM Sans',sans-serif!important;
+    text-align:center!important;
+  }
+}
+
+@media(max-width:370px){
+  #dashboardPage .quick-services{padding-right:4px!important;padding-left:4px!important}
+  #dashboardPage .quick-services .service-card>span.service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d,
+  #dashboardPage .quick-services .service-card>span.service-3d>img{
+    width:52px!important;
+    height:52px!important;
+  }
+  #dashboardPage .quick-services .service-card>span.service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{flex-basis:52px!important}
+  #dashboardPage .quick-services .service-card>b{font-size:9px!important}
+}
