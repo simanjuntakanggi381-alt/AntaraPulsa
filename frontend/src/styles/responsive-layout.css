@@ -138,3 +138,49 @@
     transform: translateX(-50%) !important;
   }
 }
+
+/* Provider-driven service catalogue opened from the "Lainnya" menu. */
+.services-page .simple-head { margin-bottom: 20px !important; }
+.services-page .extra-services {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+.service-category-card {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 82px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 44px minmax(0,1fr) 14px;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid #deebe5;
+  border-radius: 16px;
+  background: #fff;
+  color: #173d32;
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(8,72,53,.04);
+}
+.service-category-card:active { transform: scale(.985); background: #f6faf8; }
+.service-category-logo {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d5e9e0;
+  border-radius: 14px;
+  background: linear-gradient(145deg,#ecf8f3,#ddf1e8);
+  color: #08785e;
+}
+.service-category-logo svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.service-category-card div { min-width: 0; }
+.service-category-card b { display: block; overflow: hidden; color: #173d32; font: 800 11px/1.25 Manrope,sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.service-category-card small { display: block; margin-top: 5px; color: #7a8e86; font-size: 8px; }
+.service-category-card i { color: #86a49a; font: normal 20px/1 sans-serif; text-align: right; }
+
+@media (max-width: 360px) {
+  .services-page .extra-services { grid-template-columns: 1fr !important; }
+  .service-category-card { min-height: 76px; }
+}

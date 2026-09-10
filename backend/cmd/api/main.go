@@ -115,12 +115,23 @@ func normalizeCategory(category, group, name string) string {
 		category string
 		terms    []string
 	}{
+		{"Internet & TV", []string{"indihome", "wifi", "internet rumah", "first media", "myrepublic"}},
 		{"Paket Data", []string{"paket data", "internet", "kuota"}},
 		{"Token PLN", []string{"token pln", "pln prepaid", "listrik prabayar"}},
 		{"E-Wallet", []string{"e-wallet", "e-money", "dana", "gopay", "ovo", "linkaja", "shopeepay", "astrapay"}},
 		{"Game", []string{"game", "diamond", "mobile legends", "free fire", "pubg"}},
-		{"Voucher", []string{"voucher"}},
-		{"PPOB", []string{"ppob", "pascabayar", "bpjs", "pdam", "tagihan"}},
+		{"Voucher Digital", []string{"voucher", "gift card"}},
+		{"TV & Streaming", []string{"streaming", "netflix", "vidio", "spotify", "wetv", "viu", "tv kabel"}},
+		{"Telepon & SMS", []string{"telepon", "telpon", "sms"}},
+		{"BPJS", []string{"bpjs"}},
+		{"PDAM", []string{"pdam", "air minum"}},
+		{"Gas", []string{"pgn", "gas negara"}},
+		{"Multifinance", []string{"multifinance", "leasing", "adira", "fif", "oto finance"}},
+		{"Transportasi", []string{"grab", "gojek", "maxim", "transportasi"}},
+		{"Pendidikan", []string{"pendidikan", "sekolah", "universitas"}},
+		{"Asuransi", []string{"asuransi", "insurance"}},
+		{"Pajak", []string{"pajak", "pbb", "samsat"}},
+		{"PPOB", []string{"ppob", "pascabayar", "tagihan"}},
 		{"Pulsa", []string{"pulsa", "regular", "reguler"}},
 	} {
 		for _, term := range rule.terms {
@@ -129,7 +140,27 @@ func normalizeCategory(category, group, name string) string {
 			}
 		}
 	}
+	if raw := strings.TrimSpace(category); raw != "" {
+		return cleanCategoryName(raw)
+	}
+	if raw := strings.TrimSpace(group); raw != "" {
+		return cleanCategoryName(raw)
+	}
 	return "Lainnya"
+}
+
+func cleanCategoryName(value string) string {
+	value = strings.Join(strings.Fields(strings.ReplaceAll(value, "_", " ")), " ")
+	if value == "" {
+		return "Lainnya"
+	}
+	words := strings.Fields(strings.ToLower(value))
+	for i := range words {
+		if len(words[i]) > 0 {
+			words[i] = strings.ToUpper(words[i][:1]) + words[i][1:]
+		}
+	}
+	return strings.Join(words, " ")
 }
 
 func normalizeProvider(brand, category, name string) string {

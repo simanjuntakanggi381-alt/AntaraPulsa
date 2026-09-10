@@ -43,12 +43,18 @@ func TestNormalizeCategories(t *testing.T) {
 		"Kuota internet Telkomsel": "Paket Data",
 		"Token PLN 20.000":         "Token PLN",
 		"Top up GoPay":             "E-Wallet",
-		"BPJS Kesehatan":           "PPOB",
+		"BPJS Kesehatan":           "BPJS",
 		"Mobile Legends diamond":   "Game",
 	}
 	for name, want := range cases {
 		if got := normalizeCategory("", "", name); got != want {
 			t.Errorf("%q: want %q, got %q", name, want, got)
 		}
+	}
+}
+
+func TestNormalizeCategoryPreservesProviderCategory(t *testing.T) {
+	if got := normalizeCategory("Produk Donasi", "", "Sedekah digital"); got != "Produk Donasi" {
+		t.Fatalf("provider category should remain visible, got %q", got)
 	}
 }

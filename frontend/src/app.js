@@ -49,7 +49,7 @@ function setUser(user) {
 
 async function loadApp() {
   const [user, products, transactions] = await Promise.all([api('/api/me'), api('/api/products'), api('/api/transactions')]);
-  setUser(user); state.products = products || []; state.transactions = transactions || [];
+  setUser(user); state.products = products || []; state.transactions = transactions || []; renderServiceCategories();
   renderProducts(); renderRecent(); renderHistory();
 }
 
@@ -113,8 +113,62 @@ function renderProducts(filter = 'all') {
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${p.provider}</small><b>${p.name}</b><strong>Rp ${money(p.price)}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
 }
+
+const serviceSymbols = {
+  pulsa: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M10 5h4M10 18.5h4"/>',
+  data: '<path d="M5 12.5a10 10 0 0 1 14 0M8 16a5.8 5.8 0 0 1 8 0M11 19.5a1.5 1.5 0 0 1 2 0"/>',
+  wallet: '<path d="M4 7h15a2 2 0 0 1 2 2v9H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12M16 12h5"/><circle cx="16" cy="12" r=".8"/>',
+  power: '<path d="m13.5 2-8 12h6L10.5 22l8-12h-6z"/>',
+  game: '<path d="M8 7h8a6 6 0 0 1 5.5 8.4l-1.2 2.8a2 2 0 0 1-3.2.7L15 17H9l-2.1 1.9a2 2 0 0 1-3.2-.7l-1.2-2.8A6 6 0 0 1 8 7Z"/><path d="M7 12v4M5 14h4M16.5 12.5h.01M18.5 15h.01"/>',
+  ticket: '<path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z"/><path d="M13 8.5v1M13 12v1M13 15.5v1"/>',
+  bill: '<path d="M3 21h18M5 21V9l7-5 7 5v12M8 12h2v2H8zM14 12h2v2h-2zM10 21v-4h4v4"/>',
+  shield: '<path d="M12 21s8-3.5 8-10V5l-8-3-8 3v6c0 6.5 8 10 8 10Z"/><path d="m8.5 11.5 2.2 2.2 4.8-5"/>',
+  water: '<path d="M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z"/><path d="M9 16a3 3 0 0 0 3 2"/>',
+  tv: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m9 2 3 3 3-3M9 15l6-3-6-3z"/>',
+  phone: '<path d="M21 16.5v3a2 2 0 0 1-2.2 2 19.7 19.7 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.7 19.7 0 0 1 1.1 3.8 2 2 0 0 1 3.1 1.6h3a2 2 0 0 1 2 1.7"/>',
+  grid: '<rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/>'
+};
+
+function serviceSymbol(category) {
+  const value = category.toLowerCase();
+  if (value.includes('pulsa')) return serviceSymbols.pulsa;
+  if (value.includes('data') || value.includes('internet')) return serviceSymbols.data;
+  if (value.includes('wallet') || value.includes('money')) return serviceSymbols.wallet;
+  if (value.includes('pln') || value.includes('listrik') || value.includes('gas')) return serviceSymbols.power;
+  if (value.includes('game')) return serviceSymbols.game;
+  if (value.includes('voucher')) return serviceSymbols.ticket;
+  if (value.includes('bpjs') || value.includes('asuransi')) return serviceSymbols.shield;
+  if (value.includes('pdam') || value.includes('air')) return serviceSymbols.water;
+  if (value.includes('tv') || value.includes('stream')) return serviceSymbols.tv;
+  if (value.includes('telepon') || value.includes('sms')) return serviceSymbols.phone;
+  if (value.includes('ppob') || value.includes('tagihan') || value.includes('pajak')) return serviceSymbols.bill;
+  return serviceSymbols.grid;
+}
+
+function escapeText(value) {
+  return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+function renderServiceCategories() {
+  const grid = $('#allServiceGrid');
+  if (!grid) return;
+  const counts = state.products.reduce((out, product) => {
+    const category = product.type || 'Lainnya';
+    out[category] = (out[category] || 0) + 1;
+    return out;
+  }, {});
+  const categories = Object.entries(counts).sort(([a], [b]) => a.localeCompare(b, 'id'));
+  grid.innerHTML = categories.map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><div><b>${escapeText(category)}</b><small>${count} produk aktif</small></div><i>›</i></button>`).join('');
+  $$('[data-service-category]', grid).forEach(button => button.onclick = () => {
+    state.returnPage = 'services';
+    showPage('transaction');
+    $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === button.dataset.serviceCategory));
+    renderProducts(button.dataset.serviceCategory);
+  });
+}
 function selectProduct(id) {
-  state.selected = state.products.find(p => p.id === id); renderProducts($('.filter-tabs .active').dataset.filter);
+  state.selected = state.products.find(p => p.id === id);
+  renderProducts($('.filter-tabs .active')?.dataset.filter || state.selected?.type || 'all');
   $('#selectedEmpty').classList.add('hidden'); $('#selectedProduct').classList.remove('hidden');
   $('#selectedLogo').textContent = providerLetter(state.selected.provider); $('#selectedLogo').style.background = state.selected.color;
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
