@@ -14,7 +14,7 @@
     padding: 1px 0 3px !important;
     display: grid !important;
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-    gap: 4px !important;
+    gap: 7px !important;
     overflow: visible !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -25,26 +25,27 @@
   #dashboardPage .quick-services .service-card {
     box-sizing: border-box !important;
     min-width: 0 !important;
-    height: 78px !important;
+    height: 76px !important;
     margin: 0 !important;
-    padding: 3px 0 0 !important;
+    padding: 5px 2px 3px !important;
     display: grid !important;
-    grid-template-rows: 50px 19px !important;
+    grid-template-rows: 44px 18px !important;
     align-content: start !important;
     justify-items: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     overflow: hidden !important;
-    border: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    border: 1px solid rgba(210,230,221,.9) !important;
+    border-radius: 16px !important;
+    background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,248,244,.94)) !important;
+    box-shadow: 0 5px 12px rgba(7,75,55,.055) !important;
     transform: none !important;
   }
 
   #dashboardPage .quick-services .service-card > .service-3d,
   #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d {
     box-sizing: border-box !important;
-    width: 50px !important;
-    height: 50px !important;
+    width: 44px !important;
+    height: 44px !important;
     margin: 0 !important;
     padding: 0 !important;
     display: grid !important;
@@ -58,10 +59,10 @@
 
   #dashboardPage .quick-services .service-card > .service-3d > img {
     display: block !important;
-    width: 44px !important;
-    height: 44px !important;
-    max-width: 44px !important;
-    max-height: 44px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
     margin: 0 !important;
     object-fit: contain !important;
     object-position: center !important;
@@ -76,7 +77,7 @@
     z-index: 5 !important;
     box-sizing: border-box !important;
     width: 100% !important;
-    height: 19px !important;
+    height: 18px !important;
     margin: 0 !important;
     padding: 0 1px !important;
     display: block !important;
@@ -84,13 +85,13 @@
     border: 0 !important;
     background: transparent !important;
     color: #183d33 !important;
-    font: 700 9px/19px 'DM Sans', sans-serif !important;
+    font: 700 8.5px/18px 'DM Sans', sans-serif !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
 
-  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 46px !important; height: 46px !important; max-width: 46px !important; max-height: 46px !important; }
-  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 38px !important; height: 38px !important; max-width: 38px !important; max-height: 38px !important; }
 }
 
 /* Keep the product as a centered phone app on tablets and computers. */
