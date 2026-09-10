@@ -175,6 +175,7 @@
   color: #08785e;
 }
 .service-category-logo svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.service-category-logo svg text { fill: currentColor; stroke: none; font: 800 7px Manrope,sans-serif; }
 .service-category-card div { min-width: 0; }
 .service-category-card b { display: block; overflow: hidden; color: #173d32; font: 800 11px/1.25 Manrope,sans-serif; text-overflow: ellipsis; white-space: nowrap; }
 .service-category-card small { display: block; margin-top: 5px; color: #7a8e86; font-size: 8px; }
@@ -188,7 +189,7 @@
 /* Guided transaction flow: service -> destination -> provider -> product. */
 .transaction-flow { display: flex; flex-direction: column; gap: 12px; }
 .product-finder, .product-results, .transaction-flow .checkout-card { padding: 16px !important; border: 1px solid #dfeae5 !important; border-radius: 19px !important; background: #fff !important; box-shadow: 0 5px 16px rgba(8,65,48,.045) !important; }
-.product-finder .filter-tabs { margin: -2px -2px 18px; padding-bottom: 3px; gap: 7px; }
+.product-finder .filter-tabs { display: none !important; }
 .product-finder .filter-tabs button { height: 34px; padding: 0 13px; flex: 0 0 auto; border-radius: 17px; }
 .product-finder .filter-tabs button.active { background: #08785e; color: #fff; }
 .finder-label { display: block; margin: 0 0 7px !important; color: #5d746b; font-size: 10px !important; font-weight: 800 !important; }

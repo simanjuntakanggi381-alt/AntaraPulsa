@@ -110,7 +110,7 @@ $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-st
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
   const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider.toLowerCase().includes(provider.toLowerCase())));
-  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${p.provider}</small><b>${p.name}</b><strong>Rp ${money(p.price)}</strong></button>`).join('');
+  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
   $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
@@ -160,6 +160,8 @@ function prepareProductFinder(type) {
   state.selected = null;
   state.selectedProvider = '';
   $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === state.selectedType));
+  const heading = $('#transactionPage .simple-head h1');
+  if (heading) heading.textContent = state.selectedType;
   $('#productResults').classList.add('hidden');
   $('#selectedProduct').classList.add('hidden');
   $('#selectedEmpty').classList.remove('hidden');
@@ -203,7 +205,8 @@ function serviceSymbol(category) {
   if (value.includes('tv') || value.includes('stream')) return serviceSymbols.tv;
   if (value.includes('telepon') || value.includes('sms')) return serviceSymbols.phone;
   if (value.includes('ppob') || value.includes('tagihan') || value.includes('pajak')) return serviceSymbols.bill;
-  return serviceSymbols.grid;
+  const initials = category.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'AP';
+  return `<rect x="3" y="3" width="18" height="18" rx="6"/><text x="12" y="15" text-anchor="middle">${initials}</text>`;
 }
 
 function escapeText(value) {
@@ -218,7 +221,8 @@ function renderServiceCategories() {
     out[category] = (out[category] || 0) + 1;
     return out;
   }, {});
-  const categories = Object.entries(counts).sort(([a], [b]) => a.localeCompare(b, 'id'));
+  const dashboardServices = new Set(['Pulsa', 'Paket Data', 'E-Wallet', 'Token PLN']);
+  const categories = Object.entries(counts).filter(([category]) => !dashboardServices.has(category)).sort(([a], [b]) => a.localeCompare(b, 'id'));
   grid.innerHTML = categories.map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><div><b>${escapeText(category)}</b><small>${count} produk aktif</small></div><i>›</i></button>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
@@ -228,7 +232,10 @@ function selectProduct(id) {
   $('#selectedEmpty').classList.add('hidden'); $('#selectedProduct').classList.remove('hidden');
   $('#selectedLogo').textContent = providerLetter(state.selected.provider); $('#selectedLogo').style.background = state.selected.color;
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
-  $('#selectedPrice').textContent = `Rp ${money(state.selected.price)}`;
+  const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
+  $('#selectedPrice').textContent = openAmount ? `Nominal bebas + admin Rp ${money(state.selected.fee)}` : `Rp ${money(state.selected.price)}`;
+  $('#payBtn').disabled = openAmount;
+  $('#payBtn').firstChild.textContent = openAmount ? 'Nominal bebas segera tersedia ' : 'Bayar sekarang ';
   $('#checkoutTarget').textContent = $('#targetInput').value.trim();
   $('.checkout-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }

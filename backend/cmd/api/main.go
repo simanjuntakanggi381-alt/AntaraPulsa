@@ -69,10 +69,8 @@ func syncH2HRProducts(dataStore *store.Store) {
 	log.Printf("katalog H2HR tersinkron: %d SKU aktif", len(products))
 }
 
-// catalogProducts converts Pulsa24Jam's live catalogue into safe retail items.
-// OPEN_AMOUNT products need an amount/min/max flow and must never be charged as
-// if their administration fee were the product price, so the first production
-// purchase flow deliberately exposes fixed-price SKUs only.
+// catalogProducts converts every active Pulsa24Jam SKU into a retail item while
+// retaining whether its value is fixed or must be supplied by the customer.
 func catalogProducts(items []h2hr.Product) []model.Product {
 	products := make([]model.Product, 0, len(items))
 	seen := make(map[string]struct{}, len(items))
@@ -80,18 +78,28 @@ func catalogProducts(items []h2hr.Product) []model.Product {
 		sku := strings.ToUpper(strings.TrimSpace(item.SKU))
 		name := strings.TrimSpace(item.Name)
 		priceType := strings.ToUpper(strings.TrimSpace(item.PriceType))
-		if sku == "" || name == "" || item.Price <= 0 || priceType == "OPEN_AMOUNT" {
+		if sku == "" || name == "" {
+			continue
+		}
+		if priceType == "" {
+			priceType = "FIXED"
+		}
+		if priceType != "OPEN_AMOUNT" && item.Price <= 0 {
 			continue
 		}
 		if _, duplicate := seen[sku]; duplicate {
 			continue
 		}
 		seen[sku] = struct{}{}
-		provider := normalizeProvider(item.Brand, item.Category, name)
+		provider := normalizeProvider(item.Brand, item.Category, sku, name)
 		category := normalizeCategory(item.Category, item.Group, name)
+		price := item.Price
+		if priceType != "OPEN_AMOUNT" {
+			price += item.AdditionalFee
+		}
 		products = append(products, model.Product{
 			ID: sku, Provider: provider, Name: name, Type: category,
-			Price: item.Price + item.AdditionalFee, Color: providerColor(provider),
+			Price: price, Color: providerColor(provider), PriceType: priceType, Fee: item.AdditionalFee,
 		})
 	}
 	sort.Slice(products, func(i, j int) bool {
@@ -163,15 +171,34 @@ func cleanCategoryName(value string) string {
 	return strings.Join(words, " ")
 }
 
-func normalizeProvider(brand, category, name string) string {
-	if value := strings.TrimSpace(brand); value != "" {
-		return value
+func normalizeProvider(brand, category, sku, name string) string {
+	brand = strings.TrimSpace(brand)
+	generic := map[string]bool{"": true, "pulsa": true, "data": true, "paket data": true, "e-wallet": true, "ppob": true, "produk": true}
+	if !generic[strings.ToLower(brand)] {
+		return brand
 	}
-	value := strings.ToLower(strings.Join([]string{category, name}, " "))
-	for _, provider := range []string{"Telkomsel", "Indosat", "Smartfren", "LinkAja", "ShopeePay", "AstraPay", "GoPay", "DANA", "OVO", "PLN", "Axis", "XL", "Tri"} {
-		if strings.Contains(value, strings.ToLower(provider)) {
-			return provider
+	value := strings.ToLower(strings.Join([]string{sku, category, name}, " "))
+	providers := []struct {
+		name  string
+		terms []string
+	}{
+		{"Telkomsel", []string{"telkomsel", "tsel", "simpati", "kartu as", "by.u", "byu"}},
+		{"Indosat", []string{"indosat", "im3", "mentari", "isat"}},
+		{"Smartfren", []string{"smartfren", "smart", "sf"}},
+		{"Axis", []string{"axis"}}, {"XL", []string{" xl ", "xlaxiata", "xtra"}},
+		{"Tri", []string{" tri ", "three", "3data"}}, {"PLN", []string{"pln", "token listrik"}},
+		{"DANA", []string{"dana"}}, {"GoPay", []string{"gopay"}}, {"OVO", []string{" ovo", "ovo "}},
+		{"LinkAja", []string{"linkaja"}}, {"ShopeePay", []string{"shopee"}}, {"AstraPay", []string{"astrapay", "asa"}},
+	}
+	for _, provider := range providers {
+		for _, term := range provider.terms {
+			if strings.Contains(" "+value+" ", term) {
+				return provider.name
+			}
 		}
+	}
+	if brand != "" {
+		return brand
 	}
 	if value := strings.TrimSpace(category); value != "" {
 		return value

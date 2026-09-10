@@ -64,6 +64,8 @@ func (s *Store) migrate(ctx context.Context) error {
 		`CREATE SEQUENCE IF NOT EXISTS users_id_seq`,
 		`SELECT setval('users_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM users), 0), 1), true)`,
 		`CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, provider TEXT NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, price BIGINT NOT NULL, color TEXT NOT NULL)`,
+		`ALTER TABLE products ADD COLUMN IF NOT EXISTS price_type TEXT NOT NULL DEFAULT 'FIXED'`,
+		`ALTER TABLE products ADD COLUMN IF NOT EXISTS fee BIGINT NOT NULL DEFAULT 0`,
 		`CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), type TEXT NOT NULL, provider TEXT NOT NULL, product TEXT NOT NULL, target TEXT NOT NULL, amount BIGINT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
 		`CREATE INDEX IF NOT EXISTS transactions_user_created_idx ON transactions (user_id, created_at DESC)`,
 		`CREATE TABLE IF NOT EXISTS h2hr_callbacks (refid TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT '', payload JSONB NOT NULL, received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
@@ -76,7 +78,7 @@ func (s *Store) migrate(ctx context.Context) error {
 		return err
 	}
 	for _, p := range seedProducts() {
-		if _, err := s.db.ExecContext(ctx, `INSERT INTO products (id,provider,name,type,price,color) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (id) DO NOTHING`, p.ID, p.Provider, p.Name, p.Type, p.Price, p.Color); err != nil {
+		if _, err := s.db.ExecContext(ctx, `INSERT INTO products (id,provider,name,type,price,color,price_type,fee) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (id) DO NOTHING`, p.ID, p.Provider, p.Name, p.Type, p.Price, p.Color, p.PriceType, p.Fee); err != nil {
 			return err
 		}
 	}
@@ -124,7 +126,16 @@ func (s *Store) FindOrCreateGoogleUser(googleSub, name, email string) (*model.Us
 }
 
 func seedProducts() []model.Product {
-	return []model.Product{{"tsel-10", "Telkomsel", "Pulsa 10.000", "Pulsa", 11200, "#ef3340"}, {"tsel-50", "Telkomsel", "Pulsa 50.000", "Pulsa", 50200, "#ef3340"}, {"tsel-100", "Telkomsel", "Pulsa 100.000", "Pulsa", 98500, "#ef3340"}, {"isat-25gb", "Indosat", "Freedom 25 GB", "Paket Data", 62500, "#f6c700"}, {"xl-15gb", "XL", "Xtra Combo 15 GB", "Paket Data", 54750, "#2f49d1"}, {"tri-20gb", "Tri", "Happy 20 GB", "Paket Data", 48900, "#ff6b35"}, {"pln-100", "PLN", "Token 100.000", "Token PLN", 101500, "#19a7ce"}, {"pln-200", "PLN", "Token 200.000", "Token PLN", 201500, "#19a7ce"}}
+	return []model.Product{
+		{ID: "tsel-10", Provider: "Telkomsel", Name: "Pulsa 10.000", Type: "Pulsa", Price: 11200, Color: "#ef3340", PriceType: "FIXED"},
+		{ID: "tsel-50", Provider: "Telkomsel", Name: "Pulsa 50.000", Type: "Pulsa", Price: 50200, Color: "#ef3340", PriceType: "FIXED"},
+		{ID: "tsel-100", Provider: "Telkomsel", Name: "Pulsa 100.000", Type: "Pulsa", Price: 98500, Color: "#ef3340", PriceType: "FIXED"},
+		{ID: "isat-25gb", Provider: "Indosat", Name: "Freedom 25 GB", Type: "Paket Data", Price: 62500, Color: "#f6c700", PriceType: "FIXED"},
+		{ID: "xl-15gb", Provider: "XL", Name: "Xtra Combo 15 GB", Type: "Paket Data", Price: 54750, Color: "#2f49d1", PriceType: "FIXED"},
+		{ID: "tri-20gb", Provider: "Tri", Name: "Happy 20 GB", Type: "Paket Data", Price: 48900, Color: "#ff6b35", PriceType: "FIXED"},
+		{ID: "pln-100", Provider: "PLN", Name: "Token 100.000", Type: "Token PLN", Price: 101500, Color: "#19a7ce", PriceType: "FIXED"},
+		{ID: "pln-200", Provider: "PLN", Name: "Token 200.000", Type: "Token PLN", Price: 201500, Color: "#19a7ce", PriceType: "FIXED"},
+	}
 }
 func (s *Store) Authenticate(phone, password string) (*model.User, bool) {
 	if s.db != nil {
@@ -158,7 +169,7 @@ func (s *Store) User(id int64) (*model.User, bool) {
 }
 func (s *Store) Products() []model.Product {
 	if s.db != nil {
-		rows, err := s.db.Query(`SELECT id,provider,name,type,price,color FROM products ORDER BY id`)
+		rows, err := s.db.Query(`SELECT id,provider,name,type,price,color,price_type,fee FROM products ORDER BY id`)
 		if err != nil {
 			return nil
 		}
@@ -166,7 +177,7 @@ func (s *Store) Products() []model.Product {
 		var out []model.Product
 		for rows.Next() {
 			var p model.Product
-			if rows.Scan(&p.ID, &p.Provider, &p.Name, &p.Type, &p.Price, &p.Color) == nil {
+			if rows.Scan(&p.ID, &p.Provider, &p.Name, &p.Type, &p.Price, &p.Color, &p.PriceType, &p.Fee) == nil {
 				out = append(out, p)
 			}
 		}
@@ -189,7 +200,7 @@ func (s *Store) ReplaceProducts(products []model.Product) error {
 			return err
 		}
 		for _, product := range products {
-			if _, err = tx.Exec(`INSERT INTO products (id,provider,name,type,price,color) VALUES ($1,$2,$3,$4,$5,$6)`, product.ID, product.Provider, product.Name, product.Type, product.Price, product.Color); err != nil {
+			if _, err = tx.Exec(`INSERT INTO products (id,provider,name,type,price,color,price_type,fee) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`, product.ID, product.Provider, product.Name, product.Type, product.Price, product.Color, product.PriceType, product.Fee); err != nil {
 				return err
 			}
 		}
@@ -249,6 +260,9 @@ func (s *Store) Purchase(uid int64, pid, target string) (*model.Transaction, err
 	if p == nil {
 		return nil, errors.New("produk tidak ditemukan")
 	}
+	if p.PriceType == "OPEN_AMOUNT" {
+		return nil, errors.New("produk nominal bebas belum dapat dibeli")
+	}
 	if u.Balance < p.Price {
 		return nil, errors.New("saldo tidak cukup")
 	}
@@ -264,10 +278,13 @@ func (s *Store) purchasePG(uid int64, pid, target string) (*model.Transaction, e
 	}
 	defer tx.Rollback()
 	var p model.Product
-	if err = tx.QueryRow(`SELECT id,provider,name,type,price,color FROM products WHERE id=$1`, pid).Scan(&p.ID, &p.Provider, &p.Name, &p.Type, &p.Price, &p.Color); err == sql.ErrNoRows {
+	if err = tx.QueryRow(`SELECT id,provider,name,type,price,color,price_type,fee FROM products WHERE id=$1`, pid).Scan(&p.ID, &p.Provider, &p.Name, &p.Type, &p.Price, &p.Color, &p.PriceType, &p.Fee); err == sql.ErrNoRows {
 		return nil, errors.New("produk tidak ditemukan")
 	} else if err != nil {
 		return nil, err
+	}
+	if p.PriceType == "OPEN_AMOUNT" {
+		return nil, errors.New("produk nominal bebas belum dapat dibeli")
 	}
 	r, err := tx.Exec(`UPDATE users SET balance=balance-$1 WHERE id=$2 AND balance >= $1`, p.Price, uid)
 	if err != nil {

@@ -23,18 +23,27 @@ func TestCatalogProductsMapsProviderCategoryAndPrice(t *testing.T) {
 	}
 }
 
-func TestCatalogProductsRejectsUnsafeAndDuplicateItems(t *testing.T) {
+func TestCatalogProductsKeepsOpenAmountAndRejectsDuplicates(t *testing.T) {
 	got := catalogProducts([]h2hr.Product{
 		{SKU: "DANA", Name: "DANA bebas nominal", Brand: "DANA", PriceType: "OPEN_AMOUNT", AdditionalFee: 1000},
 		{SKU: "T5", Name: "Pulsa Telkomsel 5.000", PriceType: "FIXED", Price: 5500},
 		{SKU: "t5", Name: "Duplikat", PriceType: "FIXED", Price: 5600},
 		{SKU: "", Name: "Tanpa SKU", PriceType: "FIXED", Price: 1000},
 	})
-	if len(got) != 1 {
-		t.Fatalf("want one safe unique product, got %+v", got)
+	if len(got) != 2 {
+		t.Fatalf("want fixed and open-amount products, got %+v", got)
 	}
-	if got[0].ID != "T5" || got[0].Provider != "Telkomsel" {
-		t.Fatalf("unexpected product: %+v", got[0])
+	var foundOpen bool
+	for _, product := range got {
+		if product.ID == "DANA" {
+			foundOpen = product.PriceType == "OPEN_AMOUNT" && product.Fee == 1000 && product.Price == 0
+		}
+	}
+	if !foundOpen {
+		t.Fatalf("open-amount metadata was not preserved: %+v", got)
+	}
+	if got[1].ID != "T5" || got[1].Provider != "Telkomsel" {
+		t.Fatalf("unexpected fixed product: %+v", got[1])
 	}
 }
 

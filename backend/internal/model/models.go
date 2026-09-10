@@ -25,10 +25,12 @@ type Transaction struct {
 }
 
 type Product struct {
-	ID       string `json:"id"`
-	Provider string `json:"provider"`
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	Price    int64  `json:"price"`
-	Color    string `json:"color"`
+	ID        string `json:"id"`
+	Provider  string `json:"provider"`
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Price     int64  `json:"price"`
+	Color     string `json:"color"`
+	PriceType string `json:"price_type"`
+	Fee       int64  `json:"fee"`
 }
