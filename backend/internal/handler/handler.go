@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -46,11 +47,87 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
 	mux.HandleFunc("POST /api/h2hr/callback/{token}", h.h2hrCallback)
+	mux.HandleFunc("GET /api/v1/webhooks/pulsa24jam", h.h2hrWebhook)
+	mux.HandleFunc("POST /api/v1/webhooks/pulsa24jam", h.h2hrWebhook)
 	mux.HandleFunc("POST /api/purchase", h.withAuth(h.purchase))
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
 		respond(w, 200, map[string]string{"status": "ok", "service": "antarapulsa-api"})
 	})
 	return securityHeaders(mux)
+}
+
+func (h *Handler) h2hrWebhook(w http.ResponseWriter, r *http.Request) {
+	if h.h2hrConfig.CallbackToken == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	var callback struct {
+		RefID   string `json:"refid"`
+		Status  string `json:"status"`
+		Message string `json:"message"`
+		Key     string `json:"key"`
+	}
+	var payload []byte
+	var err error
+	if r.Method == http.MethodGet {
+		callback.RefID = firstNonEmpty(r.URL.Query().Get("refid"), r.URL.Query().Get("ref_id"))
+		callback.Status = r.URL.Query().Get("status")
+		callback.Message = firstNonEmpty(r.URL.Query().Get("message"), r.URL.Query().Get("msg"))
+		callback.Key = r.URL.Query().Get("key")
+		payload, err = json.Marshal(r.URL.Query())
+	} else {
+		payload, err = io.ReadAll(io.LimitReader(r.Body, 1<<20))
+		if err == nil {
+			err = json.Unmarshal(payload, &callback)
+		}
+	}
+	if err != nil {
+		http.Error(w, "payload tidak valid", http.StatusBadRequest)
+		return
+	}
+
+	providedKey := firstNonEmpty(callback.Key, r.URL.Query().Get("key"), r.Header.Get("X-Webhook-Token"), r.Header.Get("X-Callback-Token"))
+	providedKey = strings.TrimPrefix(providedKey, "Bearer ")
+	if subtle.ConstantTimeCompare([]byte(providedKey), []byte(h.h2hrConfig.CallbackToken)) != 1 {
+		http.NotFound(w, r)
+		return
+	}
+	callback.RefID = strings.TrimSpace(callback.RefID)
+	if callback.RefID == "" {
+		http.Error(w, "refid wajib diisi", http.StatusBadRequest)
+		return
+	}
+	status := normalizeH2HRStatus(firstNonEmpty(callback.Status, callback.Message))
+	if err := h.store.RecordH2HRCallback(callback.RefID, status, payload); err != nil {
+		http.Error(w, "callback tidak dapat disimpan", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = w.Write([]byte("OK"))
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func normalizeH2HRStatus(value string) string {
+	upper := strings.ToUpper(strings.TrimSpace(value))
+	switch {
+	case strings.Contains(upper, "SUKSES"), strings.Contains(upper, "SUCCESS"):
+		return "success"
+	case strings.Contains(upper, "GAGAL"), strings.Contains(upper, "FAILED"), strings.Contains(upper, "FAILURE"):
+		return "failed"
+	case strings.Contains(upper, "PENDING"), strings.Contains(upper, "PROSES"), strings.Contains(upper, "PROCESS"):
+		return "pending"
+	default:
+		return strings.ToLower(strings.TrimSpace(value))
+	}
 }
 
 func (h *Handler) h2hrCallback(w http.ResponseWriter, r *http.Request) {
