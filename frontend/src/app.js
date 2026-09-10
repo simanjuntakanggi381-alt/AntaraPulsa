@@ -223,6 +223,15 @@ function escapeText(value) {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }
 
+function serviceCategoryVisual(service) {
+  if (Number.isInteger(service.sprite)) {
+    const column = service.sprite % 6;
+    const row = Math.floor(service.sprite / 6);
+    return `<span class="service-category-logo service-category-logo-3d" style="--sprite-x:${column * 20}%;--sprite-y:${row * (100 / 3)}%" aria-hidden="true"></span>`;
+  }
+  return `<span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(service.label)}</svg></span>`;
+}
+
 function renderServiceCategories() {
   const grid = $('#allServiceGrid');
   if (!grid) return;
@@ -234,27 +243,27 @@ function renderServiceCategories() {
   const dashboardServices = new Set(['Pulsa', 'Paket Data', 'E-Wallet', 'Token PLN']);
   const serviceGroups = [
     { title:'Komunikasi', services:[
-      { label:'HP Pascabayar', category:'HP Pascabayar' }, { label:'Aktivasi Perdana', category:'Aktivasi Perdana' },
-      { label:'Masa Aktif', category:'Masa Aktif' }, { label:'Paket Telepon', category:'Paket Telepon' }
+      { label:'HP Pascabayar', category:'HP Pascabayar', sprite:0 }, { label:'Aktivasi Perdana', category:'Aktivasi Perdana', sprite:1 },
+      { label:'Masa Aktif', category:'Masa Aktif', sprite:2 }, { label:'Paket Telepon', category:'Paket Telepon', sprite:3 }
     ]},
     { title:'Keuangan', services:[
-      { label:'Asuransi', category:'Asuransi' }, { label:'Transfer Bank', category:'Transfer Bank' },
-      { label:'Donasi & Zakat', category:'Donasi & Zakat' }, { label:'Multifinance', category:'Multifinance' }
+      { label:'Asuransi', category:'Asuransi', sprite:4 }, { label:'Transfer Bank', category:'Transfer Bank', sprite:5 },
+      { label:'Donasi & Zakat', category:'Donasi & Zakat', sprite:6 }, { label:'Multifinance', category:'Multifinance', sprite:7 }
     ]},
     { title:'Rumah Tangga', services:[
-      { label:'Gas Negara', category:'Gas' }, { label:'PDAM', category:'PDAM' },
-      { label:'BPJS', category:'BPJS' }, { label:'Internet & TV', category:'Internet & TV' },
-      { label:'Pajak', category:'Pajak' }, { label:'PPOB', category:'PPOB' }
+      { label:'Gas Negara', category:'Gas', sprite:8 }, { label:'PDAM', category:'PDAM', sprite:9 },
+      { label:'BPJS', category:'BPJS', sprite:10 }, { label:'Internet & TV', category:'Internet & TV', sprite:11 },
+      { label:'Pajak', category:'Pajak', sprite:12 }, { label:'PPOB', category:'PPOB', sprite:13 }
     ]},
     { title:'Hiburan', services:[
-      { label:'Top Up Game', category:'Game' }, { label:'TV & Streaming', category:'TV & Streaming' },
-      { label:'Voucher Digital', category:'Voucher Digital' }
+      { label:'Top Up Game', category:'Game', sprite:14 }, { label:'TV & Streaming', category:'TV & Streaming', sprite:15 },
+      { label:'Voucher Digital', category:'Voucher Digital', sprite:16 }
     ]},
     { title:'Transportasi', services:[
-      { label:'Transportasi', category:'Transportasi' }, { label:'Tiket', category:'Tiket' }, { label:'E-Toll', category:'E-Toll' }
+      { label:'Transportasi', category:'Transportasi', sprite:17 }, { label:'Tiket', category:'Tiket', sprite:18 }, { label:'E-Toll', category:'E-Toll', sprite:19 }
     ]},
     { title:'Layanan Publik', services:[
-      { label:'Pendidikan', category:'Pendidikan' }, { label:'Kesehatan', category:'Kesehatan' }
+      { label:'Pendidikan', category:'Pendidikan', sprite:20 }, { label:'Kesehatan', category:'Kesehatan', sprite:21 }
     ]}
   ];
   const declared = new Set(serviceGroups.flatMap(group => group.services.map(service => service.category)));
@@ -263,7 +272,7 @@ function renderServiceCategories() {
     .sort((a,b) => a.localeCompare(b,'id'))
     .map(category => ({ label:category, category }));
   if (extras.length) serviceGroups.push({ title:'Layanan Lainnya', services:extras });
-  grid.innerHTML = serviceGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(service.label)}</svg></span><b>${escapeText(service.label)}</b>${counts[service.category] ? `<small>${counts[service.category]} produk</small>` : ''}</button>`).join('')}</div></section>`).join('');
+  grid.innerHTML = serviceGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}">${serviceCategoryVisual(service)}<b>${escapeText(service.label)}</b>${counts[service.category] ? `<small>${counts[service.category]} produk</small>` : ''}</button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 function selectProduct(id) {

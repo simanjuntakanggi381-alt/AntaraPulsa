@@ -188,6 +188,20 @@
 .service-group:nth-child(2n) .service-category-logo { background: linear-gradient(145deg,#eef7ff,#dceeff); color:#137fbd; }
 .service-group:nth-child(3n) .service-category-logo { background: linear-gradient(145deg,#fff8e8,#ffedc5); color:#d18119; }
 .service-group:nth-child(4n) .service-category-logo { background: linear-gradient(145deg,#f6efff,#eadcff); color:#7654c7; }
+.service-category-logo.service-category-logo-3d {
+  width: 58px;
+  height: 58px;
+  flex-basis: 58px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent !important;
+  background-image: url('/assets/service-catalog-3d-v1.png') !important;
+  background-repeat: no-repeat !important;
+  background-size: 600% 400% !important;
+  background-position: var(--sprite-x) var(--sprite-y) !important;
+  filter: drop-shadow(0 5px 5px rgba(4,65,55,.12));
+}
+.service-category-card:has(.service-category-logo-3d) { min-height: 84px; gap: 4px; }
 .service-catalog-empty { padding: 48px 20px; border:1px solid #e1eae6; border-radius:18px; background:#fff; text-align:center; }
 .service-catalog-empty b { color:#173d32; font:800 13px Manrope; }.service-catalog-empty p{color:#80918a;font-size:9px}
 
