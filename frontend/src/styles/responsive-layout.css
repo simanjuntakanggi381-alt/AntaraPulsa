@@ -9,9 +9,9 @@
   #dashboardPage .quick-services {
     box-sizing: border-box !important;
     width: 100% !important;
-    min-height: 104px !important;
+    min-height: 82px !important;
     margin: 0 !important;
-    padding: 5px 0 7px !important;
+    padding: 1px 0 3px !important;
     display: grid !important;
     grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
     gap: 4px !important;
@@ -25,14 +25,14 @@
   #dashboardPage .quick-services .service-card {
     box-sizing: border-box !important;
     min-width: 0 !important;
-    height: 96px !important;
+    height: 78px !important;
     margin: 0 !important;
     padding: 3px 0 0 !important;
     display: grid !important;
-    grid-template-rows: 62px 22px !important;
+    grid-template-rows: 50px 19px !important;
     align-content: start !important;
     justify-items: center !important;
-    gap: 7px !important;
+    gap: 4px !important;
     overflow: hidden !important;
     border: 0 !important;
     background: transparent !important;
@@ -43,32 +43,32 @@
   #dashboardPage .quick-services .service-card > .service-3d,
   #dashboardPage .quick-services .service-card:nth-child(even) > .service-3d {
     box-sizing: border-box !important;
-    width: 60px !important;
-    height: 60px !important;
+    width: 50px !important;
+    height: 50px !important;
     margin: 0 !important;
     padding: 0 !important;
     display: grid !important;
     place-items: center !important;
-    overflow: hidden !important;
-    border: 1px solid #d9e9e2 !important;
-    border-radius: 18px !important;
-    background: linear-gradient(145deg, #f8fcfa, #eaf5f0) !important;
-    box-shadow: inset 0 1px #fff, 0 5px 13px rgba(8, 91, 67, .07) !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   #dashboardPage .quick-services .service-card > .service-3d > img {
     display: block !important;
-    width: 40px !important;
-    height: 40px !important;
-    max-width: 40px !important;
-    max-height: 40px !important;
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
     margin: 0 !important;
     object-fit: contain !important;
     object-position: center !important;
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
-    filter: drop-shadow(0 3px 4px rgba(3, 62, 48, .16)) !important;
+    filter: drop-shadow(0 3px 3px rgba(3, 62, 48, .13)) !important;
   }
 
   #dashboardPage .quick-services .service-card > b {
@@ -76,7 +76,7 @@
     z-index: 5 !important;
     box-sizing: border-box !important;
     width: 100% !important;
-    height: 22px !important;
+    height: 19px !important;
     margin: 0 !important;
     padding: 0 1px !important;
     display: block !important;
@@ -84,13 +84,13 @@
     border: 0 !important;
     background: transparent !important;
     color: #183d33 !important;
-    font: 700 9px/22px 'DM Sans', sans-serif !important;
+    font: 700 9px/19px 'DM Sans', sans-serif !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
 
-  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
-  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 38px !important; height: 38px !important; max-width: 38px !important; max-height: 38px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 46px !important; height: 46px !important; max-width: 46px !important; max-height: 46px !important; }
+  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 42px !important; height: 42px !important; max-width: 42px !important; max-height: 42px !important; }
 }
 
 /* Keep the product as a centered phone app on tablets and computers. */
