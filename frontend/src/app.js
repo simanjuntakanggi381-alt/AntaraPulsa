@@ -225,9 +225,8 @@ function escapeText(value) {
 
 function serviceCategoryVisual(service) {
   if (Number.isInteger(service.sprite)) {
-    const column = service.sprite % 6;
-    const row = Math.floor(service.sprite / 6);
-    return `<span class="service-category-logo service-category-logo-3d sprite-row-${row}" style="--sprite-x:${column * 20}%;--sprite-y:${row * (100 / 3)}%" aria-hidden="true"></span>`;
+    const filename = String(service.sprite).padStart(2, '0');
+    return `<span class="service-category-logo service-category-logo-3d"><img src="/assets/service-category-${filename}.png" alt="" width="44" height="44" loading="lazy" decoding="async"></span>`;
   }
   return `<span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(service.label)}</svg></span>`;
 }

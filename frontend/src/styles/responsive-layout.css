@@ -34,10 +34,10 @@
     justify-items: center !important;
     gap: 3px !important;
     overflow: hidden !important;
-    border: 1px solid rgba(210,230,221,.9) !important;
-    border-radius: 14px !important;
-    background: linear-gradient(145deg,rgba(255,255,255,.98),rgba(240,248,244,.94)) !important;
-    box-shadow: 0 5px 12px rgba(7,75,55,.055) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
     transform: none !important;
   }
 
@@ -50,11 +50,11 @@
     padding: 0 !important;
     display: grid !important;
     place-items: center !important;
-    overflow: visible !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    overflow: hidden !important;
+    border: 1px solid #dcebe4 !important;
+    border-radius: 15px !important;
+    background: linear-gradient(145deg,#fff,#edf7f2) !important;
+    box-shadow: inset 0 1px #fff,0 4px 10px rgba(7,75,55,.055) !important;
   }
 
   #dashboardPage .quick-services .service-card > .service-3d > img {
@@ -163,12 +163,12 @@
   justify-content: flex-start;
   gap: 6px;
   overflow: hidden;
-  border: 1px solid #e1ece7;
-  border-radius: 14px;
-  background: linear-gradient(145deg,#fff,#f5faf7);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: #173d32;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(7,74,54,.045);
+  box-shadow: none;
 }
 .service-category-card:active { transform: scale(.985); background: #f6faf8; }
 .service-category-logo {
@@ -190,23 +190,17 @@
 .service-group:nth-child(3n) .service-category-logo { background: linear-gradient(145deg,#fff8e8,#ffedc5); color:#d18119; }
 .service-group:nth-child(4n) .service-category-logo { background: linear-gradient(145deg,#f6efff,#eadcff); color:#7654c7; }
 .service-category-logo.service-category-logo-3d {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  flex-basis: 50px;
+  width: 52px;
+  height: 52px;
+  flex-basis: 52px;
   overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background-color: transparent !important;
-  background-image: url('/assets/service-catalog-3d-v1.png') !important;
-  background-repeat: no-repeat !important;
-  background-size: 600% 400% !important;
-  background-position: var(--sprite-x) var(--sprite-y) !important;
-  filter: drop-shadow(0 3px 3px rgba(4,65,55,.08));
+  border: 1px solid #dcebe4;
+  border-radius: 15px;
+  background: linear-gradient(145deg,#fff,#edf7f2) !important;
+  box-shadow: inset 0 1px #fff,0 4px 10px rgba(7,75,55,.055);
+  filter: none;
 }
-.service-category-logo-3d.sprite-row-1,
-.service-category-logo-3d.sprite-row-2 { clip-path: inset(10px 0 0); }
-.service-category-logo-3d.sprite-row-3 { clip-path: inset(6px 0 0); }
+.service-category-logo-3d img { width: 44px; height: 44px; display: block; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(4,65,55,.09)); }
 .service-category-card:has(.service-category-logo-3d) { min-height: 88px; gap: 4px; }
 .service-catalog-empty { padding: 48px 20px; border:1px solid #e1eae6; border-radius:18px; background:#fff; text-align:center; }
 .service-catalog-empty b { color:#173d32; font:800 13px Manrope; }.service-catalog-empty p{color:#80918a;font-size:9px}

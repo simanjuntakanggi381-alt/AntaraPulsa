@@ -1,4 +1,4 @@
-const CACHE = 'antarapulsa-shell-v3';
+const CACHE = 'antarapulsa-shell-v4';
 const SHELL = ['/', '/manifest.webmanifest', '/assets/brand-mark.png'];
 
 self.addEventListener('install', event => {
