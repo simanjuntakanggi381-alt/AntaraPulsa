@@ -53,12 +53,13 @@
   #dashboardPage .quick-services .service-card{
     height:91px!important;
     padding:2px 0 0!important;
-    display:flex!important;
-    flex-direction:column!important;
-    align-items:center!important;
-    justify-content:flex-start!important;
-    gap:7px!important;
-    overflow:visible!important;
+    display:grid!important;
+    grid-template-rows:58px 18px!important;
+    align-content:start!important;
+    justify-items:center!important;
+    gap:8px!important;
+    overflow:hidden!important;
+    isolation:isolate!important;
   }
   #dashboardPage .quick-services .service-card>span.service-3d,
   #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{
@@ -75,13 +76,15 @@
     background:linear-gradient(145deg,rgba(247,253,250,.98),rgba(231,245,239,.92))!important;
     box-shadow:inset 0 1px rgba(255,255,255,.9),0 5px 12px rgba(9,85,63,.07)!important;
     overflow:hidden!important;
+    position:relative!important;
+    z-index:1!important;
   }
   #dashboardPage .quick-services .service-card>span.service-3d>img{
     display:block!important;
     visibility:visible!important;
     opacity:1!important;
-    width:46px!important;
-    height:46px!important;
+    width:40px!important;
+    height:40px!important;
     max-width:none!important;
     max-height:none!important;
     margin:0!important;
@@ -90,16 +93,21 @@
     transform:none!important;
     filter:drop-shadow(0 3px 4px rgba(3,66,52,.17))!important;
   }
-  #dashboardPage .quick-services .service-card:nth-child(1) .service-3d>img{width:43px!important;height:43px!important;transform:translate(-1px,1px)!important}
-  #dashboardPage .quick-services .service-card:nth-child(2) .service-3d>img{width:47px!important;height:47px!important;transform:translateY(1px)!important}
-  #dashboardPage .quick-services .service-card:nth-child(3) .service-3d>img{width:45px!important;height:45px!important;transform:translateY(1px)!important}
-  #dashboardPage .quick-services .service-card:nth-child(4) .service-3d>img{width:44px!important;height:44px!important;transform:translateY(-1px)!important}
-  #dashboardPage .quick-services .service-card:nth-child(5) .service-3d>img{width:44px!important;height:44px!important;transform:translateY(1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(1) .service-3d>img{width:38px!important;height:38px!important;transform:translate(-1px,1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(2) .service-3d>img{width:41px!important;height:41px!important;transform:translateY(1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(3) .service-3d>img{width:39px!important;height:39px!important;transform:translateY(1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(4) .service-3d>img{width:38px!important;height:38px!important;transform:translateY(-1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(5) .service-3d>img{width:38px!important;height:38px!important;transform:translateY(1px)!important}
   #dashboardPage .quick-services .service-card>b{
-    min-height:17px!important;
+    position:relative!important;
+    z-index:3!important;
+    min-height:18px!important;
+    padding:0 2px!important;
+    background:#fff!important;
     color:#173d32!important;
-    font:700 9px/17px 'DM Sans',sans-serif!important;
+    font:700 9px/18px 'DM Sans',sans-serif!important;
     text-align:center!important;
+    overflow:hidden!important;
   }
 }
 
