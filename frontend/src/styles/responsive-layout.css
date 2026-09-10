@@ -142,48 +142,57 @@
 /* Provider-driven service catalogue opened from the "Lainnya" menu. */
 .services-page .simple-head { margin-bottom: 20px !important; }
 .services-page .extra-services {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 10px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
 }
+.service-group { padding: 15px 12px 17px; border: 1px solid #e0e9e5; border-radius: 19px; background: #fff; box-shadow: 0 4px 13px rgba(8,65,48,.035); }
+.service-group-head { margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+.service-group-head h2 { margin: 0; color: #173d32; font: 800 12px Manrope,sans-serif; }
+.service-group-head span { padding: 3px 6px; border-radius: 8px; background: #e5f5ff; color: #1681b5; font-size: 6px; font-weight: 800; }
+.service-group-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px 5px; }
 .service-category-card {
   box-sizing: border-box;
   min-width: 0;
-  min-height: 82px;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: 44px minmax(0,1fr) 14px;
+  min-height: 73px;
+  padding: 0 2px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-start;
+  gap: 6px;
   overflow: hidden;
-  border: 1px solid #deebe5;
-  border-radius: 16px;
-  background: #fff;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
   color: #173d32;
-  text-align: left;
-  box-shadow: 0 4px 12px rgba(8,72,53,.04);
+  text-align: center;
+  box-shadow: none;
 }
 .service-category-card:active { transform: scale(.985); background: #f6faf8; }
 .service-category-logo {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   display: grid;
   place-items: center;
   border: 1px solid #d5e9e0;
-  border-radius: 14px;
-  background: linear-gradient(145deg,#ecf8f3,#ddf1e8);
+  border-radius: 15px;
+  background: linear-gradient(145deg,#f3fbf8,#dff2ea);
   color: #08785e;
 }
-.service-category-logo svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.service-category-logo svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 .service-category-logo svg text { fill: currentColor; stroke: none; font: 800 7px Manrope,sans-serif; }
-.service-category-card div { min-width: 0; }
-.service-category-card b { display: block; overflow: hidden; color: #173d32; font: 800 11px/1.25 Manrope,sans-serif; text-overflow: ellipsis; white-space: nowrap; }
-.service-category-card small { display: block; margin-top: 5px; color: #7a8e86; font-size: 8px; }
-.service-category-card i { color: #86a49a; font: normal 20px/1 sans-serif; text-align: right; }
+.service-category-card b { display: -webkit-box; min-height: 20px; overflow: hidden; color: #173d32; font: 800 8px/1.25 'DM Sans',sans-serif; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.service-category-card small { display: none; }
+.service-group:nth-child(2n) .service-category-logo { background: linear-gradient(145deg,#eef7ff,#dceeff); color:#137fbd; }
+.service-group:nth-child(3n) .service-category-logo { background: linear-gradient(145deg,#fff8e8,#ffedc5); color:#d18119; }
+.service-group:nth-child(4n) .service-category-logo { background: linear-gradient(145deg,#f6efff,#eadcff); color:#7654c7; }
+.service-catalog-empty { padding: 48px 20px; border:1px solid #e1eae6; border-radius:18px; background:#fff; text-align:center; }
+.service-catalog-empty b { color:#173d32; font:800 13px Manrope; }.service-catalog-empty p{color:#80918a;font-size:9px}
 
 @media (max-width: 360px) {
-  .services-page .extra-services { grid-template-columns: 1fr !important; }
-  .service-category-card { min-height: 76px; }
+  .service-group-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 
 /* Guided transaction flow: service -> destination -> provider -> product. */

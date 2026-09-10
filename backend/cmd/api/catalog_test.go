@@ -62,8 +62,11 @@ func TestNormalizeCategories(t *testing.T) {
 	}
 }
 
-func TestNormalizeCategoryPreservesProviderCategory(t *testing.T) {
-	if got := normalizeCategory("Produk Donasi", "", "Sedekah digital"); got != "Produk Donasi" {
-		t.Fatalf("provider category should remain visible, got %q", got)
+func TestNormalizeCategoryPreservesOrMapsProviderCategory(t *testing.T) {
+	if got := normalizeCategory("Produk Donasi", "", "Sedekah digital"); got != "Donasi & Zakat" {
+		t.Fatalf("provider category should be mapped, got %q", got)
+	}
+	if got := normalizeCategory("Produk Khusus", "", "Layanan premium"); got != "Produk Khusus" {
+		t.Fatalf("unknown provider category should remain visible, got %q", got)
 	}
 }

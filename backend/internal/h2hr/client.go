@@ -119,7 +119,13 @@ func (c *Client) Call(ctx context.Context, request Request) (Response, error) {
 		return Response{}, fmt.Errorf("menghubungi H2HR: %w", err)
 	}
 	defer resp.Body.Close()
-	raw, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	responseLimit := int64(1 << 20)
+	if request.Commands == "PRODUK" {
+		// The active Pulsa24Jam catalogue contains thousands of SKUs and is
+		// substantially larger than ordinary balance/transaction responses.
+		responseLimit = 32 << 20
+	}
+	raw, err := io.ReadAll(io.LimitReader(resp.Body, responseLimit))
 	if err != nil {
 		return Response{}, err
 	}

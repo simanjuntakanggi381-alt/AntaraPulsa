@@ -189,6 +189,11 @@ const serviceSymbols = {
   water: '<path d="M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z"/><path d="M9 16a3 3 0 0 0 3 2"/>',
   tv: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m9 2 3 3 3-3M9 15l6-3-6-3z"/>',
   phone: '<path d="M21 16.5v3a2 2 0 0 1-2.2 2 19.7 19.7 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.7 19.7 0 0 1 1.1 3.8 2 2 0 0 1 3.1 1.6h3a2 2 0 0 1 2 1.7"/>',
+  sim: '<path d="M7 2h8l4 4v16H5V4a2 2 0 0 1 2-2Z"/><path d="M9 10h6v7H9zM12 10v7M9 13.5h6"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h3M8 17h6"/>',
+  bank: '<path d="m3 9 9-6 9 6M5 10h14M6 10v8M10 10v8M14 10v8M18 10v8M3 21h18"/>',
+  heart: '<path d="M12 21S3 16 3 9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 9 2.5C21 16 12 21 12 21Z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>',
+  flame: '<path d="M13 2s1 4-2 6c-2-3-5-2-5 3a6 6 0 1 0 12 0c0-4-2-7-5-9Z"/><path d="M12 12c2 2 2 5 0 7-3-1-4-5 0-7Z"/>',
   grid: '<rect x="4" y="4" width="6" height="6" rx="2"/><rect x="14" y="4" width="6" height="6" rx="2"/><rect x="4" y="14" width="6" height="6" rx="2"/><rect x="14" y="14" width="6" height="6" rx="2"/>'
 };
 
@@ -197,12 +202,17 @@ function serviceSymbol(category) {
   if (value.includes('pulsa')) return serviceSymbols.pulsa;
   if (value.includes('data') || value.includes('internet')) return serviceSymbols.data;
   if (value.includes('wallet') || value.includes('money')) return serviceSymbols.wallet;
-  if (value.includes('pln') || value.includes('listrik') || value.includes('gas')) return serviceSymbols.power;
+  if (value.includes('pln') || value.includes('listrik')) return serviceSymbols.power;
   if (value.includes('game')) return serviceSymbols.game;
   if (value.includes('voucher')) return serviceSymbols.ticket;
   if (value.includes('bpjs') || value.includes('asuransi')) return serviceSymbols.shield;
   if (value.includes('pdam') || value.includes('air')) return serviceSymbols.water;
   if (value.includes('tv') || value.includes('stream')) return serviceSymbols.tv;
+  if (value.includes('aktivasi') || value.includes('perdana')) return serviceSymbols.sim;
+  if (value.includes('masa aktif')) return serviceSymbols.calendar;
+  if (value.includes('transfer') || value.includes('bank')) return serviceSymbols.bank;
+  if (value.includes('donasi') || value.includes('zakat')) return serviceSymbols.heart;
+  if (value.includes('gas')) return serviceSymbols.flame;
   if (value.includes('telepon') || value.includes('sms')) return serviceSymbols.phone;
   if (value.includes('ppob') || value.includes('tagihan') || value.includes('pajak')) return serviceSymbols.bill;
   const initials = category.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase().replace(/[^A-Z0-9]/g, '') || 'AP';
@@ -223,7 +233,24 @@ function renderServiceCategories() {
   }, {});
   const dashboardServices = new Set(['Pulsa', 'Paket Data', 'E-Wallet', 'Token PLN']);
   const categories = Object.entries(counts).filter(([category]) => !dashboardServices.has(category)).sort(([a], [b]) => a.localeCompare(b, 'id'));
-  grid.innerHTML = categories.map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><div><b>${escapeText(category)}</b><small>${count} produk aktif</small></div><i>›</i></button>`).join('');
+  const groupFor = category => {
+    const value = category.toLowerCase();
+    if (/pascabayar|perdana|masa aktif|telepon|sms/.test(value)) return 'Komunikasi';
+    if (/bank|transfer|asuransi|donasi|zakat|multifinance|keuangan/.test(value)) return 'Keuangan';
+    if (/gas|pdam|bpjs|pajak|internet|tagihan|ppob/.test(value)) return 'Rumah Tangga';
+    if (/game|hiburan|voucher|stream|tv/.test(value)) return 'Hiburan';
+    if (/transport|tiket|travel/.test(value)) return 'Transportasi';
+    return 'Layanan Lainnya';
+  };
+  const groups = categories.reduce((result, entry) => {
+    const group = groupFor(entry[0]); (result[group] ||= []).push(entry); return result;
+  }, {});
+  const order = ['Komunikasi','Keuangan','Rumah Tangga','Hiburan','Transportasi','Layanan Lainnya'];
+  if (!categories.length) {
+    grid.innerHTML = '<div class="service-catalog-empty"><b>Katalog sedang disinkronkan</b><p>Silakan muat ulang beberapa saat lagi.</p></div>';
+    return;
+  }
+  grid.innerHTML = order.filter(group => groups[group]?.length).map(group => `<section class="service-group"><div class="service-group-head"><h2>${group}</h2><span>${groups[group].length} layanan</span></div><div class="service-group-grid">${groups[group].map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><b>${escapeText(category)}</b><small>${count} produk</small></button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 function selectProduct(id) {

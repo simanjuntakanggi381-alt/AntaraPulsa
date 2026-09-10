@@ -123,6 +123,12 @@ func normalizeCategory(category, group, name string) string {
 		category string
 		terms    []string
 	}{
+		{"HP Pascabayar", []string{"hp pascabayar", "pulsa pascabayar", "kartu halo", "halo postpaid", "xl prioritas", "indosat postpaid"}},
+		{"Aktivasi Perdana", []string{"aktivasi perdana", "kartu perdana", "registrasi perdana"}},
+		{"Masa Aktif", []string{"masa aktif", "tambah masa"}},
+		{"Paket Telepon", []string{"paket telepon", "paket telpon", "voice package"}},
+		{"Transfer Bank", []string{"bank transfer", "transfer bank", "withdrawal deposit"}},
+		{"Donasi & Zakat", []string{"donasi", "zakat", "sedekah", "infaq"}},
 		{"Internet & TV", []string{"indihome", "wifi", "internet rumah", "first media", "myrepublic"}},
 		{"Paket Data", []string{"paket data", "internet", "kuota"}},
 		{"Token PLN", []string{"token pln", "pln prepaid", "listrik prabayar"}},
