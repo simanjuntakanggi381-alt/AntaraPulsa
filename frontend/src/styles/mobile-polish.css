@@ -45,19 +45,19 @@
 /* Final mobile override: the primary services use illustrated PNG marks, not SVG tiles. */
 @media(max-width:520px){
   #dashboardPage .quick-services{
-    min-height:112px!important;
-    padding:13px 7px 11px!important;
+    min-height:118px!important;
+    padding:14px 7px 13px!important;
     align-items:center!important;
     overflow:visible!important;
   }
   #dashboardPage .quick-services .service-card{
-    height:88px!important;
+    height:91px!important;
     padding:2px 0 0!important;
     display:flex!important;
     flex-direction:column!important;
     align-items:center!important;
     justify-content:flex-start!important;
-    gap:5px!important;
+    gap:7px!important;
     overflow:visible!important;
   }
   #dashboardPage .quick-services .service-card>span.service-3d,
@@ -70,30 +70,35 @@
     padding:0!important;
     display:grid!important;
     place-items:center!important;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    overflow:visible!important;
+    border:1px solid rgba(190,222,210,.72)!important;
+    border-radius:17px!important;
+    background:linear-gradient(145deg,rgba(247,253,250,.98),rgba(231,245,239,.92))!important;
+    box-shadow:inset 0 1px rgba(255,255,255,.9),0 5px 12px rgba(9,85,63,.07)!important;
+    overflow:hidden!important;
   }
   #dashboardPage .quick-services .service-card>span.service-3d>img{
     display:block!important;
     visibility:visible!important;
     opacity:1!important;
-    width:58px!important;
-    height:58px!important;
+    width:46px!important;
+    height:46px!important;
     max-width:none!important;
     max-height:none!important;
     margin:0!important;
     object-fit:contain!important;
     object-position:center!important;
     transform:none!important;
-    filter:drop-shadow(0 5px 7px rgba(3,66,52,.18))!important;
+    filter:drop-shadow(0 3px 4px rgba(3,66,52,.17))!important;
   }
+  #dashboardPage .quick-services .service-card:nth-child(1) .service-3d>img{width:43px!important;height:43px!important;transform:translate(-1px,1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(2) .service-3d>img{width:47px!important;height:47px!important;transform:translateY(1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(3) .service-3d>img{width:45px!important;height:45px!important;transform:translateY(1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(4) .service-3d>img{width:44px!important;height:44px!important;transform:translateY(-1px)!important}
+  #dashboardPage .quick-services .service-card:nth-child(5) .service-3d>img{width:44px!important;height:44px!important;transform:translateY(1px)!important}
   #dashboardPage .quick-services .service-card>b{
     min-height:17px!important;
     color:#173d32!important;
-    font:700 10px/17px 'DM Sans',sans-serif!important;
+    font:700 9px/17px 'DM Sans',sans-serif!important;
     text-align:center!important;
   }
 }
@@ -101,12 +106,8 @@
 @media(max-width:370px){
   #dashboardPage .quick-services{padding-right:4px!important;padding-left:4px!important}
   #dashboardPage .quick-services .service-card>span.service-3d,
-  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d,
-  #dashboardPage .quick-services .service-card>span.service-3d>img{
-    width:52px!important;
-    height:52px!important;
-  }
+  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{width:54px!important;height:54px!important}
   #dashboardPage .quick-services .service-card>span.service-3d,
-  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{flex-basis:52px!important}
-  #dashboardPage .quick-services .service-card>b{font-size:9px!important}
+  #dashboardPage .quick-services .service-card:nth-child(even)>span.service-3d{flex-basis:54px!important}
+  #dashboardPage .quick-services .service-card>b{font-size:8.5px!important}
 }
