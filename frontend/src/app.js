@@ -232,25 +232,38 @@ function renderServiceCategories() {
     return out;
   }, {});
   const dashboardServices = new Set(['Pulsa', 'Paket Data', 'E-Wallet', 'Token PLN']);
-  const categories = Object.entries(counts).filter(([category]) => !dashboardServices.has(category)).sort(([a], [b]) => a.localeCompare(b, 'id'));
-  const groupFor = category => {
-    const value = category.toLowerCase();
-    if (/pascabayar|perdana|masa aktif|telepon|sms/.test(value)) return 'Komunikasi';
-    if (/bank|transfer|asuransi|donasi|zakat|multifinance|keuangan/.test(value)) return 'Keuangan';
-    if (/gas|pdam|bpjs|pajak|internet|tagihan|ppob/.test(value)) return 'Rumah Tangga';
-    if (/game|hiburan|voucher|stream|tv/.test(value)) return 'Hiburan';
-    if (/transport|tiket|travel/.test(value)) return 'Transportasi';
-    return 'Layanan Lainnya';
-  };
-  const groups = categories.reduce((result, entry) => {
-    const group = groupFor(entry[0]); (result[group] ||= []).push(entry); return result;
-  }, {});
-  const order = ['Komunikasi','Keuangan','Rumah Tangga','Hiburan','Transportasi','Layanan Lainnya'];
-  if (!categories.length) {
-    grid.innerHTML = '<div class="service-catalog-empty"><b>Katalog sedang disinkronkan</b><p>Silakan muat ulang beberapa saat lagi.</p></div>';
-    return;
-  }
-  grid.innerHTML = order.filter(group => groups[group]?.length).map(group => `<section class="service-group"><div class="service-group-head"><h2>${group}</h2><span>${groups[group].length} layanan</span></div><div class="service-group-grid">${groups[group].map(([category, count]) => `<button class="service-category-card" data-service-category="${escapeText(category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(category)}</svg></span><b>${escapeText(category)}</b><small>${count} produk</small></button>`).join('')}</div></section>`).join('');
+  const serviceGroups = [
+    { title:'Komunikasi', services:[
+      { label:'HP Pascabayar', category:'HP Pascabayar' }, { label:'Aktivasi Perdana', category:'Aktivasi Perdana' },
+      { label:'Masa Aktif', category:'Masa Aktif' }, { label:'Paket Telepon', category:'Paket Telepon' }
+    ]},
+    { title:'Keuangan', services:[
+      { label:'Asuransi', category:'Asuransi' }, { label:'Transfer Bank', category:'Transfer Bank' },
+      { label:'Donasi & Zakat', category:'Donasi & Zakat' }, { label:'Multifinance', category:'Multifinance' }
+    ]},
+    { title:'Rumah Tangga', services:[
+      { label:'Gas Negara', category:'Gas' }, { label:'PDAM', category:'PDAM' },
+      { label:'BPJS', category:'BPJS' }, { label:'Internet & TV', category:'Internet & TV' },
+      { label:'Pajak', category:'Pajak' }, { label:'PPOB', category:'PPOB' }
+    ]},
+    { title:'Hiburan', services:[
+      { label:'Top Up Game', category:'Game' }, { label:'TV & Streaming', category:'TV & Streaming' },
+      { label:'Voucher Digital', category:'Voucher Digital' }
+    ]},
+    { title:'Transportasi', services:[
+      { label:'Transportasi', category:'Transportasi' }, { label:'Tiket', category:'Tiket' }, { label:'E-Toll', category:'E-Toll' }
+    ]},
+    { title:'Layanan Publik', services:[
+      { label:'Pendidikan', category:'Pendidikan' }, { label:'Kesehatan', category:'Kesehatan' }
+    ]}
+  ];
+  const declared = new Set(serviceGroups.flatMap(group => group.services.map(service => service.category)));
+  const extras = Object.keys(counts)
+    .filter(category => !dashboardServices.has(category) && !declared.has(category))
+    .sort((a,b) => a.localeCompare(b,'id'))
+    .map(category => ({ label:category, category }));
+  if (extras.length) serviceGroups.push({ title:'Layanan Lainnya', services:extras });
+  grid.innerHTML = serviceGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}"><span class="service-category-logo"><svg viewBox="0 0 24 24" aria-hidden="true">${serviceSymbol(service.label)}</svg></span><b>${escapeText(service.label)}</b>${counts[service.category] ? `<small>${counts[service.category]} produk</small>` : ''}</button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 function selectProduct(id) {
