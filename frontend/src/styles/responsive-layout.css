@@ -289,6 +289,30 @@
 .provider-choices button > b { width:100%; overflow: hidden; font-size: 8px; text-align:center; text-overflow: ellipsis; white-space: nowrap; }
 .provider-choices button > small { color:#91a098; font-size:6.5px; font-weight:700; }
 .provider-choices button.active { border-color: #69b49e; background: #eff8f4; box-shadow: 0 0 0 2px rgba(8,120,94,.08); }
+
+/* Provider marks use crisp brand artwork when available and a polished
+   service emblem as the fallback. Every shell has the same visual bounds. */
+.provider-logo-shell { box-sizing: border-box; width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; overflow: hidden; border: 1px solid color-mix(in srgb,var(--provider-color) 16%,#dfeae5); border-radius: 14px; background: #fff; box-shadow: 0 4px 11px rgba(9,70,52,.07); }
+.provider-logo-shell > img { display: block; width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: contain; object-position: center; transform: none; filter: none; }
+.provider-choices button > .provider-logo-shell { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: #fff; }
+.provider-choices button > .provider-logo-shell > img { width: 31px; height: 31px; max-width: 31px; max-height: 31px; }
+.product > .product-provider-logo { width: 42px; height: 42px; margin-bottom: 11px; }
+.product > .product-provider-logo > img { width: 30px; height: 30px; }
+.tx-provider-logo { width: 38px; height: 38px; flex-basis: 38px; border-radius: 11px; box-shadow: none; }
+.tx-provider-logo > img { width: 27px; height: 27px; }
+#providerIndicator:has(.indicator-provider-logo) { padding: 0; overflow: visible; background: transparent; }
+.indicator-provider-logo { width: 34px; height: 34px; flex-basis: 34px; border-radius: 10px; box-shadow: none; }
+.indicator-provider-logo > img { width: 24px; height: 24px; }
+#selectedLogo:has(.selected-provider-logo) { overflow: visible; }
+.selected-provider-logo { width: 48px; height: 48px; flex-basis: 48px; }
+.selected-provider-logo > img { width: 34px; height: 34px; }
+
+@media (max-width: 430px) {
+  .provider-choices button { min-height: 94px; padding: 9px 4px; gap: 6px; }
+  .provider-choices button > .provider-logo-shell { width: 42px; height: 42px; flex-basis: 42px; }
+  .provider-choices button > .provider-logo-shell > img { width: 30px; height: 30px; }
+  .provider-choices button > b { min-height: 20px; display: grid; place-items: center; line-height: 1.2; white-space: normal; }
+}
 .provider-empty { grid-column:1/-1; margin:0; padding:24px 12px; border:1px dashed #d9e6e0; border-radius:13px; color:#7d9088; font-size:9px; text-align:center; }
 .finder-submit { height: 43px !important; margin-top: 13px; border-radius: 11px !important; font-size: 10px !important; }
 .product-results-head { margin-bottom: 13px; display: flex; align-items: center; justify-content: space-between; }

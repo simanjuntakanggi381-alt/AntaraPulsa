@@ -87,11 +87,35 @@ $('#accountLogout').onclick = () => $('#logoutBtn').click();
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
 
-function providerLetter(name) { return name === 'PLN' ? 'ϟ' : name.charAt(0); }
 function providerColor(name) { return state.products.find(p => p.provider === name)?.color || '#178e69'; }
+const providerDomains = {
+  telkomsel:'telkomsel.com', indosat:'im3.id', im3:'im3.id', axis:'axis.co.id', xl:'xl.co.id', smartfren:'smartfren.com', 'by.u':'byu.id', byu:'byu.id', tri:'tri.co.id', three:'tri.co.id',
+  pln:'pln.co.id', dana:'dana.id', ovo:'ovo.id', gopay:'gojek.com', gojek:'gojek.com', shopeepay:'shopeepay.co.id', shopee:'shopee.co.id', linkaja:'linkaja.id', astrapay:'astrapay.com', grab:'grab.com', maxim:'taximaxim.com',
+  bca:'bca.co.id', bri:'bri.co.id', bni:'bni.co.id', mandiri:'bankmandiri.co.id', btn:'btn.co.id', bsi:'bankbsi.co.id', cimb:'cimbniaga.co.id', permata:'permatabank.com', danamon:'danamon.co.id', maybank:'maybank.co.id', panin:'panin.co.id', seabank:'seabank.co.id', jago:'jago.com', neocommerce:'bankneo.co.id',
+  bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
+};
+const providerFallbacks = {
+  Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
+  'Token PLN':'service-listrik-3d-compact.png', Listrik:'service-listrik-3d-compact.png', Game:'service-category-14.png',
+  'Aktivasi Perdana':'service-category-01.png', 'Masa Aktif':'service-category-02.png', 'Paket Telepon':'service-category-03.png',
+  'HP Pascabayar':'service-category-00.png', 'Transfer Bank':'service-category-05.png', PDAM:'service-category-09.png', BPJS:'service-category-10.png',
+  'Internet & TV':'service-category-11.png', 'TV & Streaming':'service-category-15.png', Voucher:'service-category-16.png', 'Voucher Digital':'service-category-16.png'
+};
+function providerFallback(type) { return `/assets/${providerFallbacks[type] || 'service-lainnya-3d-compact.png'}`; }
+function providerDomain(name) {
+  const normalized = String(name || '').toLowerCase().replace(/[^a-z0-9. ]/g,'').trim();
+  if (providerDomains[normalized]) return providerDomains[normalized];
+  const match = Object.keys(providerDomains).find(key => normalized.includes(key));
+  return match ? providerDomains[match] : '';
+}
+function providerLogoMarkup(provider, type, className = '') {
+  const fallback = providerFallback(type), domain = providerDomain(provider);
+  const source = domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback;
+  return `<span class="provider-logo-shell ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
+}
 function txRow(tx, detailed = false) {
-  if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product"><span class="tx-logo" style="background:${providerColor(tx.provider)}">${providerLetter(tx.provider)}</span><div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
-  return `<div class="tx-row"><span class="tx-logo" style="background:${providerColor(tx.provider)}">${providerLetter(tx.provider)}</span><div class="tx-info"><b>${tx.product}</b><small>${tx.target} · ${tx.provider}</small></div><div class="tx-amount"><b>Rp ${money(tx.amount)}</b><span class="status">${tx.status}</span></div></div>`;
+  if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
+  return `<div class="tx-row">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div class="tx-info"><b>${tx.product}</b><small>${tx.target} · ${tx.provider}</small></div><div class="tx-amount"><b>Rp ${money(tx.amount)}</b><span class="status">${tx.status}</span></div></div>`;
 }
 function renderRecent() {
   const recent = state.transactions.slice(0, 3);
@@ -110,7 +134,7 @@ $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-st
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
   const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider === provider));
-  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
+  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
   $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
@@ -165,7 +189,7 @@ function hideProductSelection() {
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
   $('#detectedProvider').textContent = provider || (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Nomor belum dikenali' : 'Pilih provider di bawah');
-  $('#providerIndicator').textContent = provider ? providerLetter(provider) : '?';
+  $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
   $('#detectionStatus').textContent = provider ? 'Terpilih' : 'Otomatis';
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
@@ -177,7 +201,7 @@ function renderProviderChoices() {
   $('#providerChoices').innerHTML = providers.length
     ? providers.map(provider => {
       const total = state.products.filter(product => product.type === state.selectedType && product.provider === provider).length;
-      return `<button type="button" data-provider="${escapeText(provider)}"><span style="--provider-color:${providerColor(provider)}">${providerLetter(provider)}</span><b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
+      return `<button type="button" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
     }).join('')
     : '<p class="provider-empty">Provider sedang disinkronkan dari Pulsa24Jam.</p>';
   $$('#providerChoices button').forEach(button => button.onclick = () => updateProviderDetection(button.dataset.provider));
@@ -309,7 +333,7 @@ function selectProduct(id) {
   state.selected = state.products.find(p => p.id === id);
   renderProducts(state.selectedType, state.selectedProvider);
   $('#selectedEmpty').classList.add('hidden'); $('#selectedProduct').classList.remove('hidden');
-  $('#selectedLogo').textContent = providerLetter(state.selected.provider); $('#selectedLogo').style.background = state.selected.color;
+  $('#selectedLogo').innerHTML = providerLogoMarkup(state.selected.provider,state.selected.type,'selected-provider-logo'); $('#selectedLogo').style.background = 'transparent';
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
   $('#selectedPrice').textContent = openAmount ? `Nominal bebas + admin Rp ${money(state.selected.fee)}` : `Rp ${money(state.selected.price)}`;
