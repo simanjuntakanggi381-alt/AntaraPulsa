@@ -109,7 +109,7 @@ $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter')
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider.toLowerCase().includes(provider.toLowerCase())));
+  const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider === provider));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}"><span class="product-logo" style="background:${p.color}">${providerLetter(p.provider)}</span><small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
@@ -141,17 +141,45 @@ function availableProviders(type) {
     .sort((a, b) => a.localeCompare(b, 'id'));
 }
 
+function matchingAvailableProvider(provider) {
+  return availableProviders(state.selectedType).find(item => item.toLowerCase() === provider.toLowerCase()) || '';
+}
+
+function transactionInputConfig(type) {
+  if (['Pulsa','Paket Data','HP Pascabayar','Masa Aktif','Paket Telepon'].includes(type)) {
+    return { label:'Nomor handphone', prefix:'+62', placeholder:'Contoh: 081234567890', autocomplete:'tel' };
+  }
+  if (type === 'E-Wallet') return { label:'Nomor E-Wallet', prefix:'HP', placeholder:'Masukkan nomor e-wallet aktif', autocomplete:'tel' };
+  if (type === 'Token PLN') return { label:'Nomor meter / ID pelanggan', prefix:'ID', placeholder:'Masukkan nomor meter atau ID pelanggan', autocomplete:'off' };
+  if (type === 'Game') return { label:'User ID / Zone ID', prefix:'ID', placeholder:'Masukkan user ID tujuan', autocomplete:'off' };
+  return { label:'Nomor tujuan / ID pelanggan', prefix:'ID', placeholder:'Masukkan nomor atau ID tujuan', autocomplete:'off' };
+}
+
+function hideProductSelection() {
+  $('#productResults').classList.add('hidden');
+  state.selected = null;
+  $('#selectedProduct').classList.add('hidden');
+  $('#selectedEmpty').classList.remove('hidden');
+}
+
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
   $('#detectedProvider').textContent = provider || (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Nomor belum dikenali' : 'Pilih provider di bawah');
   $('#providerIndicator').textContent = provider ? providerLetter(provider) : '?';
   $('#detectionStatus').textContent = provider ? 'Terpilih' : 'Otomatis';
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
+  hideProductSelection();
 }
 
 function renderProviderChoices() {
   const providers = availableProviders(state.selectedType);
-  $('#providerChoices').innerHTML = providers.map(provider => `<button type="button" data-provider="${escapeText(provider)}"><span style="--provider-color:${providerColor(provider)}">${providerLetter(provider)}</span><b>${escapeText(provider)}</b></button>`).join('');
+  $('#providerCount').textContent = `${providers.length} provider`;
+  $('#providerChoices').innerHTML = providers.length
+    ? providers.map(provider => {
+      const total = state.products.filter(product => product.type === state.selectedType && product.provider === provider).length;
+      return `<button type="button" data-provider="${escapeText(provider)}"><span style="--provider-color:${providerColor(provider)}">${providerLetter(provider)}</span><b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
+    }).join('')
+    : '<p class="provider-empty">Provider sedang disinkronkan dari Pulsa24Jam.</p>';
   $$('#providerChoices button').forEach(button => button.onclick = () => updateProviderDetection(button.dataset.provider));
 }
 
@@ -162,9 +190,12 @@ function prepareProductFinder(type) {
   $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === state.selectedType));
   const heading = $('#transactionPage .simple-head h1');
   if (heading) heading.textContent = state.selectedType;
-  $('#productResults').classList.add('hidden');
-  $('#selectedProduct').classList.add('hidden');
-  $('#selectedEmpty').classList.remove('hidden');
+  const inputConfig = transactionInputConfig(state.selectedType);
+  $('#targetLabel').textContent = inputConfig.label;
+  $('#targetPrefix').textContent = inputConfig.prefix;
+  $('#targetInput').placeholder = inputConfig.placeholder;
+  $('#targetInput').autocomplete = inputConfig.autocomplete;
+  hideProductSelection();
   $('#targetInput').value = '';
   renderProviderChoices();
   updateProviderDetection('');
@@ -297,15 +328,13 @@ $('#allServices').onclick = () => showPage('services');
 
 $('#targetInput').addEventListener('input', event => {
   if (!['Pulsa','Paket Data'].includes(state.selectedType)) return;
-  updateProviderDetection(detectOperator(event.target.value));
+  updateProviderDetection(matchingAvailableProvider(detectOperator(event.target.value)));
 });
 
 $('#showProductsBtn').onclick = () => {
   const target = $('#targetInput').value.trim();
   if (!target) { showToast('Tujuan belum diisi', 'Masukkan nomor tujuan atau ID pelanggan terlebih dahulu.'); return; }
-  if (['Pulsa','Paket Data'].includes(state.selectedType) && !state.selectedProvider) {
-    showToast('Provider belum dikenali', 'Periksa nomor atau pilih provider secara manual.'); return;
-  }
+  if (!state.selectedProvider) { showToast('Provider belum dipilih', 'Pilih salah satu provider yang tersedia.'); return; }
   $('#productResults').classList.remove('hidden');
   renderProducts(state.selectedType, state.selectedProvider);
   $('#productResults').scrollIntoView({ behavior:'smooth', block:'start' });
