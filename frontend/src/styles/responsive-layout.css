@@ -322,6 +322,7 @@
 .product-results-head > span { padding: 5px 8px; border-radius: 10px; background: #edf6f2; color: #08785e; font-size: 8px; font-weight: 800; }
 .product-results .product-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
 .product-results .product { min-width: 0; padding: 12px !important; border-radius: 13px !important; }
+.checkout-card:has(#selectedProduct.hidden) { display: none !important; }
 .product-results .product b { min-height: 31px; overflow: hidden; line-height: 1.35; }
 .checkout-target { margin: 4px 0 14px; padding: 10px 0; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e7eeeb; border-bottom: 1px solid #e7eeeb; }
 .checkout-target span { color: #74877f; font-size: 9px; }

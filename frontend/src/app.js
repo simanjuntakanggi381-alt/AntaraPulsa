@@ -213,8 +213,9 @@ function transactionInputConfig(type) {
 function hideProductSelection() {
   $('#productResults').classList.add('hidden');
   state.selected = null;
+  $('.checkout-card').classList.add('hidden');
   $('#selectedProduct').classList.add('hidden');
-  $('#selectedEmpty').classList.remove('hidden');
+  $('#selectedEmpty').classList.add('hidden');
 }
 
 function readTransactionDraft() {
@@ -396,6 +397,7 @@ function renderServiceCategories() {
 function selectProduct(id) {
   state.selected = state.products.find(p => p.id === id);
   renderProducts(state.selectedType, state.selectedProvider);
+  $('.checkout-card').classList.remove('hidden');
   $('#selectedEmpty').classList.add('hidden'); $('#selectedProduct').classList.remove('hidden');
   $('#selectedLogo').innerHTML = providerLogoMarkup(state.selected.provider,state.selected.type,'selected-provider-logo'); $('#selectedLogo').style.background = 'transparent';
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
