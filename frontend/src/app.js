@@ -100,6 +100,7 @@ const providerDomains = {
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
   iconnet:'/assets/provider-iconnet-symbol.png?v=3',
+  pln:'/assets/provider-pln.png',
   brizzi:'/assets/provider-brizzi.png', dana:'/assets/provider-dana.png', emoneymandiri:'/assets/provider-emoney-mandiri.png',
   gopay:'/assets/provider-gopay.png', grab:'/assets/provider-grab.png', isaku:'/assets/provider-isaku.png',
   kaspro:'/assets/provider-kaspro.png', linkaja:'/assets/provider-linkaja.png', maxim:'/assets/provider-maxim.png',
@@ -154,7 +155,7 @@ $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter')
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => (filter === 'all' || p.type === filter) && (!provider || p.provider === provider));
+  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || p.provider === provider));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
@@ -182,8 +183,17 @@ function detectOperator(value) {
 }
 
 function availableProviders(type) {
-  return [...new Set(state.products.filter(product => product.type === type).map(product => product.provider))]
+  const canonicalType = canonicalProductType(type);
+  return [...new Set(state.products.filter(product => canonicalProductType(product.type) === canonicalType).map(product => product.provider))]
     .sort((a, b) => a.localeCompare(b, 'id'));
+}
+
+function canonicalProductType(type) {
+  const normalized = String(type || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (normalized === 'listrik' || normalized === 'tokenpln') return 'Token PLN';
+  if (normalized === 'rtol') return 'Transfer Bank';
+  if (normalized === 'tv' || normalized === 'tvstreaming') return 'TV & Streaming';
+  return String(type || 'Lainnya');
 }
 
 function matchingAvailableProvider(provider) {
@@ -250,7 +260,7 @@ function renderProviderChoices() {
   $('#providerCount').textContent = `${providers.length} provider`;
   $('#providerChoices').innerHTML = providers.length
     ? providers.map(provider => {
-      const total = state.products.filter(product => product.type === state.selectedType && product.provider === provider).length;
+      const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && product.provider === provider).length;
       return `<button type="button" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
     }).join('')
     : '<p class="provider-empty">Provider sedang disinkronkan dari Pulsa24Jam.</p>';
@@ -341,7 +351,7 @@ function renderServiceCategories() {
   const grid = $('#allServiceGrid');
   if (!grid) return;
   const counts = state.products.reduce((out, product) => {
-    const category = product.type || 'Lainnya';
+    const category = canonicalProductType(product.type);
     out[category] = (out[category] || 0) + 1;
     return out;
   }, {});
