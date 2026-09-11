@@ -387,7 +387,10 @@ function renderServiceCategories() {
     .sort((a,b) => a.localeCompare(b,'id'))
     .map(category => ({ label:category, category }));
   if (extras.length) serviceGroups.push({ title:'Layanan Lainnya', services:extras });
-  grid.innerHTML = serviceGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}">${serviceCategoryVisual(service)}<b>${escapeText(service.label)}</b>${counts[service.category] ? `<small>${counts[service.category]} produk</small>` : ''}</button>`).join('')}</div></section>`).join('');
+  const activeGroups = serviceGroups
+    .map(group => ({ ...group, services: group.services.filter(service => (counts[service.category] || 0) > 0) }))
+    .filter(group => group.services.length > 0);
+  grid.innerHTML = activeGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}">${serviceCategoryVisual(service)}<b>${escapeText(service.label)}</b><small>${counts[service.category]} produk</small></button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 function selectProduct(id) {
