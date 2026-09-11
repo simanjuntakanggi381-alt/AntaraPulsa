@@ -96,7 +96,7 @@ const providerDomains = {
 };
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
-  biznet:'/assets/provider-biznet-symbol.png?v=3', iconnet:'/assets/provider-iconnet-symbol.png?v=3'
+  biznet:'/assets/provider-biznet-bmark-2026.png', iconnet:'/assets/provider-iconnet-symbol.png?v=3'
 };
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
