@@ -1,5 +1,5 @@
-const CACHE = 'antarapulsa-shell-v9';
-const SHELL = ['/', '/manifest.webmanifest', '/assets/brand-mark.png'];
+const CACHE = 'antarapulsa-shell-v10';
+const SHELL = ['/', '/manifest.webmanifest', '/assets/brand-mark.png', '/assets/provider-indosat.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)));
