@@ -1,4 +1,4 @@
-const CACHE = 'antarapulsa-shell-v15';
+const CACHE = 'antarapulsa-shell-v16';
 const SHELL = ['/', '/manifest.webmanifest', '/assets/brand-mark.png', '/assets/provider-indosat.png', '/assets/provider-biznet-bmark-2026.png', '/assets/provider-iconnet-symbol.png'];
 
 self.addEventListener('install', event => {

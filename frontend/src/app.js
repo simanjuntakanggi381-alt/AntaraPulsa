@@ -10,7 +10,7 @@ import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
-import biznetLogo from './assets/provider-biznet-symbol.png';
+import biznetLogo from './assets/provider-biznet-symbol.png?inline';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
