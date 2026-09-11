@@ -10,6 +10,7 @@ import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
+import biznetLogo from './assets/provider-biznet-symbol.png';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
@@ -18,6 +19,7 @@ if ('serviceWorker' in navigator) {
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', balanceVisible: true, returnPage: 'dashboard' };
+const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
 const showToast = createToast('#toast');
 
 const appIcons = {
@@ -50,7 +52,9 @@ function setUser(user) {
 async function loadApp() {
   const [user, products, transactions] = await Promise.all([api('/api/me'), api('/api/products'), api('/api/transactions')]);
   setUser(user); state.products = products || []; state.transactions = transactions || []; renderServiceCategories();
-  prepareProductFinder('Pulsa'); renderRecent(); renderHistory();
+  if (location.hash === '#transaction') restoreTransactionDraft();
+  else prepareProductFinder('Pulsa');
+  renderRecent(); renderHistory();
 }
 
 function resetViewport() {
@@ -96,7 +100,7 @@ const providerDomains = {
 };
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
-  biznet:'/assets/provider-biznet-bmark-2026.png', iconnet:'/assets/provider-iconnet-symbol.png?v=3'
+  biznet:biznetLogo, iconnet:'/assets/provider-iconnet-symbol.png?v=3'
 };
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
@@ -195,6 +199,34 @@ function hideProductSelection() {
   $('#selectedEmpty').classList.remove('hidden');
 }
 
+function readTransactionDraft() {
+  try { return JSON.parse(sessionStorage.getItem(TRANSACTION_DRAFT_KEY) || 'null'); }
+  catch { return null; }
+}
+
+function saveTransactionDraft() {
+  sessionStorage.setItem(TRANSACTION_DRAFT_KEY, JSON.stringify({
+    type: state.selectedType,
+    provider: state.selectedProvider,
+    target: $('#targetInput').value,
+    productsVisible: !$('#productResults').classList.contains('hidden')
+  }));
+}
+
+function restoreTransactionDraft() {
+  const draft = readTransactionDraft();
+  prepareProductFinder(draft?.type || 'Pulsa');
+  if (!draft) return;
+  $('#targetInput').value = draft.target || '';
+  const provider = availableProviders(state.selectedType).find(item => item.toLowerCase() === String(draft.provider || '').toLowerCase()) || '';
+  updateProviderDetection(provider);
+  if (draft.productsVisible && provider && draft.target) {
+    $('#productResults').classList.remove('hidden');
+    renderProducts(state.selectedType, provider);
+  }
+  saveTransactionDraft();
+}
+
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
   $('#detectedProvider').textContent = provider || (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Nomor belum dikenali' : 'Pilih provider di bawah');
@@ -202,6 +234,7 @@ function updateProviderDetection(provider = '') {
   $('#detectionStatus').textContent = provider ? 'Terpilih' : 'Otomatis';
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
+  saveTransactionDraft();
 }
 
 function renderProviderChoices() {
@@ -232,6 +265,7 @@ function prepareProductFinder(type) {
   $('#targetInput').value = '';
   renderProviderChoices();
   updateProviderDetection('');
+  saveTransactionDraft();
 }
 
 function openTransaction(type) {
@@ -360,8 +394,9 @@ $$('.service-card').forEach(btn => btn.onclick = () => {
 $('#allServices').onclick = () => showPage('services');
 
 $('#targetInput').addEventListener('input', event => {
-  if (!['Pulsa','Paket Data'].includes(state.selectedType)) return;
-  updateProviderDetection(matchingAvailableProvider(detectOperator(event.target.value)));
+  if (['Pulsa','Paket Data'].includes(state.selectedType)) {
+    updateProviderDetection(matchingAvailableProvider(detectOperator(event.target.value)));
+  } else saveTransactionDraft();
 });
 
 $('#showProductsBtn').onclick = () => {
@@ -370,6 +405,7 @@ $('#showProductsBtn').onclick = () => {
   if (!state.selectedProvider) { showToast('Provider belum dipilih', 'Pilih salah satu provider yang tersedia.'); return; }
   $('#productResults').classList.remove('hidden');
   renderProducts(state.selectedType, state.selectedProvider);
+  saveTransactionDraft();
   $('#productResults').scrollIntoView({ behavior:'smooth', block:'start' });
 };
 
