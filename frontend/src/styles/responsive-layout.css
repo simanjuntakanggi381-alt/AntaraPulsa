@@ -297,6 +297,7 @@
 .provider-logo-pgn { position: relative; }
 .provider-logo-pgn > img { position: absolute; left: 4px; width: 110px; height: 32px; max-width: none; max-height: none; object-fit: fill; }
 .provider-logo-indihome > img { width: 39px; height: 24px; max-width: 39px; max-height: 24px; }
+.provider-logo-tv > img { width: 39px; height: 31px; max-width: 39px; max-height: 31px; }
 .provider-logo-biznet { background-color: #fff; }
 .provider-choices button > .provider-logo-shell { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: #fff; }
 .provider-choices button > .provider-logo-shell > img { width: 31px; height: 31px; max-width: 31px; max-height: 31px; }
