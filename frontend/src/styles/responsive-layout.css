@@ -50,7 +50,7 @@
     padding: 0 !important;
     display: grid !important;
     place-items: center !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     border: 1px solid #dcebe4 !important;
     border-radius: 15px !important;
     background: linear-gradient(145deg,#fff,#edf7f2) !important;
@@ -82,10 +82,10 @@
   }
 
   #dashboardPage .quick-services .service-card:nth-child(n) > .service-3d > img {
-    width: 43px !important;
-    height: 43px !important;
-    max-width: 43px !important;
-    max-height: 43px !important;
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
     margin: 0 auto !important;
     object-position: 50% 50% !important;
     align-self: center !important;
@@ -211,14 +211,14 @@
   width: 52px;
   height: 52px;
   flex-basis: 52px;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid #dcebe4;
   border-radius: 15px;
   background: linear-gradient(145deg,#fff,#edf7f2) !important;
   box-shadow: inset 0 1px #fff,0 4px 10px rgba(7,75,55,.055);
   filter: none;
 }
-.service-category-logo-3d img { width: 44px; height: 44px; display: block; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(4,65,55,.09)); }
+.service-category-logo-3d img { width: 40px; height: 40px; display: block; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(4,65,55,.07)); }
 .service-category-card:has(.service-category-logo-3d) { min-height: 88px; gap: 4px; }
 .services-page .service-group-grid .service-category-card {
   display: grid;
@@ -236,8 +236,8 @@
   transform: none !important;
 }
 .services-page .service-group-grid .service-category-card > .service-category-logo-3d > img {
-  width: 44px !important;
-  height: 44px !important;
+  width: 40px !important;
+  height: 40px !important;
   margin: 0 auto !important;
   display: block !important;
   object-fit: contain !important;
