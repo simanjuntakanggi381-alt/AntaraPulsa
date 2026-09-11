@@ -94,7 +94,10 @@ const providerDomains = {
   bca:'bca.co.id', bri:'bri.co.id', bni:'bni.co.id', mandiri:'bankmandiri.co.id', btn:'btn.co.id', bsi:'bankbsi.co.id', cimb:'cimbniaga.co.id', permata:'permatabank.com', danamon:'danamon.co.id', maybank:'maybank.co.id', panin:'panin.co.id', seabank:'seabank.co.id', jago:'jago.com', neocommerce:'bankneo.co.id',
   bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
 };
-const providerAssets = { indosat:'/assets/provider-indosat.png', im3:'/assets/provider-indosat.png' };
+const providerAssets = {
+  indosat:'/assets/provider-indosat.png', im3:'/assets/provider-indosat.png',
+  biznet:'/assets/provider-biznet.png', iconnet:'/assets/provider-iconnet.webp'
+};
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
   'Token PLN':'service-listrik-3d-compact.png', Listrik:'service-listrik-3d-compact.png', Game:'service-category-14.png',
@@ -112,7 +115,8 @@ function providerDomain(name) {
 function providerLogoMarkup(provider, type, className = '') {
   const fallback = providerFallback(type), normalized = String(provider || '').toLowerCase().trim(), domain = providerDomain(provider);
   const source = providerAssets[normalized] || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
-  return `<span class="provider-logo-shell ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
+  const wide = ['biznet','iconnet'].includes(normalized) ? ' provider-logo-wide' : '';
+  return `<span class="provider-logo-shell ${className}${wide}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {
   if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
