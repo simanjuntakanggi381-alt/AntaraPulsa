@@ -100,6 +100,7 @@ const providerDomains = {
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
   iconnet:'/assets/provider-iconnet-symbol.png?v=3',
+  indihome:'/assets/provider-indihome.svg',
   pln:'/assets/provider-pln.png',
   pgn:'/assets/provider-pgn.svg',
   brizzi:'/assets/provider-brizzi.png', dana:'/assets/provider-dana.png', emoneymandiri:'/assets/provider-emoney-mandiri.png',
@@ -139,7 +140,7 @@ function providerLogoMarkup(provider, type, className = '') {
   }
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
-  const providerClass = providerKey === 'pgn' ? 'provider-logo-pgn' : '';
+  const providerClass = providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {
