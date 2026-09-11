@@ -10,7 +10,6 @@ import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
-import biznetLogo from './assets/provider-biznet-symbol.png?inline';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
@@ -100,7 +99,7 @@ const providerDomains = {
 };
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
-  biznet:biznetLogo, iconnet:'/assets/provider-iconnet-symbol.png?v=3'
+  iconnet:'/assets/provider-iconnet-symbol.png?v=3'
 };
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
@@ -123,6 +122,10 @@ function localProviderAsset(name) {
 }
 function providerLogoMarkup(provider, type, className = '') {
   const fallback = providerFallback(type), domain = providerDomain(provider);
+  const providerKey = String(provider || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
+  if (providerKey.includes('biznet')) {
+    return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
+  }
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   return `<span class="provider-logo-shell ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
