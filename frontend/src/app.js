@@ -95,8 +95,8 @@ const providerDomains = {
   bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
 };
 const providerAssets = {
-  indosat:'/assets/provider-indosat.png', im3:'/assets/provider-indosat.png',
-  biznet:'/assets/provider-biznet-symbol.png', iconnet:'/assets/provider-iconnet-symbol.png'
+  indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
+  biznet:'/assets/provider-biznet-symbol.png?v=3', iconnet:'/assets/provider-iconnet-symbol.png?v=3'
 };
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
@@ -112,9 +112,14 @@ function providerDomain(name) {
   const match = Object.keys(providerDomains).find(key => normalized.includes(key));
   return match ? providerDomains[match] : '';
 }
+function localProviderAsset(name) {
+  const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
+  const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key));
+  return alias ? providerAssets[alias] : '';
+}
 function providerLogoMarkup(provider, type, className = '') {
-  const fallback = providerFallback(type), normalized = String(provider || '').toLowerCase().trim(), domain = providerDomain(provider);
-  const source = providerAssets[normalized] || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
+  const fallback = providerFallback(type), domain = providerDomain(provider);
+  const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   return `<span class="provider-logo-shell ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {
