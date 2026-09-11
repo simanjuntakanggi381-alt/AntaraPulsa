@@ -99,7 +99,12 @@ const providerDomains = {
 };
 const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
-  iconnet:'/assets/provider-iconnet-symbol.png?v=3'
+  iconnet:'/assets/provider-iconnet-symbol.png?v=3',
+  brizzi:'/assets/provider-brizzi.png', dana:'/assets/provider-dana.png', emoneymandiri:'/assets/provider-emoney-mandiri.png',
+  gopay:'/assets/provider-gopay.png', grab:'/assets/provider-grab.png', isaku:'/assets/provider-isaku.png',
+  kaspro:'/assets/provider-kaspro.png', linkaja:'/assets/provider-linkaja.png', maxim:'/assets/provider-maxim.png',
+  ovo:'/assets/provider-ovo.png', sakuku:'/assets/provider-sakuku.png', shopeepay:'/assets/provider-shopeepay.png',
+  tapcash:'/assets/provider-tapcash.png'
 };
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
@@ -117,7 +122,7 @@ function providerDomain(name) {
 }
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
-  const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key));
+  const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key.replace(/[^a-z0-9]/g, '')));
   return alias ? providerAssets[alias] : '';
 }
 function providerLogoMarkup(provider, type, className = '') {
