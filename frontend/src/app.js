@@ -123,7 +123,7 @@ function localProviderAsset(name) {
 function providerLogoMarkup(provider, type, className = '') {
   const fallback = providerFallback(type), domain = providerDomain(provider);
   const providerKey = String(provider || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
-  if (providerKey.includes('biznet')) {
+  if (providerKey.includes('biznet') || providerKey.includes('bizznet')) {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
