@@ -101,6 +101,7 @@ const providerAssets = {
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
   iconnet:'/assets/provider-iconnet-symbol.png?v=3',
   pln:'/assets/provider-pln.png',
+  pgn:'/assets/provider-pgn.svg',
   brizzi:'/assets/provider-brizzi.png', dana:'/assets/provider-dana.png', emoneymandiri:'/assets/provider-emoney-mandiri.png',
   gopay:'/assets/provider-gopay.png', grab:'/assets/provider-grab.png', isaku:'/assets/provider-isaku.png',
   kaspro:'/assets/provider-kaspro.png', linkaja:'/assets/provider-linkaja.png', maxim:'/assets/provider-maxim.png',
@@ -138,7 +139,8 @@ function providerLogoMarkup(provider, type, className = '') {
   }
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
-  return `<span class="provider-logo-shell ${bankClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
+  const providerClass = providerKey === 'pgn' ? 'provider-logo-pgn' : '';
+  return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {
   if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
