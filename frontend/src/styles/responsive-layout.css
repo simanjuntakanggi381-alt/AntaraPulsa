@@ -72,6 +72,26 @@
     filter: drop-shadow(0 3px 3px rgba(3, 62, 48, .13)) !important;
   }
 
+  #dashboardPage .quick-services .service-card:nth-child(n) > .service-3d,
+  #dashboardPage .quick-services .service-card:nth-child(n) > span.service-3d {
+    width: 52px !important;
+    height: 52px !important;
+    margin: 0 auto !important;
+    align-self: center !important;
+    transform: none !important;
+  }
+
+  #dashboardPage .quick-services .service-card:nth-child(n) > .service-3d > img {
+    width: 43px !important;
+    height: 43px !important;
+    max-width: 43px !important;
+    max-height: 43px !important;
+    margin: 0 auto !important;
+    object-position: 50% 50% !important;
+    align-self: center !important;
+    transform: none !important;
+  }
+
   #dashboardPage .quick-services .service-card > b {
     position: relative !important;
     z-index: 5 !important;
@@ -200,6 +220,40 @@
 }
 .service-category-logo-3d img { width: 44px; height: 44px; display: block; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(4,65,55,.09)); }
 .service-category-card:has(.service-category-logo-3d) { min-height: 88px; gap: 4px; }
+.services-page .service-group-grid .service-category-card {
+  display: grid;
+  grid-template-rows: 52px 26px;
+  align-items: start;
+  justify-items: center;
+}
+.services-page .service-group-grid .service-category-card > .service-category-logo-3d {
+  width: 52px !important;
+  height: 52px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  place-items: center !important;
+  align-self: start !important;
+  transform: none !important;
+}
+.services-page .service-group-grid .service-category-card > .service-category-logo-3d > img {
+  width: 44px !important;
+  height: 44px !important;
+  margin: 0 auto !important;
+  display: block !important;
+  object-fit: contain !important;
+  object-position: 50% 50% !important;
+  align-self: center !important;
+  transform: none !important;
+}
+.services-page .service-group-grid .service-category-card > b {
+  width: 100%;
+  min-height: 26px;
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+}
 .service-catalog-empty { padding: 48px 20px; border:1px solid #e1eae6; border-radius:18px; background:#fff; text-align:center; }
 .service-catalog-empty b { color:#173d32; font:800 13px Manrope; }.service-catalog-empty p{color:#80918a;font-size:9px}
 
