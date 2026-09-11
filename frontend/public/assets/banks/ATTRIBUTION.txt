@@ -1,0 +1,8 @@
+Bank logo artwork in this directory is sourced from idn-finlogos by Hafidz Noor Fauzi:
+https://github.com/hafidznoor/idn-finlogos
+
+Collection license: CC BY-NC 4.0
+https://creativecommons.org/licenses/by-nc/4.0/
+
+The underlying names, logos, and trademarks remain the property of their respective owners.
+The marks are displayed unmodified for provider identification; no endorsement or affiliation is implied.
