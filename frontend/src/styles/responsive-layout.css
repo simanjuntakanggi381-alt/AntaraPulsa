@@ -294,7 +294,7 @@
    service emblem as the fallback. Every shell has the same visual bounds. */
 .provider-logo-shell { box-sizing: border-box; width: 44px; height: 44px; flex: 0 0 44px; display: grid; place-items: center; overflow: hidden; border: 1px solid color-mix(in srgb,var(--provider-color) 16%,#dfeae5); border-radius: 14px; background: #fff; box-shadow: 0 4px 11px rgba(9,70,52,.07); }
 .provider-logo-shell > img { display: block; width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: contain; object-position: center; transform: none; filter: none; }
-.provider-logo-biznet { background-color: #fff; background-image: url('/assets/provider-biznet-bmark-2026.png'); background-repeat: no-repeat; background-position: center; background-size: 32px 32px; }
+.provider-logo-biznet { background-color: #fff; }
 .provider-choices button > .provider-logo-shell { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: #fff; }
 .provider-choices button > .provider-logo-shell > img { width: 31px; height: 31px; max-width: 31px; max-height: 31px; }
 .product > .product-provider-logo { width: 42px; height: 42px; margin-bottom: 11px; }
@@ -314,6 +314,7 @@
   .provider-choices button > .provider-logo-shell > img { width: 30px; height: 30px; }
   .provider-choices button > b { min-height: 20px; display: grid; place-items: center; line-height: 1.2; white-space: normal; }
 }
+.provider-logo-biznet::before { content: ''; display: block; width: 32px; height: 32px; background: url('/assets/provider-biznet-bmark-2026.png') center / contain no-repeat; }
 .provider-empty { grid-column:1/-1; margin:0; padding:24px 12px; border:1px dashed #d9e6e0; border-radius:13px; color:#7d9088; font-size:9px; text-align:center; }
 .finder-submit { height: 43px !important; margin-top: 13px; border-radius: 11px !important; font-size: 10px !important; }
 .product-results-head { margin-bottom: 13px; display: flex; align-items: center; justify-content: space-between; }
