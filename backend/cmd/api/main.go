@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"antarapulsa/backend/internal/auth"
+	"antarapulsa/backend/internal/catalog"
 	"antarapulsa/backend/internal/h2hr"
 	"antarapulsa/backend/internal/handler"
 	"antarapulsa/backend/internal/model"
@@ -59,8 +60,13 @@ func syncH2HRProducts(dataStore *store.Store) {
 	}
 	products := catalogProducts(response.Items)
 	if len(products) == 0 {
-		log.Printf("sinkronisasi katalog H2HR tidak menemukan SKU aktif")
-		return
+		snapshot, snapshotErr := catalog.Snapshot()
+		if snapshotErr != nil {
+			log.Printf("sinkronisasi katalog H2HR tidak menemukan SKU aktif; snapshot gagal: %v", snapshotErr)
+			return
+		}
+		products = catalogProducts(snapshot)
+		log.Printf("PRODUK H2HR kosong; memakai snapshot pemilik akun (%d SKU valid)", len(products))
 	}
 	if err := dataStore.ReplaceProducts(products); err != nil {
 		log.Printf("sinkronisasi katalog H2HR gagal disimpan: %v", err)

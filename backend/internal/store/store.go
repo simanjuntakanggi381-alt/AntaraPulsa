@@ -188,6 +188,104 @@ func (s *Store) Products() []model.Product {
 	return append([]model.Product(nil), s.products...)
 }
 
+func (s *Store) Product(id string) (model.Product, bool) {
+	if s.db != nil {
+		var p model.Product
+		err := s.db.QueryRow(`SELECT id,provider,name,type,price,color,price_type,fee FROM products WHERE id=$1`, id).Scan(&p.ID, &p.Provider, &p.Name, &p.Type, &p.Price, &p.Color, &p.PriceType, &p.Fee)
+		return p, err == nil
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	for _, p := range s.products {
+		if p.ID == id {
+			return p, true
+		}
+	}
+	return model.Product{}, false
+}
+
+// PrepareH2HRPurchase reserves the member balance and persists a pending
+// transaction before any request is sent to the upstream provider.
+func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Transaction, model.Product, error) {
+	p, ok := s.Product(pid)
+	if !ok {
+		return nil, p, errors.New("produk tidak ditemukan")
+	}
+	if target == "" {
+		return nil, p, errors.New("nomor tujuan wajib diisi")
+	}
+	if p.PriceType == "OPEN_AMOUNT" {
+		return nil, p, errors.New("produk nominal bebas belum dapat dibeli")
+	}
+	if s.db == nil {
+		return nil, p, errors.New("transaksi H2HR memerlukan PostgreSQL")
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, p, err
+	}
+	defer tx.Rollback()
+	r, err := tx.Exec(`UPDATE users SET balance=balance-$1 WHERE id=$2 AND balance >= $1`, p.Price, uid)
+	if err != nil {
+		return nil, p, err
+	}
+	n, _ := r.RowsAffected()
+	if n == 0 {
+		return nil, p, errors.New("saldo tidak cukup atau akun tidak ditemukan")
+	}
+	x := &model.Transaction{ID: fmt.Sprintf("AP-%d", time.Now().UnixNano()), UserID: uid, Type: p.Type, Provider: p.Provider, Product: p.Name, Target: target, Amount: p.Price, Status: "Diproses", CreatedAt: time.Now()}
+	if _, err = tx.Exec(`INSERT INTO transactions (id,user_id,type,provider,product,target,amount,status,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, x.ID, x.UserID, x.Type, x.Provider, x.Product, x.Target, x.Amount, x.Status, x.CreatedAt); err != nil {
+		return nil, p, err
+	}
+	return x, p, tx.Commit()
+}
+
+// ResolveH2HRPurchase applies a final provider result exactly once. A failed
+// purchase refunds the balance in the same database transaction.
+func (s *Store) ResolveH2HRPurchase(refID, status string) error {
+	if s.db == nil {
+		return nil
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	var uid, amount int64
+	var current string
+	if err = tx.QueryRow(`SELECT user_id,amount,status FROM transactions WHERE id=$1 FOR UPDATE`, refID).Scan(&uid, &amount, &current); err != nil {
+		return err
+	}
+	if current == "Berhasil" || current == "Gagal" {
+		return tx.Commit()
+	}
+	switch normalizePurchaseStatus(status) {
+	case "Berhasil":
+		_, err = tx.Exec(`UPDATE transactions SET status='Berhasil' WHERE id=$1`, refID)
+	case "Gagal":
+		if _, err = tx.Exec(`UPDATE users SET balance=balance+$1 WHERE id=$2`, amount, uid); err == nil {
+			_, err = tx.Exec(`UPDATE transactions SET status='Gagal' WHERE id=$1`, refID)
+		}
+	default:
+		_, err = tx.Exec(`UPDATE transactions SET status='Diproses' WHERE id=$1`, refID)
+	}
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func normalizePurchaseStatus(status string) string {
+	status = strings.ToLower(strings.TrimSpace(status))
+	if status == "2" || strings.Contains(status, "success") || strings.Contains(status, "sukses") {
+		return "Berhasil"
+	}
+	if status == "3" || strings.Contains(status, "failed") || strings.Contains(status, "gagal") {
+		return "Gagal"
+	}
+	return "Diproses"
+}
+
 // ReplaceProducts atomically refreshes the display catalog from the active provider catalog.
 func (s *Store) ReplaceProducts(products []model.Product) error {
 	if s.db != nil {

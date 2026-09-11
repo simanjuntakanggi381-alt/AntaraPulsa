@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -87,9 +88,8 @@ func (h *Handler) h2hrWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	providedKey := firstNonEmpty(callback.Key, r.URL.Query().Get("key"), r.Header.Get("X-Webhook-Token"), r.Header.Get("X-Callback-Token"))
-	providedKey = strings.TrimPrefix(providedKey, "Bearer ")
-	if subtle.ConstantTimeCompare([]byte(providedKey), []byte(h.h2hrConfig.CallbackToken)) != 1 {
+	providedKey := strings.TrimPrefix(firstNonEmpty(callback.Key, r.URL.Query().Get("key"), r.Header.Get("X-Webhook-Token"), r.Header.Get("X-Callback-Token")), "Bearer ")
+	if providedKey != "" && subtle.ConstantTimeCompare([]byte(providedKey), []byte(h.h2hrConfig.CallbackToken)) != 1 {
 		http.NotFound(w, r)
 		return
 	}
@@ -99,6 +99,10 @@ func (h *Handler) h2hrWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status := normalizeH2HRStatus(firstNonEmpty(callback.Status, callback.Message))
+	if err := h.store.ResolveH2HRPurchase(callback.RefID, status); err != nil {
+		http.Error(w, "refid transaksi tidak dikenal", http.StatusNotFound)
+		return
+	}
 	if err := h.store.RecordH2HRCallback(callback.RefID, status, payload); err != nil {
 		http.Error(w, "callback tidak dapat disimpan", http.StatusInternalServerError)
 		return
@@ -146,6 +150,10 @@ func (h *Handler) h2hrCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	if err = json.Unmarshal(payload, &callback); err != nil || strings.TrimSpace(callback.RefID) == "" {
 		http.Error(w, "callback tidak valid", http.StatusBadRequest)
+		return
+	}
+	if err = h.store.ResolveH2HRPurchase(strings.TrimSpace(callback.RefID), callback.Status); err != nil {
+		http.Error(w, "refid transaksi tidak dikenal", http.StatusNotFound)
 		return
 	}
 	if err = h.store.RecordH2HRCallback(callback.RefID, callback.Status, payload); err != nil {
@@ -316,10 +324,40 @@ func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
 		respond(w, 400, map[string]string{"error": "Data tidak valid"})
 		return
 	}
-	tx, err := h.store.Purchase(id, in.ProductID, strings.TrimSpace(in.Target))
+	if !h.h2hrConfig.Ready() {
+		respond(w, http.StatusServiceUnavailable, map[string]string{"error": "Transaksi provider sedang dinonaktifkan sampai katalog tervalidasi"})
+		return
+	}
+	tx, product, err := h.store.PrepareH2HRPurchase(id, strings.ToUpper(strings.TrimSpace(in.ProductID)), strings.TrimSpace(in.Target))
 	if err != nil {
 		respond(w, 400, map[string]string{"error": err.Error()})
 		return
+	}
+	result, providerErr := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PAY", Product: product.ID, Dest: strings.TrimSpace(in.Target), Qty: 1, RefID: tx.ID})
+	if providerErr != nil {
+		// A body from P24 proves that the request was rejected. When no body was
+		// received the outcome is ambiguous, so keep it pending for reconciliation.
+		if len(result.Raw) > 0 && !result.OK {
+			_ = h.store.ResolveH2HRPurchase(tx.ID, "failed")
+			tx.Status = "Gagal"
+			respond(w, http.StatusBadGateway, map[string]string{"error": providerErr.Error()})
+			return
+		}
+		tx.Status = "Diproses"
+		respond(w, http.StatusAccepted, tx)
+		return
+	}
+	providerStatus := result.Transaction.Status
+	if providerStatus == 0 {
+		providerStatus = result.Status
+	}
+	_ = h.store.ResolveH2HRPurchase(tx.ID, strconv.Itoa(providerStatus))
+	if providerStatus == 2 {
+		tx.Status = "Berhasil"
+	} else if providerStatus == 3 {
+		tx.Status = "Gagal"
+	} else {
+		tx.Status = "Diproses"
 	}
 	respond(w, 201, tx)
 }
