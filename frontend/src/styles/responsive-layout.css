@@ -90,8 +90,6 @@
     white-space: nowrap !important;
   }
 
-  #dashboardPage .quick-services .service-card:nth-child(2) > .service-3d > img { width: 45px !important; height: 45px !important; max-width: 45px !important; max-height: 45px !important; }
-  #dashboardPage .quick-services .service-card:nth-child(4) > .service-3d > img { width: 41px !important; height: 41px !important; max-width: 41px !important; max-height: 41px !important; }
 }
 
 /* Keep the product as a centered phone app on tablets and computers. */
