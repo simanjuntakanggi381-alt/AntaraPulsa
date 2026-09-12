@@ -1,4 +1,4 @@
-const CACHE = 'antarapulsa-shell-v41';
+const CACHE = 'antarapulsa-shell-v42';
 const SHELL = ['/', '/manifest.webmanifest', '/assets/brand-mark.png', '/assets/provider-indosat.png', '/assets/provider-biznet-bmark-2026.png', '/assets/provider-iconnet-symbol.png', '/assets/provider-pln.png', '/assets/provider-brizzi.png', '/assets/provider-dana.png', '/assets/provider-emoney-mandiri.png', '/assets/provider-gopay.png', '/assets/provider-grab.png', '/assets/provider-isaku.png', '/assets/provider-kaspro.png', '/assets/provider-linkaja.png', '/assets/provider-maxim.png', '/assets/provider-ovo.png', '/assets/provider-sakuku.png', '/assets/provider-shopeepay.png', '/assets/provider-tapcash.png'];
 
 self.addEventListener('install', event => {

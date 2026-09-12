@@ -1,0 +1,114 @@
+/* Final login layer: username-first and optimized for small phone screens. */
+.login-box::before {
+  content: "ANTARAPULSA";
+  display: block;
+  margin: 0 0 18px;
+  color: #078c48;
+  font: 800 10px/1 Manrope, sans-serif;
+  letter-spacing: 2.2px;
+}
+
+.login-box .welcome-icon {
+  position: absolute !important;
+  top: 22px !important;
+  right: 22px !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 15px !important;
+  background: linear-gradient(145deg, #e7faef, #d8f4e4) !important;
+  box-shadow: 0 7px 18px rgba(8, 143, 74, .13) !important;
+}
+
+.login-box h2 {
+  margin-top: 0 !important;
+  font-size: 25px !important;
+  letter-spacing: -1px !important;
+}
+
+.login-box > p {
+  max-width: 250px;
+  font-size: 12px !important;
+  line-height: 1.55 !important;
+}
+
+.login-box .field {
+  height: 49px !important;
+  padding: 0 14px !important;
+  border: 1px solid #d9e7df !important;
+  border-radius: 13px !important;
+  background: #f8fcf9 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9) !important;
+  transition: border-color .2s, box-shadow .2s, background .2s !important;
+}
+
+.login-box .field:focus-within {
+  border-color: #0aa057 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 4px rgba(10, 160, 87, .1) !important;
+}
+
+.login-box .field-icon.user,
+.login-box .field-icon.lock {
+  box-sizing: content-box !important;
+  width: 23px !important;
+  height: 23px !important;
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 23px !important;
+  padding: 0 12px 0 0 !important;
+  margin-right: 12px !important;
+  border: 0 !important;
+  border-right: 1px solid #dce8e1 !important;
+  color: #078e49 !important;
+}
+
+.login-box .field-icon.user svg,
+.login-box .field-icon.lock svg {
+  width: 19px !important;
+  height: 19px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.9 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+.login-box .field input {
+  min-width: 0 !important;
+  color: #183329 !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  background: transparent !important;
+}
+
+.login-box .field input::placeholder {
+  color: #9aaca3 !important;
+  font-weight: 500 !important;
+}
+
+.login-box .primary-btn {
+  height: 50px !important;
+  border-radius: 13px !important;
+  box-shadow: 0 11px 24px rgba(7, 142, 72, .22) !important;
+  letter-spacing: .1px !important;
+}
+
+@media (max-width: 520px) {
+  .login-panel {
+    padding: 28px 16px !important;
+    align-items: center !important;
+  }
+
+  .login-box {
+    padding: 25px 20px 21px !important;
+  }
+
+  .login-box .welcome-icon {
+    top: 20px !important;
+    right: 20px !important;
+  }
+
+  .login-box h2 {
+    font-size: 24px !important;
+  }
+}

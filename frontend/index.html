@@ -43,10 +43,10 @@
         <button type="button" class="google-login"><b aria-hidden="true">G</b><span>Login dengan Google</span></button>
         <div class="login-divider"><span>atau masuk dengan akun</span></div>
         <form id="loginForm">
-          <label>Nomor handphone</label>
-          <div class="field"><span class="field-icon">+62</span><input id="loginPhone" value="081234567890" autocomplete="tel" inputmode="numeric" required></div>
+          <label for="loginPhone">Username</label>
+          <div class="field login-username-field"><span class="field-icon user" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></span><input id="loginPhone" type="text" placeholder="Masukkan username" autocomplete="username" autocapitalize="none" spellcheck="false" required></div>
           <label>Kata sandi</label>
-          <div class="field"><span class="field-icon lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/></svg></span><input id="loginPassword" type="password" value="pulsa123" autocomplete="current-password" required><button type="button" id="togglePassword" aria-label="Lihat sandi"><svg viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
+          <div class="field"><span class="field-icon lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/></svg></span><input id="loginPassword" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required><button type="button" id="togglePassword" aria-label="Lihat sandi"><svg viewBox="0 0 24 24"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></div>
           <div class="form-row"><label class="check"><input type="checkbox" checked><span></span> Ingat saya</label><a href="#">Lupa kata sandi?</a></div>
           <button class="primary-btn" type="submit"><span>Masuk ke dashboard</span><b>→</b></button>
           <div id="loginError" class="form-error"></div>
