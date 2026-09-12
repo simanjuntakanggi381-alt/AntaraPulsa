@@ -15,6 +15,7 @@ import './styles/network.css';
 import './styles/document-review.css';
 import './styles/operator.css';
 import './styles/operator-credit.css';
+import './styles/operator-migration.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -141,11 +142,23 @@ $('#operatorLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $$('[data-operator-page]').forEach(button => button.onclick = () => {
   const page = button.dataset.operatorPage; $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === page)); $('.operator-sidebar').classList.remove('open');
-  $('.operator-main').classList.toggle('hidden', page === 'credit'); $('#operatorCreditView').classList.toggle('hidden', page !== 'credit');
-  if (page === 'credit') renderOperatorCredit(); else if (page !== 'dashboard') showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
+  const dedicatedPage = page === 'credit' || page === 'migration';
+  $('.operator-main').classList.toggle('hidden', dedicatedPage);
+  $('#operatorCreditView').classList.toggle('hidden', page !== 'credit');
+  $('#operatorMigrationView').classList.toggle('hidden', page !== 'migration');
+  if (page === 'credit') renderOperatorCredit(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
 });
 $('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
 $('#operatorCreditMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
+$('#operatorMigrationMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
+$('#legacySearchForm').onsubmit = event => {
+  event.preventDefault();
+  const query = $('#legacyMasterSearch').value.trim();
+  if (!query) { showToast('Masukkan data master', 'Isi nama atau email master yang ingin dicari.'); $('#legacyMasterSearch').focus(); return; }
+  const result = $('#legacySearchResult');
+  result.classList.remove('hidden');
+  result.innerHTML = '<b>Master tidak ditemukan</b><p>Belum ada data lama yang cocok dengan pencarian tersebut.</p>';
+};
 
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
