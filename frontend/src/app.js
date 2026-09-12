@@ -156,7 +156,7 @@ function providerLogoMarkup(provider, type, className = '') {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
-  const bankClass = source.includes('/assets/banks/') ? `provider-logo-bank provider-logo-bank-${providerKey}` : '';
+  const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
   const providerClass = source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
