@@ -18,6 +18,7 @@ import './styles/operator-credit.css';
 import './styles/operator-migration.css';
 import './styles/operator-inactive.css';
 import './styles/operator-turnover.css';
+import './styles/operator-payments.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -35,6 +36,7 @@ const state = { user: null, products: [], transactions: [], selected: null, sele
 const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
 const CAPITAL_APPLICATION_KEY = 'antarapulsa-capital-applications-v1';
 const CAPITAL_MONITOR_KEY = 'antarapulsa-capital-monitor-v1';
+const CAPITAL_PAYMENT_KEY = 'antarapulsa-capital-payments-v1';
 const showToast = createToast('#toast');
 
 const appIcons = {
@@ -648,6 +650,9 @@ const getMonitoredApplications = () => {
   try { return JSON.parse(localStorage.getItem(CAPITAL_MONITOR_KEY) || '[]'); }
   catch { return []; }
 };
+const getCapitalPayments = () => { try { return JSON.parse(localStorage.getItem(CAPITAL_PAYMENT_KEY) || '[]'); } catch { return []; } };
+const applicationRemaining = item => Math.max(0, Number(item.remaining ?? item.amount ?? 0));
+const agentKey = item => String(item.agentKey || item.whatsapp || item.owner || '').toLowerCase();
 function renderMarketingCapital() {
   const applications = getMonitoredApplications();
   const empty = '<div class="marketing-monitor-empty"><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 15a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/><path d="m15 18 2 2"/></svg></span><b>Belum ada pengajuan Agent</b><p>Dokumen dan pengajuan Agent akan tampil otomatis setelah dikirim.</p></div>';
@@ -658,38 +663,57 @@ let operatorCreditTab = 'applications';
 let previewApplicationIndex = -1;
 function updateOperatorApplication(index, status) {
   const applications = getMonitoredApplications(); if (!applications[index]) return;
-  applications[index].status = status; if (status === 'Aktif') applications[index].approvedAt = new Date().toISOString(); localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
+  applications[index].status = status; if (status === 'Aktif') { applications[index].approvedAt = new Date().toISOString(); applications[index].remaining ??= Number(applications[index].amount || 0); } localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
   showToast(status === 'Aktif' ? 'Pengajuan disetujui' : 'Pengajuan ditolak', `Status ${applications[index].id} berhasil diperbarui.`);
 }
 function renderOperatorCredit() {
   const query = ($('#creditSearch')?.value || '').toLowerCase(); const filter = $('#creditStatus')?.value || 'Pending';
   const all = getMonitoredApplications(); const rows = all.map((item,index)=>({item,index})).filter(({item}) => (filter === 'Semua' || item.status === filter) && `${item.id} ${item.owner} ${item.shop || ''}`.toLowerCase().includes(query));
   if (!rows.length) { $('#operatorCreditList').innerHTML = '<div class="operator-credit-empty"><b>Belum ada pengajuan nyata</b><p>Pengajuan Agent akan muncul otomatis setelah benar-benar dikirim.</p></div>'; return; }
+  const groups = Object.values(rows.reduce((out,row)=>{ const key=agentKey(row.item); out[key] ||= {key,owner:row.item.owner,shop:row.item.shop,items:[]}; out[key].items.push(row); return out; },{}));
   $('#operatorCreditList').innerHTML = operatorCreditTab === 'documents'
-    ? rows.map(({item,index}) => `<section class="operator-doc-agent"><header><div><b>${escapeHTML(item.owner)}</b><small>${item.documents?.length || 0} dokumen · ${escapeHTML(item.shop || '-')}</small></div><span>${escapeHTML(item.status)}</span></header><div>${(item.documents || []).map((doc,docIndex)=>`<article><div><b>${escapeHTML(documentNames[docIndex])}</b><small>${escapeHTML(doc.name)}</small></div><i>${escapeHTML(item.status)}</i><button data-open-document="${index}:${docIndex}">Buka</button><button class="approve" data-credit-action="Aktif:${index}">Approve</button><button class="reject" data-credit-action="Ditolak:${index}">Reject</button></article>`).join('')}</div></section>`).join('')
-    : rows.map(({item,index}) => `<section class="operator-application"><button data-credit-expand="${index}"><div><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || '-')} · 1 riwayat kredit</small></div><i>⌄</i></button><div class="hidden"><div><b>${escapeHTML(item.id)} · ${escapeHTML(item.owner)}</b><small>Tujuan: ${escapeHTML(item.shop || 'Modal usaha')}</small></div><aside><strong>Rp ${money(item.amount)}</strong><span>${escapeHTML(item.status)}</span></aside><footer><button class="approve" data-credit-action="Aktif:${index}">Approve</button><button class="reject" data-credit-action="Ditolak:${index}">Reject</button></footer></div></section>`).join('');
+    ? groups.map(group=>{const source=group.items.find(row=>row.item.documents?.length);if(!source)return '';const readonly=!['Pending','Ditolak'].includes(source.item.status);return `<section class="operator-doc-agent"><header><div><b>${escapeHTML(group.owner)}</b><small>${source.item.documents.length} dokumen · ${escapeHTML(group.shop||'-')}</small></div><span>${escapeHTML(source.item.status)}</span></header><div>${source.item.documents.map((doc,docIndex)=>`<article><div><b>${escapeHTML(documentNames[docIndex])}</b><small>${escapeHTML(doc.name)}</small></div><i>${readonly?'Disetujui':escapeHTML(source.item.status)}</i><button data-open-document="${source.index}:${docIndex}" data-readonly="${readonly}">Buka</button>${readonly?'':`<button class="approve" data-credit-action="Aktif:${source.index}">Approve</button><button class="reject" data-credit-action="Ditolak:${source.index}">Reject</button>`}</article>`).join('')}</div></section>`}).join('')
+    : groups.map(group=>`<section class="operator-application credit-agent-group"><button data-credit-expand="${escapeHTML(group.key)}"><div><b>${escapeHTML(group.owner)}</b><small>${escapeHTML(group.shop||'-')} · ${group.items.length} riwayat kredit</small></div><i>⌄</i></button><div class="hidden"><nav><button data-payment-agent="${escapeHTML(group.key)}">Catat Pembayaran</button><button data-payment-history="${escapeHTML(group.key)}">Riwayat Pembayaran</button></nav>${group.items.map(({item,index})=>`<article><div><b>${escapeHTML(item.id)} · ${escapeHTML(item.owner)}</b><small>Tujuan: ${escapeHTML(item.shop||'Modal usaha')}</small></div><aside><strong>Rp ${money(item.amount)}</strong><small>Dibayar Rp ${money(Number(item.amount)-applicationRemaining(item))} · Sisa Rp ${money(applicationRemaining(item))}</small><span>${escapeHTML(item.status)}</span></aside>${item.status==='Pending'?`<footer><button class="approve" data-credit-action="Aktif:${index}">Approve</button><button class="reject" data-credit-action="Ditolak:${index}">Reject</button></footer>`:''}</article>`).join('')}</div></section>`).join('');
 }
 $$('[data-credit-tab]').forEach(button => button.onclick = () => { operatorCreditTab=button.dataset.creditTab; $$('[data-credit-tab]').forEach(item=>item.classList.toggle('active',item===button)); renderOperatorCredit(); });
 $('#creditStatus').onchange = renderOperatorCredit; $('#creditSearch').oninput = renderOperatorCredit; $('#refreshOperatorCredit').onclick = renderOperatorCredit;
 $('#operatorCreditList').addEventListener('click', event => {
   const expand=event.target.closest('[data-credit-expand]'); if(expand){ expand.classList.toggle('open'); expand.nextElementSibling.classList.toggle('hidden'); return; }
   const action=event.target.closest('[data-credit-action]'); if(action){ const [status,index]=action.dataset.creditAction.split(':'); updateOperatorApplication(Number(index),status); return; }
-  const open=event.target.closest('[data-open-document]'); if(open){ const [appIndex,docIndex]=open.dataset.openDocument.split(':').map(Number); const app=getMonitoredApplications()[appIndex]; if(!app?.documents?.[docIndex])return; previewApplicationIndex=appIndex; $('#operatorPreviewImage').src=app.documents[docIndex].data; $('#operatorDocumentPreview').classList.remove('hidden'); }
+  const payment=event.target.closest('[data-payment-agent]'); if(payment){ openPaymentModal(payment.dataset.paymentAgent); return; }
+  const history=event.target.closest('[data-payment-history]'); if(history){ openPaymentHistory(history.dataset.paymentHistory); return; }
+  const open=event.target.closest('[data-open-document]'); if(open){ const [appIndex,docIndex]=open.dataset.openDocument.split(':').map(Number); const app=getMonitoredApplications()[appIndex]; if(!app?.documents?.[docIndex])return; previewApplicationIndex=appIndex; $('#operatorPreviewImage').src=app.documents[docIndex].data; $$('[data-preview-action]').forEach(button=>button.classList.toggle('hidden',open.dataset.readonly==='true')); $('#operatorDocumentPreview').classList.remove('hidden'); }
 });
 const closeOperatorPreview=()=>$('#operatorDocumentPreview').classList.add('hidden'); $('#closeDocumentPreview').onclick=closeOperatorPreview; $('#closePreviewFooter').onclick=closeOperatorPreview;
 $$('[data-preview-action]').forEach(button=>button.onclick=()=>{ updateOperatorApplication(previewApplicationIndex,button.dataset.previewAction); closeOperatorPreview(); });
+let paymentAgentKey = '';
+const closePaymentModal=()=>$('#paymentModal').classList.add('hidden');
+function openPaymentModal(key){ const app=getMonitoredApplications().find(item=>agentKey(item)===key); if(!app)return; paymentAgentKey=key; $('#paymentAgentLabel').textContent=`${app.owner} · Modal berjalan Rp ${money(getMonitoredApplications().filter(item=>agentKey(item)===key&&item.status==='Aktif').reduce((sum,item)=>sum+applicationRemaining(item),0))}`; $('#paymentDate').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16); $('#paymentModal').classList.remove('hidden'); }
+$('#closePaymentModal').onclick=closePaymentModal;
+const fileData=file=>new Promise((resolve,reject)=>{if(!file)return resolve(null);const reader=new FileReader();reader.onerror=reject;reader.onload=()=>resolve({name:file.name,type:file.type,data:reader.result});reader.readAsDataURL(file)});
+$('#paymentForm').onsubmit=async event=>{event.preventDefault();const amount=Number($('#paymentAmount').value.replace(/\D/g,''))||0;if(!amount)return;const applications=getMonitoredApplications();let allocation=amount;const loans=applications.map((item,index)=>({item,index})).filter(row=>agentKey(row.item)===paymentAgentKey&&row.item.status==='Aktif').sort((a,b)=>new Date(a.item.approvedAt||0)-new Date(b.item.approvedAt||0));for(const loan of loans){if(!allocation)break;const remaining=applicationRemaining(loan.item);const paid=Math.min(remaining,allocation);loan.item.remaining=remaining-paid;allocation-=paid;if(loan.item.remaining===0)loan.item.status='Lunas';}const source=loans[0]?.item||applications.find(item=>agentKey(item)===paymentAgentKey);if(!source)return;applications.unshift({...source,id:`RBG-${Date.now().toString(36).slice(-8).toUpperCase()}`,amount,remaining:amount,status:'Aktif',documents:source.documents||[],approvedAt:new Date().toISOString(),date:new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date()),revolving:true});localStorage.setItem(CAPITAL_MONITOR_KEY,JSON.stringify(applications));const payments=getCapitalPayments();payments.unshift({id:`PAY-${Date.now().toString(36).slice(-8).toUpperCase()}`,agentKey:paymentAgentKey,owner:source.owner,amount,date:$('#paymentDate').value,bank:$('#paymentBank').value,account:$('#paymentAccount').value,accountOwner:$('#paymentAccountOwner').value,sender:$('#paymentSender').value,note:$('#paymentNote').value,proof:await fileData($('#paymentProof').files[0])});localStorage.setItem(CAPITAL_PAYMENT_KEY,JSON.stringify(payments));event.target.reset();closePaymentModal();renderOperatorCredit();showToast('Pembayaran tersimpan',`Rp ${money(amount)} dialokasikan dan kredit bergulir Agent diperbarui.`);};
+function openPaymentHistory(key){const app=getMonitoredApplications().find(item=>agentKey(item)===key);const rows=getCapitalPayments().filter(item=>item.agentKey===key);$('#paymentHistoryAgent').textContent=app?.owner||'';$('#paymentHistoryList').innerHTML=rows.length?rows.map(item=>`<article><div><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · ${escapeHTML(item.bank)} · ${escapeHTML(item.sender)}</small>${item.note?`<p>${escapeHTML(item.note)}</p>`:''}</div>${item.proof?.data?`<a href="${item.proof.data}" target="_blank" rel="noopener">Buka bukti</a>`:'<span>Tanpa bukti</span>'}</article>`).join(''):'<div class="inactive-empty"><b>Belum ada pembayaran</b></div>';$('#paymentHistoryModal').classList.remove('hidden');}
+$('#closePaymentHistory').onclick=()=>$('#paymentHistoryModal').classList.add('hidden');
 const documentNames = ['KTP pemilik konter','Foto konter','Foto bersama marketing','Dokumen pengajuan kredit'];
 const renderDocumentFiles = documents => (documents?.length ? documents.map((doc,index) => `<figure><img src="${doc.data}" alt="${escapeHTML(documentNames[index])}"><figcaption>${escapeHTML(documentNames[index])}<b>Terkirim</b></figcaption></figure>`).join('') : '<p class="document-unavailable">Dokumen foto belum tersedia.</p>');
 const imageData = file => new Promise((resolve,reject) => { const reader=new FileReader(); reader.onerror=reject; reader.onload=()=>{ const img=new Image(); img.onerror=reject; img.onload=()=>{ const scale=Math.min(1,720/Math.max(img.width,img.height)); const canvas=document.createElement('canvas'); canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale); canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height); resolve({name:file.name,data:canvas.toDataURL('image/jpeg',.68)}); }; img.src=reader.result; }; reader.readAsDataURL(file); });
 function renderCapitalPage() {
   const applications = getCapitalApplications();
+  const monitored = getMonitoredApplications();
+  applications.forEach(local=>{const live=monitored.find(item=>item.id===local.id);if(live)Object.assign(local,{status:live.status,remaining:live.remaining,approvedAt:live.approvedAt});});
+  const currentKey=String(state.user?.phone||state.user?.name||'').toLowerCase();
+  const agentLoans=monitored.filter(item=>agentKey(item)===currentKey||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase());
+  const activeLoans=agentLoans.filter(item=>item.status==='Aktif'); const payments=getCapitalPayments().filter(item=>item.agentKey===currentKey||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase());
+  const overview=$('.capital-overview'); overview.querySelector('.capital-overview-title strong').textContent=`Rp ${money(activeLoans.reduce((sum,item)=>sum+applicationRemaining(item),0))}`; overview.querySelector('.capital-overview-title>b').textContent=`${activeLoans.length} fasilitas aktif`; const stats=overview.querySelectorAll('.capital-overview-stats strong'); stats[0].textContent=`Rp ${money(payments.reduce((sum,item)=>sum+Number(item.amount),0))}`; stats[1].textContent=`Rp ${money(activeLoans.reduce((sum,item)=>sum+applicationRemaining(item),0))}`;
   $('#capitalOwner').value ||= state.user?.name || '';
   $('#capitalWhatsapp').value ||= /^\d+$/.test(state.user?.phone || '') ? state.user.phone : '';
   $('#capitalDocumentCount').textContent = applications.length ? '4 dokumen · tersimpan pada pengajuan terakhir' : '0 dokumen · klik untuk melihat semua';
   $('#capitalDocumentStatus').textContent = applications.length ? 'Lengkap' : 'Belum ada';
-  $('#capitalHistory').innerHTML = applications.length
-    ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · ${escapeHTML(item.owner)}</small></div><strong>${escapeHTML(item.status)}</strong></article>`).join('')
+  const visibleLoans=agentLoans.length?agentLoans:applications;
+  $('#capitalHistory').innerHTML = visibleLoans.length
+    ? visibleLoans.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · Sisa Rp ${money(applicationRemaining(item))}</small></div><strong>${escapeHTML(item.status)}</strong></article>`).join('')
     : '<div class="capital-empty"><span>Belum ada riwayat pengajuan kredit.</span></div>';
+  $('#agentPaymentHistory').innerHTML=payments.length?payments.map(item=>`<article><div><span>${escapeHTML(item.id)}</span><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · ${escapeHTML(item.bank)}</small></div>${item.proof?.data?`<a href="${item.proof.data}" target="_blank" rel="noopener">Buka bukti</a>`:'<strong>Tercatat</strong>'}</article>`).join(''):'<div class="capital-empty"><span>Belum ada riwayat pembayaran.</span></div>';
   const latest = applications[0];
   $('#capitalPendingPanel').classList.toggle('hidden', !latest);
   $('#capitalPendingPanel').innerHTML = latest ? `<span>PENGAJUAN DIPROSES</span><h2>1 pengajuan menunggu Operator</h2><article><div><b>Pengajuan Kredit</b><small>${escapeHTML(latest.id)} · Status diperbarui otomatis</small></div><strong>Rp ${money(latest.amount)}<i>${escapeHTML(latest.status)}</i></strong></article>` : '';
@@ -708,6 +732,8 @@ $$('.capital-upload input').forEach(input => input.addEventListener('change', ()
   label.querySelector('b').textContent = input.files?.[0]?.name || 'Belum diunggah';
 }));
 $('#openCapitalApplication').onclick = () => {
+  const previous=getMonitoredApplications().find(item=>(agentKey(item)===String(state.user?.phone||'').toLowerCase()||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase())&&['Aktif','Lunas'].includes(item.status)&&item.documents?.length);
+  if(previous){$('#quickLimitModal').classList.remove('hidden');return;}
   $('#applyAgentName').value = state.user?.name || $('#capitalOwner').value || '';
   $('#applyWhatsapp').value = $('#capitalWhatsapp').value || (/^\d+$/.test(state.user?.phone || '') ? state.user.phone : '');
   $('#applyEmail').value = state.user?.email || '';
@@ -716,6 +742,9 @@ $('#openCapitalApplication').onclick = () => {
   showPage('capitalApply');
   requestAnimationFrame(resetSignatureCanvas);
 };
+$('#closeQuickLimit').onclick=()=>$('#quickLimitModal').classList.add('hidden');
+$('#quickLimitAmount').oninput=event=>{const amount=Number(event.target.value.replace(/\D/g,''))||0;event.target.value=amount?money(amount):'';};
+$('#quickLimitForm').onsubmit=event=>{event.preventDefault();const monitored=getMonitoredApplications();const previous=monitored.find(item=>(agentKey(item)===String(state.user?.phone||'').toLowerCase()||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase())&&['Aktif','Lunas'].includes(item.status)&&item.documents?.length);const amount=Number($('#quickLimitAmount').value.replace(/\D/g,''))||0;if(!previous||!amount)return;monitored.unshift({...previous,id:`KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`,amount,remaining:amount,status:'Pending',note:$('#quickLimitNote').value.trim(),date:new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date()),approvedAt:null,revolving:false});localStorage.setItem(CAPITAL_MONITOR_KEY,JSON.stringify(monitored));event.target.reset();$('#quickLimitModal').classList.add('hidden');renderCapitalPage();showToast('Pengajuan limit terkirim','Dokumen lama digunakan kembali dan pengajuan menunggu Operator.');};
 $('#capitalApplyBack').onclick = () => showPage('capital');
 $('#applyAmount').addEventListener('input', event => {
   const amount = Number(event.target.value.replace(/\D/g, '')) || 0;
