@@ -152,7 +152,7 @@ $$('[data-operator-page]').forEach(button => button.onclick = () => {
   $('#operatorMigrationView').classList.toggle('hidden', page !== 'migration');
   $('#operatorInactiveView').classList.toggle('hidden', page !== 'inactive');
   $('#operatorTurnoverView').classList.toggle('hidden', page !== 'turnover');
-  if (page === 'credit') renderOperatorCredit(); else if (page === 'inactive') renderInactiveCounters(); else if (page === 'turnover') renderTurnover(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
+  if (page === 'credit') syncCreditApplications().then(renderOperatorCredit); else if (page === 'inactive') renderInactiveCounters(); else if (page === 'turnover') syncCreditApplications().then(renderTurnover); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
 });
 $('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
 $('#operatorCreditMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
@@ -631,11 +631,11 @@ $('#accountMenu').addEventListener('click', event => {
   if (button?.dataset.accountAction === 'network') { renderDownlines(); showPage('network'); }
   if (button?.dataset.accountAction === 'capital') {
     if (String(state.user?.level || '').toLowerCase() === 'marketing') {
-      renderMarketingCapital();
+      syncCreditApplications().then(renderMarketingCapital);
       showPage('marketingCapital');
       return;
     }
-    renderCapitalPage();
+    syncCreditApplications().catch(()=>getMonitoredApplications()).then(renderCapitalPage);
     showPage('capital');
   }
 });
@@ -650,6 +650,8 @@ const getMonitoredApplications = () => {
   try { return JSON.parse(localStorage.getItem(CAPITAL_MONITOR_KEY) || '[]'); }
   catch { return []; }
 };
+async function syncCreditApplications(){const applications=await api('/api/credit-applications');localStorage.setItem(CAPITAL_MONITOR_KEY,JSON.stringify(applications||[]));return applications||[];}
+setInterval(()=>{const role=String(state.user?.level||'').toLowerCase();if($('#operatorView')&&!$('#operatorView').classList.contains('hidden')&&role==='operator'){syncCreditApplications().then(()=>{if(!$('#operatorCreditView').classList.contains('hidden'))renderOperatorCredit();if(!$('#operatorTurnoverView').classList.contains('hidden'))renderTurnover();}).catch(()=>{});}if(role==='marketing'&&!$('#marketingCapitalPage').classList.contains('active'))return;if(role==='marketing')syncCreditApplications().then(renderMarketingCapital).catch(()=>{});},4000);
 const getCapitalPayments = () => { try { return JSON.parse(localStorage.getItem(CAPITAL_PAYMENT_KEY) || '[]'); } catch { return []; } };
 const applicationRemaining = item => Math.max(0, Number(item.remaining ?? item.amount ?? 0));
 const agentKey = item => String(item.agentKey || item.whatsapp || item.owner || '').toLowerCase();
@@ -661,8 +663,9 @@ function renderMarketingCapital() {
 }
 let operatorCreditTab = 'applications';
 let previewApplicationIndex = -1;
-function updateOperatorApplication(index, status) {
+async function updateOperatorApplication(index, status) {
   const applications = getMonitoredApplications(); if (!applications[index]) return;
+  try { await api(`/api/operator/credit-applications/${encodeURIComponent(applications[index].id)}`,{method:'PATCH',body:JSON.stringify({status})}); } catch(error) { showToast('Status gagal disimpan',error.message); return; }
   applications[index].status = status; if (status === 'Aktif') { applications[index].approvedAt = new Date().toISOString(); applications[index].remaining ??= Number(applications[index].amount || 0); } localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
   showToast(status === 'Aktif' ? 'Pengajuan disetujui' : 'Pengajuan ditolak', `Status ${applications[index].id} berhasil diperbarui.`);
 }
@@ -744,7 +747,7 @@ $('#openCapitalApplication').onclick = () => {
 };
 $('#closeQuickLimit').onclick=()=>$('#quickLimitModal').classList.add('hidden');
 $('#quickLimitAmount').oninput=event=>{const amount=Number(event.target.value.replace(/\D/g,''))||0;event.target.value=amount?money(amount):'';};
-$('#quickLimitForm').onsubmit=event=>{event.preventDefault();const monitored=getMonitoredApplications();const previous=monitored.find(item=>(agentKey(item)===String(state.user?.phone||'').toLowerCase()||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase())&&['Aktif','Lunas'].includes(item.status)&&item.documents?.length);const amount=Number($('#quickLimitAmount').value.replace(/\D/g,''))||0;if(!previous||!amount)return;monitored.unshift({...previous,id:`KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`,amount,remaining:amount,status:'Pending',note:$('#quickLimitNote').value.trim(),date:new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date()),approvedAt:null,revolving:false});localStorage.setItem(CAPITAL_MONITOR_KEY,JSON.stringify(monitored));event.target.reset();$('#quickLimitModal').classList.add('hidden');renderCapitalPage();showToast('Pengajuan limit terkirim','Dokumen lama digunakan kembali dan pengajuan menunggu Operator.');};
+$('#quickLimitForm').onsubmit=async event=>{event.preventDefault();const monitored=getMonitoredApplications();const previous=monitored.find(item=>(agentKey(item)===String(state.user?.phone||'').toLowerCase()||String(item.owner).toLowerCase()===String(state.user?.name||'').toLowerCase())&&['Aktif','Lunas'].includes(item.status)&&item.documents?.length);const amount=Number($('#quickLimitAmount').value.replace(/\D/g,''))||0;if(!previous||!amount)return;const item={...previous,id:`KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`,amount,remaining:amount,status:'Pending',note:$('#quickLimitNote').value.trim(),date:new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date()),approvedAt:null,revolving:false};const submit=event.currentTarget.querySelector('[type=submit]');submit.disabled=true;try{const saved=await api('/api/credit-applications',{method:'POST',body:JSON.stringify(item)});monitored.unshift(saved);localStorage.setItem(CAPITAL_MONITOR_KEY,JSON.stringify(monitored));event.target.reset();$('#quickLimitModal').classList.add('hidden');renderCapitalPage();showToast('Pengajuan limit terkirim','Dokumen lama digunakan kembali dan pengajuan menunggu Operator.');}catch(error){showToast('Pengajuan gagal dikirim',error.message);}finally{submit.disabled=false;}};
 $('#capitalApplyBack').onclick = () => showPage('capital');
 $('#applyAmount').addEventListener('input', event => {
   const amount = Number(event.target.value.replace(/\D/g, '')) || 0;
@@ -779,21 +782,18 @@ $('#capitalDetailForm').addEventListener('submit', async event => {
   if (!hasSignature) { showToast('Tanda tangan belum ada', 'Tanda tangan Agent diperlukan sebelum pengajuan dikirim.'); return; }
   const amount = Number($('#applyAmount').value.replace(/\D/g, '')) || 0;
   if (!amount) { showToast('Nominal belum sesuai', 'Masukkan nominal modal yang ingin diajukan.'); return; }
-  const documents = await Promise.all($$('.camera-documents input').map(input => imageData(input.files[0])));
-  const applications = getCapitalApplications();
-  applications.unshift({ id: `KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`, agentLogin: state.user?.phone || '', owner: $('#applyAgentName').value.trim(), whatsapp: $('#applyWhatsapp').value.trim(), shop: $('#applyShopName').value.trim(), amount, documents, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
-  localStorage.setItem(capitalStorageKey(), JSON.stringify(applications));
-  const monitored = getMonitoredApplications();
-  monitored.unshift(applications[0]);
-  localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(monitored));
-  renderCapitalPage();
-  event.target.reset();
-  $$('.camera-documents label').forEach(row => row.classList.remove('captured'));
-  showPage('capital');
-  showToast('Pengajuan terkirim', 'Pengajuan masuk ke antrean Operator dengan status Pending.');
+  const submit=event.currentTarget.querySelector('[type=submit]');submit.disabled=true;submit.textContent='Mengirim pengajuan...';
+  try {
+    const documents = await Promise.all($$('.camera-documents input').map(input => imageData(input.files[0])));
+    const item={id:`KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`,agentLogin:state.user?.phone||'',owner:$('#applyAgentName').value.trim(),whatsapp:$('#applyWhatsapp').value.trim(),shop:$('#applyShopName').value.trim(),email:$('#applyEmail').value.trim(),nik:$('#applyNik').value.trim(),amount,documents,status:'Pending',date:new Intl.DateTimeFormat('id-ID',{dateStyle:'medium',timeStyle:'short'}).format(new Date())};
+    const saved=await api('/api/credit-applications',{method:'POST',body:JSON.stringify(item)});
+    const applications=getCapitalApplications();applications.unshift(saved);localStorage.setItem(capitalStorageKey(),JSON.stringify(applications));
+    await syncCreditApplications();renderCapitalPage();event.target.reset();$$('.camera-documents label').forEach(row=>row.classList.remove('captured'));showPage('capital');showToast('Pengajuan terkirim','Pengajuan langsung masuk ke Operator dan Marketing pembina dengan status Pending.');
+  } catch(error) { showToast('Pengajuan gagal dikirim',error.message||'Periksa koneksi lalu coba kembali.'); }
+  finally { submit.disabled=false;submit.innerHTML='<svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></svg> Kirim Pengajuan Kemitraan'; }
 });
 $('#marketingCapitalBack').onclick = () => showPage('account');
-$('#refreshMarketingCapital').onclick = () => { renderMarketingCapital(); showToast('Pemantauan diperbarui', 'Data pengajuan Agent sudah dimuat ulang.'); };
+$('#refreshMarketingCapital').onclick = async () => { try { await syncCreditApplications(); renderMarketingCapital(); showToast('Pemantauan diperbarui', 'Data pengajuan Agent sudah dimuat ulang.'); } catch(error) { showToast('Gagal memperbarui',error.message); } };
 const todayISO = new Date().toISOString().slice(0, 10);
 $('#balanceTo').value = todayISO;
 $('#balanceFrom').value = `${todayISO.slice(0, 8)}01`;

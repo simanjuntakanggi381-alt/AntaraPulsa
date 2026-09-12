@@ -4,6 +4,7 @@ import (
 	"antarapulsa/backend/internal/model"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -15,13 +16,19 @@ import (
 
 // Store uses PostgreSQL in production; New remains a deterministic test store.
 type Store struct {
-	db           *sql.DB
-	mu           sync.RWMutex
-	users        map[int64]*model.User
-	byPhone      map[string]int64
-	byGoogle     map[string]int64
-	transactions []model.Transaction
-	products     []model.Product
+	db                 *sql.DB
+	mu                 sync.RWMutex
+	users              map[int64]*model.User
+	byPhone            map[string]int64
+	byGoogle           map[string]int64
+	transactions       []model.Transaction
+	products           []model.Product
+	creditApplications []creditRecord
+}
+
+type creditRecord struct {
+	UserID  int64
+	Payload map[string]any
 }
 
 func New() *Store {
@@ -70,6 +77,8 @@ func (s *Store) migrate(ctx context.Context) error {
 		`CREATE TABLE IF NOT EXISTS transactions (id TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), type TEXT NOT NULL, provider TEXT NOT NULL, product TEXT NOT NULL, target TEXT NOT NULL, amount BIGINT NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
 		`CREATE INDEX IF NOT EXISTS transactions_user_created_idx ON transactions (user_id, created_at DESC)`,
 		`CREATE TABLE IF NOT EXISTS h2hr_callbacks (refid TEXT PRIMARY KEY, status TEXT NOT NULL DEFAULT '', payload JSONB NOT NULL, received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
+		`CREATE TABLE IF NOT EXISTS credit_applications (id TEXT PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), status TEXT NOT NULL DEFAULT 'Pending', payload JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())`,
+		`CREATE INDEX IF NOT EXISTS credit_applications_user_idx ON credit_applications (user_id, created_at DESC)`,
 	} {
 		if _, err := s.db.ExecContext(ctx, q); err != nil {
 			return fmt.Errorf("migrasi database: %w", err)
@@ -84,6 +93,117 @@ func (s *Store) migrate(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (s *Store) CreateCreditApplication(userID int64, payload map[string]any) (map[string]any, error) {
+	u, ok := s.User(userID)
+	if !ok {
+		return nil, errors.New("akun Agent tidak ditemukan")
+	}
+	if !strings.EqualFold(u.Level, "agent") {
+		return nil, errors.New("hanya Agent yang dapat mengajukan kredit")
+	}
+	id, _ := payload["id"].(string)
+	id = strings.TrimSpace(id)
+	if id == "" {
+		return nil, errors.New("referensi pengajuan tidak valid")
+	}
+	payload["id"], payload["status"], payload["agentLogin"], payload["owner"] = id, "Pending", u.Phone, u.Name
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	if s.db != nil {
+		_, err = s.db.Exec(`INSERT INTO credit_applications (id,user_id,status,payload) VALUES ($1,$2,'Pending',$3::jsonb)`, id, userID, string(data))
+		if err != nil {
+			return nil, err
+		}
+		return payload, nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.creditApplications = append([]creditRecord{{UserID: userID, Payload: payload}}, s.creditApplications...)
+	return payload, nil
+}
+
+func (s *Store) CreditApplications(userID int64, role string) []map[string]any {
+	if s.db != nil {
+		query := `SELECT ca.payload,ca.status FROM credit_applications ca WHERE ca.user_id=$1 ORDER BY ca.created_at DESC`
+		if strings.EqualFold(role, "operator") {
+			query = `SELECT ca.payload,ca.status FROM credit_applications ca ORDER BY ca.created_at DESC`
+		} else if strings.EqualFold(role, "marketing") {
+			query = `SELECT ca.payload,ca.status FROM credit_applications ca JOIN users u ON u.id=ca.user_id WHERE u.parent_id=$1 ORDER BY ca.created_at DESC`
+		}
+		var rows *sql.Rows
+		var err error
+		if strings.EqualFold(role, "operator") {
+			rows, err = s.db.Query(query)
+		} else {
+			rows, err = s.db.Query(query, userID)
+		}
+		if err != nil {
+			return []map[string]any{}
+		}
+		defer rows.Close()
+		out := []map[string]any{}
+		for rows.Next() {
+			var raw []byte
+			var status string
+			if rows.Scan(&raw, &status) == nil {
+				var item map[string]any
+				if json.Unmarshal(raw, &item) == nil {
+					item["status"] = status
+					out = append(out, item)
+				}
+			}
+		}
+		return out
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := []map[string]any{}
+	for _, record := range s.creditApplications {
+		allowed := record.UserID == userID
+		if strings.EqualFold(role, "operator") {
+			allowed = true
+		} else if strings.EqualFold(role, "marketing") {
+			allowed = s.users[record.UserID] != nil && s.users[record.UserID].ParentID == userID
+		}
+		if allowed {
+			copy := map[string]any{}
+			for k, v := range record.Payload {
+				copy[k] = v
+			}
+			out = append(out, copy)
+		}
+	}
+	return out
+}
+
+func (s *Store) UpdateCreditApplicationStatus(id, status string) error {
+	if status != "Aktif" && status != "Ditolak" && status != "Lunas" {
+		return errors.New("status pengajuan tidak valid")
+	}
+	if s.db != nil {
+		result, err := s.db.Exec(`UPDATE credit_applications SET status=$1,payload=jsonb_set(payload,'{status}',to_jsonb($1::text)),updated_at=NOW() WHERE id=$2`, status, id)
+		if err != nil {
+			return err
+		}
+		n, _ := result.RowsAffected()
+		if n == 0 {
+			return errors.New("pengajuan tidak ditemukan")
+		}
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for i := range s.creditApplications {
+		if s.creditApplications[i].Payload["id"] == id {
+			s.creditApplications[i].Payload["status"] = status
+			return nil
+		}
+	}
+	return errors.New("pengajuan tidak ditemukan")
 }
 
 func (s *Store) RecordH2HRCallback(refID, status string, payload []byte) error {

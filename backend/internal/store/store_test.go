@@ -47,3 +47,34 @@ func TestAuthentication(t *testing.T) {
 		t.Fatal("password salah tidak boleh valid")
 	}
 }
+
+func TestCreditApplicationVisibleToMarketingAndOperator(t *testing.T) {
+	s := New()
+	marketing, err := s.CreateDownline(1, "Marketing", "marketing-test", "marketing@test.id", "secret12", "Marketing")
+	if err != nil {
+		t.Fatal(err)
+	}
+	agent, err := s.CreateDownline(marketing.ID, "Agent", "agent-test", "agent@test.id", "secret12", "Agent")
+	if err != nil {
+		t.Fatal(err)
+	}
+	item, err := s.CreateCreditApplication(agent.ID, map[string]any{"id": "KSA-TEST", "amount": 500000})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if item["status"] != "Pending" {
+		t.Fatalf("status: %v", item["status"])
+	}
+	if got := s.CreditApplications(marketing.ID, "Marketing"); len(got) != 1 {
+		t.Fatalf("marketing got %d", len(got))
+	}
+	if got := s.CreditApplications(999, "Operator"); len(got) != 1 {
+		t.Fatalf("operator got %d", len(got))
+	}
+	if err = s.UpdateCreditApplicationStatus("KSA-TEST", "Aktif"); err != nil {
+		t.Fatal(err)
+	}
+	if got := s.CreditApplications(agent.ID, "Agent"); got[0]["status"] != "Aktif" {
+		t.Fatalf("agent status: %v", got[0]["status"])
+	}
+}

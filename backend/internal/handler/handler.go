@@ -48,6 +48,9 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("GET /api/downlines", h.withAuth(h.downlines))
 	mux.HandleFunc("GET /api/operator/inactive-counters", h.withAuth(h.inactiveCounters))
 	mux.HandleFunc("POST /api/operator/credit-payment", h.withAuth(h.operatorCreditPayment))
+	mux.HandleFunc("GET /api/credit-applications", h.withAuth(h.creditApplications))
+	mux.HandleFunc("POST /api/credit-applications", h.withAuth(h.createCreditApplication))
+	mux.HandleFunc("PATCH /api/operator/credit-applications/{id}", h.withAuth(h.updateCreditApplication))
 	mux.HandleFunc("POST /api/downlines", h.withAuth(h.createDownline))
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
@@ -360,6 +363,51 @@ func (h *Handler) operatorCreditPayment(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 	respond(w, 200, agent)
+}
+func (h *Handler) creditApplications(w http.ResponseWriter, _ *http.Request, id int64) {
+	u, ok := h.store.User(id)
+	if !ok {
+		respond(w, 404, map[string]string{"error": "Akun tidak ditemukan"})
+		return
+	}
+	role := strings.ToLower(strings.TrimSpace(u.Level))
+	if role != "agent" && role != "marketing" && role != "operator" {
+		respond(w, 403, map[string]string{"error": "Akun tidak memiliki akses kredit"})
+		return
+	}
+	respond(w, 200, h.store.CreditApplications(id, role))
+}
+func (h *Handler) createCreditApplication(w http.ResponseWriter, r *http.Request, id int64) {
+	var payload map[string]any
+	if json.NewDecoder(io.LimitReader(r.Body, 10<<20)).Decode(&payload) != nil {
+		respond(w, 400, map[string]string{"error": "Data pengajuan atau dokumen tidak valid"})
+		return
+	}
+	item, err := h.store.CreateCreditApplication(id, payload)
+	if err != nil {
+		respond(w, 400, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, 201, item)
+}
+func (h *Handler) updateCreditApplication(w http.ResponseWriter, r *http.Request, id int64) {
+	u, ok := h.store.User(id)
+	if !ok || !strings.EqualFold(u.Level, "operator") {
+		respond(w, 403, map[string]string{"error": "Akses khusus Operator"})
+		return
+	}
+	var in struct {
+		Status string `json:"status"`
+	}
+	if decode(r, &in) != nil {
+		respond(w, 400, map[string]string{"error": "Status tidak valid"})
+		return
+	}
+	if err := h.store.UpdateCreditApplicationStatus(r.PathValue("id"), in.Status); err != nil {
+		respond(w, 400, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, 200, map[string]bool{"ok": true})
 }
 func (h *Handler) createDownline(w http.ResponseWriter, r *http.Request, id int64) {
 	parent, ok := h.store.User(id)
