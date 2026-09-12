@@ -99,7 +99,7 @@ const providerDomains = {
   bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
 };
 const providerAssets = {
-  kvision:'/assets/streaming/provider-streaming-kvision-symbol.svg', nexparabola:'/assets/streaming/provider-streaming-nex-symbol.svg',
+  kvision:'/assets/streaming/provider-streaming-kvision-symbol.png', nexparabola:'/assets/streaming/provider-streaming-nex-symbol.png',
   vidio:'/assets/streaming/provider-streaming-vidio.png', wetv:'/assets/streaming/provider-streaming-wetv.png',
   arenaofvalor:'/assets/games/provider-game-arena-of-valor.png', bloodstrike:'/assets/games/provider-game-blood-strike.png',
   callofdutymobile:'/assets/games/provider-game-call-of-duty-symbol.svg', fcmobile:'/assets/games/provider-game-fc-mobile.png',
