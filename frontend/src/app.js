@@ -101,7 +101,7 @@ const providerDomains = {
 const providerAssets = {
   arenaofvalor:'/assets/games/provider-game-arena-of-valor.png', bloodstrike:'/assets/games/provider-game-blood-strike.png',
   callofdutymobile:'/assets/games/provider-game-call-of-duty-symbol.svg', fcmobile:'/assets/games/provider-game-fc-mobile.png',
-  freefire:'/assets/games/provider-game-free-fire.png', garena:'/assets/games/provider-game-garena.svg',
+  freefire:'/assets/games/provider-game-free-fire.png',
   honkaiimpact3:'/assets/games/provider-game-honkai-impact-3.png', honorofkings:'/assets/games/provider-game-honor-of-kings.png',
   leagueoflegends:'/assets/games/provider-game-league-of-legends.svg', minecraft:'/assets/games/provider-game-minecraft-symbol.svg',
   mobilelegends:'/assets/games/provider-game-mobile-legends.png', pointblank:'/assets/games/provider-game-point-blank.svg',
@@ -205,7 +205,10 @@ function detectOperator(value) {
 
 function availableProviders(type) {
   const canonicalType = canonicalProductType(type);
-  return [...new Set(state.products.filter(product => canonicalProductType(product.type) === canonicalType).map(product => product.provider))]
+  return [...new Set(state.products
+    .filter(product => canonicalProductType(product.type) === canonicalType)
+    .map(product => product.provider)
+    .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))]
     .sort((a, b) => a.localeCompare(b, 'id'));
 }
 
