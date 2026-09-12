@@ -10,6 +10,7 @@ import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
 import { createNavigation } from './components/navigation.js';
+import { pdamProviderAssets } from './data/pdam-provider-assets.js';
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
@@ -130,6 +131,7 @@ function providerDomain(name) {
 }
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
+  if (pdamProviderAssets[normalized]) return pdamProviderAssets[normalized];
   if (bankProviderKeys.has(normalized)) return `/assets/banks/provider-bank-${normalized}.svg`;
   const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key.replace(/[^a-z0-9]/g, '')));
   return alias ? providerAssets[alias] : '';
@@ -143,7 +145,7 @@ function providerLogoMarkup(provider, type, className = '') {
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
-  const providerClass = providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
+  const providerClass = source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {

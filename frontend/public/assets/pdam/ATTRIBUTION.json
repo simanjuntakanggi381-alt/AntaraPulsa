@@ -1,0 +1,1687 @@
+{
+  "source": "https://github.com/cahyadsn/wilayah_logo",
+  "license": "MIT",
+  "generatedAt": "2026-09-12T00:06:14.725Z",
+  "mappings": [
+    {
+      "provider": "PAM ATS PALEMBANG",
+      "region": "Kota Palembang",
+      "code": "16.71"
+    },
+    {
+      "provider": "PAM Bintang Hytien Jaya Tangerang (BHJ)",
+      "region": "Kabupaten Tangerang",
+      "code": "36.03"
+    },
+    {
+      "provider": "PAM DSA KOTA AMBON",
+      "region": "Kota Ambon",
+      "code": "81.71"
+    },
+    {
+      "provider": "PDAM ACEH TENGGARA",
+      "region": "Kabupaten Aceh Tenggara",
+      "code": "11.02"
+    },
+    {
+      "provider": "PDAM AETRA TANGERANG",
+      "region": "Kabupaten Tangerang",
+      "code": "36.03"
+    },
+    {
+      "provider": "PDAM BARABAI",
+      "region": "Kabupaten Hulu Sungai Tengah",
+      "code": "63.07"
+    },
+    {
+      "provider": "PDAM BARABAI KAB. HULU SUNGAI TENGAH",
+      "region": "Kabupaten Hulu Sungai Tengah",
+      "code": "63.07"
+    },
+    {
+      "provider": "PDAM BATAM",
+      "region": "Kota Batam",
+      "code": "21.71"
+    },
+    {
+      "provider": "PDAM BUKITTINGGI",
+      "region": "Kota Bukittinggi",
+      "code": "13.75"
+    },
+    {
+      "provider": "PDAM DENPASAR",
+      "region": "Kota Denpasar",
+      "code": "51.71"
+    },
+    {
+      "provider": "PDAM ENREKANG",
+      "region": "Kabupaten Enrekang",
+      "code": "73.16"
+    },
+    {
+      "provider": "PDAM GORONTALO UTARA",
+      "region": "Kabupaten Gorontalo Utara",
+      "code": "75.05"
+    },
+    {
+      "provider": "PDAM HULU SUNGAI SELATAN",
+      "region": "Kabupaten Hulu Sungai Selatan",
+      "code": "63.06"
+    },
+    {
+      "provider": "PDAM INTAN BANJAR (KALSEL)",
+      "region": "Kabupaten Banjar",
+      "code": "63.03"
+    },
+    {
+      "provider": "PDAM KAB. ACEH BARAT (MEULABOH)",
+      "region": "Kabupaten Aceh Barat",
+      "code": "11.05"
+    },
+    {
+      "provider": "PDAM KAB. ACEH BESAR",
+      "region": "Kabupaten Aceh Besar",
+      "code": "11.06"
+    },
+    {
+      "provider": "PDAM KAB. ACEH TAMIANG",
+      "region": "Kabupaten Aceh Tamiang",
+      "code": "11.16"
+    },
+    {
+      "provider": "PDAM KAB. ACEH TIMUR",
+      "region": "Kabupaten Aceh Timur",
+      "code": "11.03"
+    },
+    {
+      "provider": "PDAM KAB. ACEH UTARA",
+      "region": "Kabupaten Aceh Utara",
+      "code": "11.08"
+    },
+    {
+      "provider": "PDAM KAB. AGAM",
+      "region": "Kabupaten Agam",
+      "code": "13.06"
+    },
+    {
+      "provider": "PDAM KAB. BADUNG",
+      "region": "Kabupaten Badung",
+      "code": "51.03"
+    },
+    {
+      "provider": "PDAM KAB. BADUNG (BALI)",
+      "region": "Kabupaten Badung",
+      "code": "51.03"
+    },
+    {
+      "provider": "PDAM KAB. BALANGAN",
+      "region": "Kabupaten Balangan",
+      "code": "63.11"
+    },
+    {
+      "provider": "PDAM KAB. BANDUNG",
+      "region": "Kabupaten Bandung",
+      "code": "32.04"
+    },
+    {
+      "provider": "PDAM KAB. BANDUNG BARAT",
+      "region": "Kabupaten Bandung Barat",
+      "code": "32.17"
+    },
+    {
+      "provider": "PDAM KAB. BANGKA",
+      "region": "Kabupaten Bangka",
+      "code": "19.01"
+    },
+    {
+      "provider": "PDAM KAB. BANGKA TENGAH",
+      "region": "Kabupaten Bangka Tengah",
+      "code": "19.04"
+    },
+    {
+      "provider": "PDAM KAB. BANGKALAN",
+      "region": "Kabupaten Bangkalan",
+      "code": "35.26"
+    },
+    {
+      "provider": "PDAM KAB. BANGLI",
+      "region": "Kabupaten Bangli",
+      "code": "51.06"
+    },
+    {
+      "provider": "PDAM KAB. BANJARNEGARA",
+      "region": "Kabupaten Banjarnegara",
+      "code": "33.04"
+    },
+    {
+      "provider": "PDAM KAB. BANTAENG",
+      "region": "Kabupaten Bantaeng",
+      "code": "73.03"
+    },
+    {
+      "provider": "PDAM KAB. BANTUL",
+      "region": "Kabupaten Bantul",
+      "code": "34.02"
+    },
+    {
+      "provider": "PDAM KAB. BANYUASIN",
+      "region": "Kabupaten Banyuasin",
+      "code": "16.07"
+    },
+    {
+      "provider": "PDAM KAB. BANYUMAS",
+      "region": "Kabupaten Banyumas",
+      "code": "33.02"
+    },
+    {
+      "provider": "PDAM KAB. BANYUWANGI",
+      "region": "Kabupaten Banyuwangi",
+      "code": "35.10"
+    },
+    {
+      "provider": "PDAM KAB. BARITO SELATAN",
+      "region": "Kabupaten Barito Selatan",
+      "code": "62.04"
+    },
+    {
+      "provider": "PDAM KAB. BARITO TIMUR",
+      "region": "Kabupaten Barito Timur",
+      "code": "62.13"
+    },
+    {
+      "provider": "PDAM KAB. BARITO UTARA",
+      "region": "Kabupaten Barito Utara",
+      "code": "62.05"
+    },
+    {
+      "provider": "PDAM KAB. BARRU",
+      "region": "Kabupaten Barru",
+      "code": "73.11"
+    },
+    {
+      "provider": "PDAM KAB. BATANG",
+      "region": "Kabupaten Batang",
+      "code": "33.25"
+    },
+    {
+      "provider": "PDAM KAB. BEKASI",
+      "region": "Kabupaten Bekasi",
+      "code": "32.16"
+    },
+    {
+      "provider": "PDAM KAB. BELITUNG TIMUR",
+      "region": "Kabupaten Belitung Timur",
+      "code": "19.06"
+    },
+    {
+      "provider": "PDAM KAB. BELU",
+      "region": "Kabupaten Belu",
+      "code": "53.04"
+    },
+    {
+      "provider": "PDAM KAB. BENER MERIAH",
+      "region": "Kabupaten Bener Meriah",
+      "code": "11.17"
+    },
+    {
+      "provider": "PDAM KAB. BENGKALIS",
+      "region": "Kabupaten Bengkalis",
+      "code": "14.03"
+    },
+    {
+      "provider": "PDAM KAB. BENGKULU TENGAH",
+      "region": "Kabupaten Bengkulu Tengah",
+      "code": "17.09"
+    },
+    {
+      "provider": "PDAM KAB. BENGKULU UTARA",
+      "region": "Kabupaten Bengkulu Utara",
+      "code": "17.03"
+    },
+    {
+      "provider": "PDAM KAB. BERAU",
+      "region": "Kabupaten Berau",
+      "code": "64.03"
+    },
+    {
+      "provider": "PDAM KAB. BIREUEN",
+      "region": "Kabupaten Bireuen",
+      "code": "11.11"
+    },
+    {
+      "provider": "PDAM KAB. BLITAR",
+      "region": "Kabupaten Blitar",
+      "code": "35.05"
+    },
+    {
+      "provider": "PDAM KAB. BLORA",
+      "region": "Kabupaten Blora",
+      "code": "33.16"
+    },
+    {
+      "provider": "PDAM KAB. BOALEMO",
+      "region": "Kabupaten Boalemo",
+      "code": "75.02"
+    },
+    {
+      "provider": "PDAM KAB. BOGOR",
+      "region": "Kabupaten Bogor",
+      "code": "32.01"
+    },
+    {
+      "provider": "PDAM KAB. BOJONEGORO",
+      "region": "Kabupaten Bojonegoro",
+      "code": "35.22"
+    },
+    {
+      "provider": "PDAM KAB. BOLAANG MONGONDOW",
+      "region": "Kabupaten Bolaang Mongondow",
+      "code": "71.01"
+    },
+    {
+      "provider": "PDAM KAB. BOMBANA",
+      "region": "Kabupaten Bombana",
+      "code": "74.06"
+    },
+    {
+      "provider": "PDAM KAB. BONDOWOSO",
+      "region": "Kabupaten Bondowoso",
+      "code": "35.11"
+    },
+    {
+      "provider": "PDAM KAB. BONE",
+      "region": "Kabupaten Bone",
+      "code": "73.08"
+    },
+    {
+      "provider": "PDAM KAB. BONE BALANGO",
+      "region": "Kabupaten Bone",
+      "code": "73.08"
+    },
+    {
+      "provider": "PDAM KAB. BOYOLALI",
+      "region": "Kabupaten Boyolali",
+      "code": "33.09"
+    },
+    {
+      "provider": "PDAM KAB. BREBES",
+      "region": "Kabupaten Brebes",
+      "code": "33.29"
+    },
+    {
+      "provider": "PDAM KAB. BULELENG",
+      "region": "Kabupaten Buleleng",
+      "code": "51.08"
+    },
+    {
+      "provider": "PDAM KAB. BULUNGAN",
+      "region": "Kabupaten Bulungan",
+      "code": "65.01"
+    },
+    {
+      "provider": "PDAM KAB. CIAMIS",
+      "region": "Kabupaten Ciamis",
+      "code": "32.07"
+    },
+    {
+      "provider": "PDAM KAB. CIANJUR",
+      "region": "Kabupaten Cianjur",
+      "code": "32.03"
+    },
+    {
+      "provider": "PDAM KAB. CILACAP",
+      "region": "Kabupaten Cilacap",
+      "code": "33.01"
+    },
+    {
+      "provider": "PDAM KAB. CIREBON",
+      "region": "Kabupaten Cirebon",
+      "code": "32.09"
+    },
+    {
+      "provider": "PDAM KAB. DAIRI",
+      "region": "Kabupaten Dairi",
+      "code": "12.11"
+    },
+    {
+      "provider": "PDAM KAB. DELI SERDANG",
+      "region": "Kabupaten Deli Serdang",
+      "code": "12.07"
+    },
+    {
+      "provider": "PDAM KAB. DEMAK",
+      "region": "Kabupaten Demak",
+      "code": "33.21"
+    },
+    {
+      "provider": "PDAM KAB. DONGGALA",
+      "region": "Kabupaten Donggala",
+      "code": "72.03"
+    },
+    {
+      "provider": "PDAM KAB. FLORES TIMUR",
+      "region": "Kabupaten Flores Timur",
+      "code": "53.06"
+    },
+    {
+      "provider": "PDAM KAB. GARUT",
+      "region": "Kabupaten Garut",
+      "code": "32.05"
+    },
+    {
+      "provider": "PDAM KAB. GAYO LUES",
+      "region": "Kabupaten Gayo Lues",
+      "code": "11.13"
+    },
+    {
+      "provider": "PDAM KAB. GIANYAR",
+      "region": "Kabupaten Gianyar",
+      "code": "51.04"
+    },
+    {
+      "provider": "PDAM KAB. GORONTALO",
+      "region": "Kabupaten Gorontalo",
+      "code": "75.01"
+    },
+    {
+      "provider": "PDAM KAB. GOWA",
+      "region": "Kabupaten Gowa",
+      "code": "73.06"
+    },
+    {
+      "provider": "PDAM KAB. GRESIK",
+      "region": "Kabupaten Gresik",
+      "code": "35.25"
+    },
+    {
+      "provider": "PDAM KAB. GROBOGAN",
+      "region": "Kabupaten Grobogan",
+      "code": "33.15"
+    },
+    {
+      "provider": "PDAM KAB. GUNUNG KIDUL",
+      "region": "Kabupaten Gunungkidul",
+      "code": "34.03"
+    },
+    {
+      "provider": "PDAM KAB. GUNUNG MAS",
+      "region": "Kabupaten Gunung Mas",
+      "code": "62.10"
+    },
+    {
+      "provider": "PDAM KAB. HALMAHERA UTARA",
+      "region": "Kabupaten Halmahera Utara",
+      "code": "82.03"
+    },
+    {
+      "provider": "PDAM KAB. HULU SUNGAI UTARA",
+      "region": "Kabupaten Hulu Sungai Utara",
+      "code": "63.08"
+    },
+    {
+      "provider": "PDAM KAB. INDRAGIRI HULU",
+      "region": "Kabupaten Indragiri Hulu",
+      "code": "14.02"
+    },
+    {
+      "provider": "PDAM KAB. INDRAMAYU",
+      "region": "Kabupaten Indramayu",
+      "code": "32.12"
+    },
+    {
+      "provider": "PDAM KAB. JEMBER",
+      "region": "Kabupaten Jember",
+      "code": "35.09"
+    },
+    {
+      "provider": "PDAM KAB. JEPARA",
+      "region": "Kabupaten Jepara",
+      "code": "33.20"
+    },
+    {
+      "provider": "PDAM KAB. JOMBANG",
+      "region": "Kabupaten Jombang",
+      "code": "35.17"
+    },
+    {
+      "provider": "PDAM KAB. KAMPAR",
+      "region": "Kabupaten Kampar",
+      "code": "14.01"
+    },
+    {
+      "provider": "PDAM KAB. KAPUAS HULU",
+      "region": "Kabupaten Kapuas Hulu",
+      "code": "61.06"
+    },
+    {
+      "provider": "PDAM KAB. KARANGANYAR",
+      "region": "Kabupaten Karanganyar",
+      "code": "33.13"
+    },
+    {
+      "provider": "PDAM KAB. KARANGASEM",
+      "region": "Kabupaten Karangasem",
+      "code": "51.07"
+    },
+    {
+      "provider": "PDAM KAB. KARAWANG",
+      "region": "Kabupaten Karawang",
+      "code": "32.15"
+    },
+    {
+      "provider": "PDAM KAB. KARO",
+      "region": "Kabupaten Karo",
+      "code": "12.06"
+    },
+    {
+      "provider": "PDAM KAB. KEBUMEN",
+      "region": "Kabupaten Kebumen",
+      "code": "33.05"
+    },
+    {
+      "provider": "PDAM KAB. KENDAL",
+      "region": "Kabupaten Kendal",
+      "code": "33.24"
+    },
+    {
+      "provider": "PDAM KAB. KETAPANG",
+      "region": "Kabupaten Ketapang",
+      "code": "61.04"
+    },
+    {
+      "provider": "PDAM KAB. KISARAN",
+      "region": "Kabupaten Asahan",
+      "code": "12.09"
+    },
+    {
+      "provider": "PDAM KAB. KLATEN",
+      "region": "Kabupaten Klaten",
+      "code": "33.10"
+    },
+    {
+      "provider": "PDAM KAB. KLATEN (JATENG)",
+      "region": "Kabupaten Klaten",
+      "code": "33.10"
+    },
+    {
+      "provider": "PDAM KAB. KLUNGKUNG",
+      "region": "Kabupaten Klungkung",
+      "code": "51.05"
+    },
+    {
+      "provider": "PDAM KAB. KOLAKA UTARA",
+      "region": "Kabupaten Kolaka Utara",
+      "code": "74.08"
+    },
+    {
+      "provider": "PDAM KAB. KOTABARU",
+      "region": "Kabupaten Kotabaru",
+      "code": "63.02"
+    },
+    {
+      "provider": "PDAM KAB. KUBU RAYA",
+      "region": "Kabupaten Kubu Raya",
+      "code": "61.12"
+    },
+    {
+      "provider": "PDAM KAB. KUDUS",
+      "region": "Kabupaten Kudus",
+      "code": "33.19"
+    },
+    {
+      "provider": "PDAM KAB. KULON PROGO",
+      "region": "Kabupaten Kulon Progo",
+      "code": "34.01"
+    },
+    {
+      "provider": "PDAM KAB. KUNINGAN",
+      "region": "Kabupaten Kuningan",
+      "code": "32.08"
+    },
+    {
+      "provider": "PDAM KAB. KUPANG",
+      "region": "Kabupaten Kupang",
+      "code": "53.01"
+    },
+    {
+      "provider": "PDAM KAB. KUTAI BARAT",
+      "region": "Kabupaten Kutai Barat",
+      "code": "64.07"
+    },
+    {
+      "provider": "PDAM KAB. KUTAI KERTANEGARA",
+      "region": "Kabupaten Kutai Kartanegara",
+      "code": "64.02"
+    },
+    {
+      "provider": "PDAM KAB. KUTAI TIMUR",
+      "region": "Kabupaten Kutai Timur",
+      "code": "64.08"
+    },
+    {
+      "provider": "PDAM KAB. LABUHAN BATU",
+      "region": "Kota Batu",
+      "code": "35.79"
+    },
+    {
+      "provider": "PDAM KAB. LAHAT",
+      "region": "Kabupaten Lahat",
+      "code": "16.04"
+    },
+    {
+      "provider": "PDAM KAB. LAMPUNG BARAT",
+      "region": "Kabupaten Lampung Barat",
+      "code": "18.04"
+    },
+    {
+      "provider": "PDAM KAB. LANDAK",
+      "region": "Kabupaten Landak",
+      "code": "61.08"
+    },
+    {
+      "provider": "PDAM KAB. LEBAK",
+      "region": "Kabupaten Lebak",
+      "code": "36.02"
+    },
+    {
+      "provider": "PDAM KAB. LEMBATA",
+      "region": "Kabupaten Lembata",
+      "code": "53.13"
+    },
+    {
+      "provider": "PDAM KAB. LIMA PULUH KOTA",
+      "region": "Kabupaten Lima Puluh Kota",
+      "code": "13.07"
+    },
+    {
+      "provider": "PDAM KAB. LOMBOK TENGAH",
+      "region": "Kabupaten Lombok Tengah",
+      "code": "52.02"
+    },
+    {
+      "provider": "PDAM KAB. LOMBOK TIMUR",
+      "region": "Kabupaten Lombok Timur",
+      "code": "52.03"
+    },
+    {
+      "provider": "PDAM KAB. LOMBOK UTARA",
+      "region": "Kabupaten Lombok Utara",
+      "code": "52.08"
+    },
+    {
+      "provider": "PDAM KAB. LUMAJANG",
+      "region": "Kabupaten Lumajang",
+      "code": "35.08"
+    },
+    {
+      "provider": "PDAM KAB. LUWU",
+      "region": "Kabupaten Luwu",
+      "code": "73.17"
+    },
+    {
+      "provider": "PDAM KAB. LUWU TIMUR",
+      "region": "Kabupaten Luwu Timur",
+      "code": "73.24"
+    },
+    {
+      "provider": "PDAM KAB. MADIUN",
+      "region": "Kabupaten Madiun",
+      "code": "35.19"
+    },
+    {
+      "provider": "PDAM KAB. MAGELANG",
+      "region": "Kabupaten Magelang",
+      "code": "33.08"
+    },
+    {
+      "provider": "PDAM KAB. MAGETAN",
+      "region": "Kabupaten Magetan",
+      "code": "35.20"
+    },
+    {
+      "provider": "PDAM KAB. MAJALENGKA",
+      "region": "Kabupaten Majalengka",
+      "code": "32.10"
+    },
+    {
+      "provider": "PDAM KAB. MALANG",
+      "region": "Kabupaten Malang",
+      "code": "35.07"
+    },
+    {
+      "provider": "PDAM KAB. MALANG REKENING NON AIR",
+      "region": "Kabupaten Malang",
+      "code": "35.07"
+    },
+    {
+      "provider": "PDAM KAB. MAMUJU",
+      "region": "Kabupaten Mamuju",
+      "code": "76.02"
+    },
+    {
+      "provider": "PDAM KAB. MANDAILING NATAL",
+      "region": "Kabupaten Mandailing Natal",
+      "code": "12.13"
+    },
+    {
+      "provider": "PDAM KAB. MANGGARAI",
+      "region": "Kabupaten Manggarai",
+      "code": "53.10"
+    },
+    {
+      "provider": "PDAM KAB. MAROS",
+      "region": "Kabupaten Maros",
+      "code": "73.09"
+    },
+    {
+      "provider": "PDAM KAB. MEMPAWAH",
+      "region": "Kabupaten Mempawah",
+      "code": "61.02"
+    },
+    {
+      "provider": "PDAM KAB. MINAHASA",
+      "region": "Kabupaten Minahasa",
+      "code": "71.02"
+    },
+    {
+      "provider": "PDAM KAB. MOJOKERTO",
+      "region": "Kabupaten Mojokerto",
+      "code": "35.16"
+    },
+    {
+      "provider": "PDAM KAB. MUARA ENIM",
+      "region": "Kabupaten Muara Enim",
+      "code": "16.03"
+    },
+    {
+      "provider": "PDAM KAB. NGADA",
+      "region": "Kabupaten Ngada",
+      "code": "53.09"
+    },
+    {
+      "provider": "PDAM KAB. NGANJUK",
+      "region": "Kabupaten Nganjuk",
+      "code": "35.18"
+    },
+    {
+      "provider": "PDAM KAB. NGAWI",
+      "region": "Kabupaten Ngawi",
+      "code": "35.21"
+    },
+    {
+      "provider": "PDAM KAB. NIAS",
+      "region": "Kabupaten Nias",
+      "code": "12.04"
+    },
+    {
+      "provider": "PDAM KAB. OGAN ILIR",
+      "region": "Kabupaten Ogan Ilir",
+      "code": "16.10"
+    },
+    {
+      "provider": "PDAM KAB. OGAN KOMERING ILIR",
+      "region": "Kabupaten Ogan Komering Ilir",
+      "code": "16.02"
+    },
+    {
+      "provider": "PDAM KAB. OGAN KOMERING ULU SELATAN",
+      "region": "Kabupaten Ogan Komering Ulu Selatan",
+      "code": "16.09"
+    },
+    {
+      "provider": "PDAM KAB. PACITAN",
+      "region": "Kabupaten Pacitan",
+      "code": "35.01"
+    },
+    {
+      "provider": "PDAM KAB. PADANG PARIAMAN",
+      "region": "Kabupaten Padang Pariaman",
+      "code": "13.05"
+    },
+    {
+      "provider": "PDAM KAB. PANDEGLANG",
+      "region": "Kabupaten Pandeglang",
+      "code": "36.01"
+    },
+    {
+      "provider": "PDAM KAB. PANGANDARAN",
+      "region": "Kabupaten Pangandaran",
+      "code": "32.18"
+    },
+    {
+      "provider": "PDAM KAB. PANGKAJENE KEPULAUAN",
+      "region": "Kabupaten Pangkajene dan Kepulauan",
+      "code": "73.10"
+    },
+    {
+      "provider": "PDAM KAB. PASAMAN",
+      "region": "Kabupaten Pasaman",
+      "code": "13.08"
+    },
+    {
+      "provider": "PDAM KAB. PASURUAN",
+      "region": "Kabupaten Pasuruan",
+      "code": "35.14"
+    },
+    {
+      "provider": "PDAM KAB. PATI",
+      "region": "Kabupaten Pati",
+      "code": "33.18"
+    },
+    {
+      "provider": "PDAM KAB. PEKALONGAN",
+      "region": "Kabupaten Pekalongan",
+      "code": "33.26"
+    },
+    {
+      "provider": "PDAM KAB. PEKALONGAN (JATENG)",
+      "region": "Kabupaten Pekalongan",
+      "code": "33.26"
+    },
+    {
+      "provider": "PDAM KAB. PEMALANG",
+      "region": "Kabupaten Pemalang",
+      "code": "33.27"
+    },
+    {
+      "provider": "PDAM KAB. PESAWARAN",
+      "region": "Kabupaten Pesawaran",
+      "code": "18.09"
+    },
+    {
+      "provider": "PDAM KAB. PESISIR SELATAN",
+      "region": "Kabupaten Pesisir Selatan",
+      "code": "13.01"
+    },
+    {
+      "provider": "PDAM KAB. PIDIE",
+      "region": "Kabupaten Pidie",
+      "code": "11.07"
+    },
+    {
+      "provider": "PDAM KAB. PIDIE JAYA",
+      "region": "Kabupaten Pidie Jaya",
+      "code": "11.18"
+    },
+    {
+      "provider": "PDAM KAB. PINRANG",
+      "region": "Kabupaten Pinrang",
+      "code": "73.15"
+    },
+    {
+      "provider": "PDAM KAB. POSO",
+      "region": "Kabupaten Poso",
+      "code": "72.02"
+    },
+    {
+      "provider": "PDAM KAB. PROBOLINGGO (JATIM)",
+      "region": "Kabupaten Probolinggo",
+      "code": "35.13"
+    },
+    {
+      "provider": "PDAM KAB. PURBALINGGA",
+      "region": "Kabupaten Purbalingga",
+      "code": "33.03"
+    },
+    {
+      "provider": "PDAM KAB. PURWAKARTA",
+      "region": "Kabupaten Purwakarta",
+      "code": "32.14"
+    },
+    {
+      "provider": "PDAM KAB. PURWOREJO",
+      "region": "Kabupaten Purworejo",
+      "code": "33.06"
+    },
+    {
+      "provider": "PDAM KAB. REJANG LEBONG",
+      "region": "Kabupaten Rejang Lebong",
+      "code": "17.02"
+    },
+    {
+      "provider": "PDAM KAB. REMBANG",
+      "region": "Kabupaten Rembang",
+      "code": "33.17"
+    },
+    {
+      "provider": "PDAM KAB. SAMBAS",
+      "region": "Kabupaten Sambas",
+      "code": "61.01"
+    },
+    {
+      "provider": "PDAM KAB. SAMPANG",
+      "region": "Kabupaten Sampang",
+      "code": "35.27"
+    },
+    {
+      "provider": "PDAM KAB. SANGGAU",
+      "region": "Kabupaten Sanggau",
+      "code": "61.03"
+    },
+    {
+      "provider": "PDAM KAB. SANGIHE",
+      "region": "Kabupaten Kepulauan Sangihe",
+      "code": "71.03"
+    },
+    {
+      "provider": "PDAM KAB. SEKADAU",
+      "region": "Kabupaten Sekadau",
+      "code": "61.09"
+    },
+    {
+      "provider": "PDAM KAB. SEMARANG",
+      "region": "Kabupaten Semarang",
+      "code": "33.22"
+    },
+    {
+      "provider": "PDAM KAB. SERANG",
+      "region": "Kabupaten Serang",
+      "code": "36.04"
+    },
+    {
+      "provider": "PDAM KAB. SERUYAN",
+      "region": "Kabupaten Seruyan",
+      "code": "62.07"
+    },
+    {
+      "provider": "PDAM KAB. SIDOARJO",
+      "region": "Kabupaten Sidoarjo",
+      "code": "35.15"
+    },
+    {
+      "provider": "PDAM KAB. SIDRAP",
+      "region": "Kabupaten Sidenreng Rappang",
+      "code": "73.14"
+    },
+    {
+      "provider": "PDAM KAB. SIKKA",
+      "region": "Kabupaten Sikka",
+      "code": "53.07"
+    },
+    {
+      "provider": "PDAM KAB. SIMEULUE",
+      "region": "Kabupaten Simeulue",
+      "code": "11.09"
+    },
+    {
+      "provider": "PDAM KAB. SINJAI",
+      "region": "Kabupaten Sinjai",
+      "code": "73.07"
+    },
+    {
+      "provider": "PDAM KAB. SINTANG",
+      "region": "Kabupaten Sintang",
+      "code": "61.05"
+    },
+    {
+      "provider": "PDAM KAB. SITUBONDO",
+      "region": "Kabupaten Situbondo",
+      "code": "35.12"
+    },
+    {
+      "provider": "PDAM KAB. SLEMAN",
+      "region": "Kabupaten Sleman",
+      "code": "34.04"
+    },
+    {
+      "provider": "PDAM KAB. SOLOK",
+      "region": "Kabupaten Solok",
+      "code": "13.02"
+    },
+    {
+      "provider": "PDAM KAB. SOLOK SELATAN",
+      "region": "Kabupaten Solok Selatan",
+      "code": "13.11"
+    },
+    {
+      "provider": "PDAM KAB. SORONG",
+      "region": "Kabupaten Sorong",
+      "code": "96.01"
+    },
+    {
+      "provider": "PDAM KAB. SRAGEN",
+      "region": "Kabupaten Sragen",
+      "code": "33.14"
+    },
+    {
+      "provider": "PDAM KAB. SUBANG",
+      "region": "Kabupaten Subang",
+      "code": "32.13"
+    },
+    {
+      "provider": "PDAM KAB. SUKABUMI",
+      "region": "Kabupaten Sukabumi",
+      "code": "32.02"
+    },
+    {
+      "provider": "PDAM KAB. SUKAMARA",
+      "region": "Kabupaten Sukamara",
+      "code": "62.08"
+    },
+    {
+      "provider": "PDAM KAB. SUKOHARJO",
+      "region": "Kabupaten Sukoharjo",
+      "code": "33.11"
+    },
+    {
+      "provider": "PDAM KAB. SUMBAWA",
+      "region": "Kabupaten Sumbawa",
+      "code": "52.04"
+    },
+    {
+      "provider": "PDAM KAB. SUMEDANG",
+      "region": "Kabupaten Sumedang",
+      "code": "32.11"
+    },
+    {
+      "provider": "PDAM KAB. TABALONG",
+      "region": "Kabupaten Tabalong",
+      "code": "63.09"
+    },
+    {
+      "provider": "PDAM KAB. TAKALAR",
+      "region": "Kabupaten Takalar",
+      "code": "73.05"
+    },
+    {
+      "provider": "PDAM KAB. TANA TIDUNG",
+      "region": "Kabupaten Tana Tidung",
+      "code": "65.04"
+    },
+    {
+      "provider": "PDAM KAB. TANA TORAJA",
+      "region": "Kabupaten Tana Toraja",
+      "code": "73.18"
+    },
+    {
+      "provider": "PDAM KAB. TANAH BUMBU",
+      "region": "Kabupaten Tanah Bumbu",
+      "code": "63.10"
+    },
+    {
+      "provider": "PDAM KAB. TANAH DATAR",
+      "region": "Kabupaten Tanah Datar",
+      "code": "13.04"
+    },
+    {
+      "provider": "PDAM KAB. TANAH LAUT",
+      "region": "Kabupaten Tanah Laut",
+      "code": "63.01"
+    },
+    {
+      "provider": "PDAM KAB. TANGERANG",
+      "region": "Kabupaten Tangerang",
+      "code": "36.03"
+    },
+    {
+      "provider": "PDAM KAB. TANGGAMUS",
+      "region": "Kabupaten Tanggamus",
+      "code": "18.06"
+    },
+    {
+      "provider": "PDAM KAB. TAPANULI TENGAH",
+      "region": "Kabupaten Tapanuli Tengah",
+      "code": "12.01"
+    },
+    {
+      "provider": "PDAM KAB. TAPANULI UTARA",
+      "region": "Kabupaten Tapanuli Utara",
+      "code": "12.02"
+    },
+    {
+      "provider": "PDAM KAB. TAPIN",
+      "region": "Kabupaten Tapin",
+      "code": "63.05"
+    },
+    {
+      "provider": "PDAM KAB. TASIKMALAYA",
+      "region": "Kabupaten Tasikmalaya",
+      "code": "32.06"
+    },
+    {
+      "provider": "PDAM KAB. TEBO",
+      "region": "Kabupaten Tebo",
+      "code": "15.09"
+    },
+    {
+      "provider": "PDAM KAB. TEGAL",
+      "region": "Kabupaten Tegal",
+      "code": "33.28"
+    },
+    {
+      "provider": "PDAM KAB. TEMANGGUNG",
+      "region": "Kabupaten Temanggung",
+      "code": "33.23"
+    },
+    {
+      "provider": "PDAM KAB. TIMOR TENGAH SELATAN",
+      "region": "Kabupaten Timor Tengah Selatan",
+      "code": "53.02"
+    },
+    {
+      "provider": "PDAM KAB. TORAJA UTARA",
+      "region": "Kabupaten Toraja Utara",
+      "code": "73.26"
+    },
+    {
+      "provider": "PDAM KAB. TRENGGALEK",
+      "region": "Kabupaten Trenggalek",
+      "code": "35.03"
+    },
+    {
+      "provider": "PDAM KAB. TUBAN",
+      "region": "Kabupaten Tuban",
+      "code": "35.23"
+    },
+    {
+      "provider": "PDAM KAB. TULUNGAGUNG",
+      "region": "Kabupaten Tulungagung",
+      "code": "35.04"
+    },
+    {
+      "provider": "PDAM KAB. WONOGIRI",
+      "region": "Kabupaten Wonogiri",
+      "code": "33.12"
+    },
+    {
+      "provider": "PDAM KAB. WONOSOBO",
+      "region": "Kabupaten Wonosobo",
+      "code": "33.07"
+    },
+    {
+      "provider": "PDAM KENDARI",
+      "region": "Kota Kendari",
+      "code": "74.71"
+    },
+    {
+      "provider": "PDAM KEPULAUAN SULA",
+      "region": "Kabupaten Kepulauan Sula",
+      "code": "82.05"
+    },
+    {
+      "provider": "PDAM KOTA AMBON",
+      "region": "Kota Ambon",
+      "code": "81.71"
+    },
+    {
+      "provider": "PDAM KOTA BALIKPAPAN",
+      "region": "Kota Balikpapan",
+      "code": "64.71"
+    },
+    {
+      "provider": "PDAM KOTA BANDA ACEH",
+      "region": "Kota Banda Aceh",
+      "code": "11.71"
+    },
+    {
+      "provider": "PDAM KOTA BANDAR LAMPUNG",
+      "region": "Kota Bandar Lampung",
+      "code": "18.71"
+    },
+    {
+      "provider": "PDAM KOTA BANDUNG",
+      "region": "Kota Bandung",
+      "code": "32.73"
+    },
+    {
+      "provider": "PDAM KOTA BANJAR",
+      "region": "Kota Banjar",
+      "code": "32.79"
+    },
+    {
+      "provider": "PDAM KOTA BANJARMASIN",
+      "region": "Kota Banjarmasin",
+      "code": "63.71"
+    },
+    {
+      "provider": "PDAM KOTA BEKASI",
+      "region": "Kota Bekasi",
+      "code": "32.75"
+    },
+    {
+      "provider": "PDAM KOTA BEKASI PERUMDA TIRTA PATRIOT (PDAM KOTA BEKASI)",
+      "region": "Kota Bekasi",
+      "code": "32.75"
+    },
+    {
+      "provider": "PDAM KOTA BENGKULU",
+      "region": "Kota Bengkulu",
+      "code": "17.71"
+    },
+    {
+      "provider": "PDAM KOTA BINJAI",
+      "region": "Kota Binjai",
+      "code": "12.75"
+    },
+    {
+      "provider": "PDAM KOTA BITUNG",
+      "region": "Kota Bitung",
+      "code": "71.72"
+    },
+    {
+      "provider": "PDAM KOTA BLITAR",
+      "region": "Kota Blitar",
+      "code": "35.72"
+    },
+    {
+      "provider": "PDAM KOTA BOGOR",
+      "region": "Kota Bogor",
+      "code": "32.71"
+    },
+    {
+      "provider": "PDAM KOTA BONTANG",
+      "region": "Kota Bontang",
+      "code": "64.74"
+    },
+    {
+      "provider": "PDAM KOTA CILEGON",
+      "region": "Kota Cilegon",
+      "code": "36.72"
+    },
+    {
+      "provider": "PDAM KOTA CIMAHI",
+      "region": "Kota Cimahi",
+      "code": "32.77"
+    },
+    {
+      "provider": "PDAM KOTA CIREBON",
+      "region": "Kota Cirebon",
+      "code": "32.74"
+    },
+    {
+      "provider": "PDAM KOTA DEPOK",
+      "region": "Kota Depok",
+      "code": "32.76"
+    },
+    {
+      "provider": "PDAM KOTA GORONTALO",
+      "region": "Kota Gorontalo",
+      "code": "75.71"
+    },
+    {
+      "provider": "PDAM KOTA JAMBI",
+      "region": "Kota Jambi",
+      "code": "15.71"
+    },
+    {
+      "provider": "PDAM KOTA JAYAPURA",
+      "region": "Kota Jayapura",
+      "code": "91.71"
+    },
+    {
+      "provider": "PDAM KOTA KEDIRI",
+      "region": "Kota Kediri",
+      "code": "35.71"
+    },
+    {
+      "provider": "PDAM KOTA LANGSA",
+      "region": "Kota Langsa",
+      "code": "11.74"
+    },
+    {
+      "provider": "PDAM KOTA LUBUK LINGGAU",
+      "region": "Kota Lubuk Linggau",
+      "code": "16.73"
+    },
+    {
+      "provider": "PDAM KOTA MADIUN",
+      "region": "Kota Madiun",
+      "code": "35.77"
+    },
+    {
+      "provider": "PDAM KOTA MAGELANG",
+      "region": "Kota Magelang",
+      "code": "33.71"
+    },
+    {
+      "provider": "PDAM KOTA MAKASSAR",
+      "region": "Kota Makassar",
+      "code": "73.71"
+    },
+    {
+      "provider": "PDAM KOTA MALANG",
+      "region": "Kota Malang",
+      "code": "35.73"
+    },
+    {
+      "provider": "PDAM KOTA MATARAM",
+      "region": "Kota Mataram",
+      "code": "52.71"
+    },
+    {
+      "provider": "PDAM KOTA MATARAM (NTB)",
+      "region": "Kota Mataram",
+      "code": "52.71"
+    },
+    {
+      "provider": "PDAM KOTA MEDAN",
+      "region": "Kota Medan",
+      "code": "12.71"
+    },
+    {
+      "provider": "PDAM KOTA MOJOKERTO",
+      "region": "Kota Mojokerto",
+      "code": "35.76"
+    },
+    {
+      "provider": "PDAM KOTA PADANG",
+      "region": "Kota Padang",
+      "code": "13.71"
+    },
+    {
+      "provider": "PDAM KOTA PADANG PANJANG",
+      "region": "Kota Padang Panjang",
+      "code": "13.74"
+    },
+    {
+      "provider": "PDAM KOTA PALEMBANG",
+      "region": "Kota Palembang",
+      "code": "16.71"
+    },
+    {
+      "provider": "PDAM KOTA PALOPO",
+      "region": "Kota Palopo",
+      "code": "73.73"
+    },
+    {
+      "provider": "PDAM KOTA PALU",
+      "region": "Kota Palu",
+      "code": "72.71"
+    },
+    {
+      "provider": "PDAM KOTA PANGKALPINANG",
+      "region": "Kota Pangkal Pinang",
+      "code": "19.71"
+    },
+    {
+      "provider": "PDAM KOTA PAREPARE",
+      "region": "Kota Parepare",
+      "code": "73.72"
+    },
+    {
+      "provider": "PDAM KOTA PAREPARE (SULSEL)",
+      "region": "Kota Parepare",
+      "code": "73.72"
+    },
+    {
+      "provider": "PDAM KOTA PASURUAN",
+      "region": "Kota Pasuruan",
+      "code": "35.75"
+    },
+    {
+      "provider": "PDAM KOTA PAYAKUMBUH",
+      "region": "Kota Payakumbuh",
+      "code": "13.76"
+    },
+    {
+      "provider": "PDAM KOTA PEKALONGAN",
+      "region": "Kota Pekalongan",
+      "code": "33.75"
+    },
+    {
+      "provider": "PDAM KOTA PEKANBARU",
+      "region": "Kota Pekanbaru",
+      "code": "14.71"
+    },
+    {
+      "provider": "PDAM KOTA PEMATANG SIANTAR",
+      "region": "Kota Pematangsiantar",
+      "code": "12.72"
+    },
+    {
+      "provider": "PDAM KOTA PONTIANAK",
+      "region": "Kota Pontianak",
+      "code": "61.71"
+    },
+    {
+      "provider": "PDAM KOTA PRABUMULIH",
+      "region": "Kota Prabumulih",
+      "code": "16.74"
+    },
+    {
+      "provider": "PDAM KOTA PROBOLINGGO",
+      "region": "Kota Probolinggo",
+      "code": "35.74"
+    },
+    {
+      "provider": "PDAM KOTA SABANG",
+      "region": "Kota Sabang",
+      "code": "11.72"
+    },
+    {
+      "provider": "PDAM KOTA SALATIGA",
+      "region": "Kota Salatiga",
+      "code": "33.73"
+    },
+    {
+      "provider": "PDAM KOTA SAMARINDA",
+      "region": "Kota Samarinda",
+      "code": "64.72"
+    },
+    {
+      "provider": "PDAM KOTA SEMARANG",
+      "region": "Kota Semarang",
+      "code": "33.74"
+    },
+    {
+      "provider": "PDAM KOTA SEMARANG (JATENG)",
+      "region": "Kota Semarang",
+      "code": "33.74"
+    },
+    {
+      "provider": "PDAM KOTA SIBOLGA",
+      "region": "Kota Sibolga",
+      "code": "12.73"
+    },
+    {
+      "provider": "PDAM KOTA SINGKAWANG",
+      "region": "Kota Singkawang",
+      "code": "61.72"
+    },
+    {
+      "provider": "PDAM KOTA SOLO",
+      "region": "Kota Surakarta",
+      "code": "33.72"
+    },
+    {
+      "provider": "PDAM KOTA SOLOK",
+      "region": "Kota Solok",
+      "code": "13.72"
+    },
+    {
+      "provider": "PDAM KOTA SUKABUMI",
+      "region": "Kota Sukabumi",
+      "code": "32.72"
+    },
+    {
+      "provider": "PDAM KOTA SURABAYA (JATIM)",
+      "region": "Kota Surabaya",
+      "code": "35.78"
+    },
+    {
+      "provider": "PDAM KOTA SURABAYA (JATIM) TAGIHAN NON AIR",
+      "region": "Kota Surabaya",
+      "code": "35.78"
+    },
+    {
+      "provider": "PDAM KOTA SURAKARTA",
+      "region": "Kota Surakarta",
+      "code": "33.72"
+    },
+    {
+      "provider": "PDAM KOTA TANGERANG",
+      "region": "Kota Tangerang",
+      "code": "36.71"
+    },
+    {
+      "provider": "PDAM KOTA TANGERANG SELATAN",
+      "region": "Kota Tangerang Selatan",
+      "code": "36.74"
+    },
+    {
+      "provider": "PDAM KOTA TANJUNGBALAI",
+      "region": "Kota Tanjungbalai",
+      "code": "12.74"
+    },
+    {
+      "provider": "PDAM KOTA TARAKAN",
+      "region": "Kota Tarakan",
+      "code": "65.71"
+    },
+    {
+      "provider": "PDAM KOTA TEBING TINGGI",
+      "region": "Kota Tebing Tinggi",
+      "code": "12.76"
+    },
+    {
+      "provider": "PDAM KOTA TEGAL",
+      "region": "Kota Tegal",
+      "code": "33.76"
+    },
+    {
+      "provider": "PDAM KOTA TERNATE",
+      "region": "Kota Ternate",
+      "code": "82.71"
+    },
+    {
+      "provider": "PDAM KOTA. MAGELANG",
+      "region": "Kota Magelang",
+      "code": "33.71"
+    },
+    {
+      "provider": "PDAM KOTA. TERNATE",
+      "region": "Kota Ternate",
+      "code": "82.71"
+    },
+    {
+      "provider": "PDAM KOTAWARINGIN TIMUR",
+      "region": "Kabupaten Kotawaringin Timur",
+      "code": "62.02"
+    },
+    {
+      "provider": "PDAM MAJENE",
+      "region": "Kabupaten Majene",
+      "code": "76.05"
+    },
+    {
+      "provider": "PDAM MAMUJU TENGAH",
+      "region": "Kabupaten Mamuju Tengah",
+      "code": "76.06"
+    },
+    {
+      "provider": "PDAM MUARO JAMBI",
+      "region": "Kabupaten Muaro Jambi",
+      "code": "15.05"
+    },
+    {
+      "provider": "PDAM PAMEKASAN",
+      "region": "Kabupaten Pamekasan",
+      "code": "35.28"
+    },
+    {
+      "provider": "PDAM PAMJAYA (AETRA & PALYJA)",
+      "region": "Kabupaten Pidie",
+      "code": "11.07"
+    },
+    {
+      "provider": "PDAM PANGKALAN BUN",
+      "region": "Kabupaten Kotawaringin Barat",
+      "code": "62.01"
+    },
+    {
+      "provider": "PDAM PERUMDAM WAY GURUH LAMPUNG TIMUR",
+      "region": "Kabupaten Lampung Timur",
+      "code": "18.07"
+    },
+    {
+      "provider": "PDAM POLEWALI MANDAR",
+      "region": "Kabupaten Polewali Mandar",
+      "code": "76.04"
+    },
+    {
+      "provider": "PDAM PONOROGO",
+      "region": "Kabupaten Ponorogo",
+      "code": "35.02"
+    },
+    {
+      "provider": "PDAM SAROLANGUN",
+      "region": "Kabupaten Sarolangun",
+      "code": "15.03"
+    },
+    {
+      "provider": "PDAM SIMALUNGUN",
+      "region": "Kabupaten Simalungun",
+      "code": "12.08"
+    },
+    {
+      "provider": "PDAM SUMBAWA",
+      "region": "Kabupaten Sumbawa",
+      "code": "52.04"
+    },
+    {
+      "provider": "PDAM SUMBAWA BARAT",
+      "region": "Kabupaten Sumbawa Barat",
+      "code": "52.07"
+    },
+    {
+      "provider": "PDAM SUMENEP",
+      "region": "Kabupaten Sumenep",
+      "code": "35.29"
+    },
+    {
+      "provider": "PDAM TIMOR TENGAH UTARA",
+      "region": "Kabupaten Timor Tengah Utara",
+      "code": "53.03"
+    },
+    {
+      "provider": "PDAM TIRTA BATANGHARI",
+      "region": "Kabupaten Batanghari",
+      "code": "15.04"
+    },
+    {
+      "provider": "PDAM TIRTA BUANA KAB. SIJUNJUNG",
+      "region": "Kabupaten Sijunjung",
+      "code": "13.03"
+    },
+    {
+      "provider": "PDAM TIRTA BUKAE KAB. LUWU UTARA",
+      "region": "Kabupaten Luwu Utara",
+      "code": "73.22"
+    },
+    {
+      "provider": "PDAM TIRTA KALWEDO KAB. MALUKU BARAT DAYA",
+      "region": "Kabupaten Maluku Barat Daya",
+      "code": "81.08"
+    },
+    {
+      "provider": "PDAM TIRTA KALWEDO KAB.UPATEN MALUKU BARAT DAYA",
+      "region": "Kabupaten Maluku Barat Daya",
+      "code": "81.08"
+    },
+    {
+      "provider": "PDAM TIRTA KEPRI",
+      "region": "Kabupaten Pidie",
+      "code": "11.07"
+    },
+    {
+      "provider": "PDAM TIRTA KHAYANGAN (KOTA SUNGAI PENUH)",
+      "region": "Kota Sungai Penuh",
+      "code": "15.72"
+    },
+    {
+      "provider": "PDAM TIRTA NENE MALLOMO KAB. SIDENRENG RAPPANG",
+      "region": "Kabupaten Sidenreng Rappang",
+      "code": "73.14"
+    },
+    {
+      "provider": "PDAM TIRTA SINGKIL KAB. ACEH",
+      "region": "Kabupaten Aceh Singkil",
+      "code": "11.10"
+    },
+    {
+      "provider": "PDAM TIRTA TAKA KAB NUNUKAN",
+      "region": "Kabupaten Nunukan",
+      "code": "65.03"
+    },
+    {
+      "provider": "PDAM TIRTA TANJUNG KAB. BATUBARA",
+      "region": "Kota Batu",
+      "code": "35.79"
+    },
+    {
+      "provider": "PDAM TIRTA WAMPU KAB. LANGKAT",
+      "region": "Kabupaten Langkat",
+      "code": "12.05"
+    },
+    {
+      "provider": "PDAM TOMOHON",
+      "region": "Kota Tomohon",
+      "code": "71.73"
+    },
+    {
+      "provider": "PDAM UETANAH KAB. TOJO UNA-UNA",
+      "region": "Kabupaten Tojo Una Una",
+      "code": "72.09"
+    },
+    {
+      "provider": "PDAM WAE MANURUNG KAB. BONE",
+      "region": "Kabupaten Bone",
+      "code": "73.08"
+    },
+    {
+      "provider": "PDAM WAJO",
+      "region": "Kabupaten Wajo",
+      "code": "73.13"
+    },
+    {
+      "provider": "PDAM WISATA BATU",
+      "region": "Kota Batu",
+      "code": "35.79"
+    },
+    {
+      "provider": "PDAM Wae Manurung Kabupaten Bone",
+      "region": "Kabupaten Bone",
+      "code": "73.08"
+    },
+    {
+      "provider": "PERUMDA AIR MINUM SUMBA TIMUR",
+      "region": "Kabupaten Sumba Timur",
+      "code": "53.11"
+    },
+    {
+      "provider": "PERUMDA AIR MINUM TIRTA KELIMUTU KAB. ENDE",
+      "region": "Kabupaten Ende",
+      "code": "53.08"
+    },
+    {
+      "provider": "PERUMDA AIR MINUM TIRTA KELIMUTU KAB. ENDE (NTT)",
+      "region": "Kabupaten Ende",
+      "code": "53.08"
+    },
+    {
+      "provider": "PERUMDA TIRTA LINGGA",
+      "region": "Kabupaten Lingga",
+      "code": "21.04"
+    },
+    {
+      "provider": "PERUMDAM LAE NCIHO KAB. DAIRI",
+      "region": "Kabupaten Dairi",
+      "code": "12.11"
+    },
+    {
+      "provider": "PERUMDAM PAISU MOUTE KAB. BANGGAI LAUT",
+      "region": "Kabupaten Banggai Laut",
+      "code": "72.11"
+    },
+    {
+      "provider": "PERUMDAM TIRTA AMERTHA BUANA TABANAN",
+      "region": "Kabupaten Tabanan",
+      "code": "51.02"
+    },
+    {
+      "provider": "PERUMDAM TIRTA BUKIT KABA KAB REJANG LEBONG",
+      "region": "Kabupaten Rejang Lebong",
+      "code": "17.02"
+    },
+    {
+      "provider": "PERUMDAM TIRTA EVAV SEJAHTERA KAB. MALUKU TENGGARA",
+      "region": "Kabupaten Maluku Tenggara",
+      "code": "81.02"
+    },
+    {
+      "provider": "PERUMDAM TIRTA SEJIRAN SETASON KAB. BANGKA BARAT",
+      "region": "Kabupaten Bangka Barat",
+      "code": "19.05"
+    },
+    {
+      "provider": "PERUMDAM TIRTA SEJIRAN SETASON KABUPATEN BANGKA BARAT",
+      "region": "Kabupaten Bangka Barat",
+      "code": "19.05"
+    },
+    {
+      "provider": "PT AIR MANADO",
+      "region": "Kota Manado",
+      "code": "71.71"
+    }
+  ]
+}
