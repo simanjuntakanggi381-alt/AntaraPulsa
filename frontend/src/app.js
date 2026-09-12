@@ -8,6 +8,7 @@ import './styles/mobile-polish.css';
 import './styles/responsive-layout.css';
 import './styles/login-polish.css';
 import './styles/capital.css';
+import './styles/capital-application.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -568,18 +569,57 @@ $$('.capital-upload input').forEach(input => input.addEventListener('change', ()
   label.classList.toggle('uploaded', Boolean(input.files?.length));
   label.querySelector('b').textContent = input.files?.[0]?.name || 'Belum diunggah';
 }));
-$('#capitalApplicationForm').addEventListener('submit', event => {
+$('#openCapitalApplication').onclick = () => {
+  $('#applyAgentName').value = state.user?.name || $('#capitalOwner').value || '';
+  $('#applyWhatsapp').value = $('#capitalWhatsapp').value || (/^\d+$/.test(state.user?.phone || '') ? state.user.phone : '');
+  $('#applyEmail').value = state.user?.email || '';
+  $('#applyAmount').value = $('#capitalAmount').value;
+  $('#signatureName').textContent = state.user?.name || 'Agent';
+  showPage('capitalApply');
+  requestAnimationFrame(resetSignatureCanvas);
+};
+$('#capitalApplyBack').onclick = () => showPage('capital');
+$('#applyAmount').addEventListener('input', event => {
+  const amount = Number(event.target.value.replace(/\D/g, '')) || 0;
+  event.target.value = amount ? money(amount) : '';
+});
+$$('.camera-documents input').forEach(input => input.addEventListener('change', () => {
+  const row = input.closest('label');
+  row.classList.toggle('captured', Boolean(input.files?.length));
+  row.querySelector('span b').textContent = input.files?.length ? 'Foto siap' : 'Ambil Foto';
+}));
+const signatureCanvas = $('#signatureCanvas');
+const signatureContext = signatureCanvas.getContext('2d');
+let signing = false;
+let hasSignature = false;
+function resetSignatureCanvas() {
+  const ratio = window.devicePixelRatio || 1;
+  const bounds = signatureCanvas.getBoundingClientRect();
+  signatureCanvas.width = Math.max(1, bounds.width * ratio);
+  signatureCanvas.height = Math.max(1, bounds.height * ratio);
+  signatureContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  signatureContext.lineWidth = 2.2; signatureContext.lineCap = 'round'; signatureContext.strokeStyle = '#263b72';
+  hasSignature = false; $('#signatureHint').hidden = false;
+}
+const signaturePoint = event => { const rect = signatureCanvas.getBoundingClientRect(); const touch = event.touches?.[0] || event; return { x: touch.clientX - rect.left, y: touch.clientY - rect.top }; };
+const startSignature = event => { event.preventDefault(); signing = true; const point = signaturePoint(event); signatureContext.beginPath(); signatureContext.moveTo(point.x, point.y); };
+const drawSignature = event => { if (!signing) return; event.preventDefault(); const point = signaturePoint(event); signatureContext.lineTo(point.x, point.y); signatureContext.stroke(); hasSignature = true; $('#signatureHint').hidden = true; };
+['pointerdown'].forEach(name => signatureCanvas.addEventListener(name, startSignature));
+signatureCanvas.addEventListener('pointermove', drawSignature); window.addEventListener('pointerup', () => { signing = false; });
+$('#clearSignature').onclick = resetSignatureCanvas;
+$('#capitalDetailForm').addEventListener('submit', event => {
   event.preventDefault();
-  const amount = Number($('#capitalAmount').value.replace(/\D/g, '')) || 0;
-  if (!amount) { showToast('Nominal belum sesuai', 'Masukkan nominal kredit yang ingin diajukan.'); return; }
+  if (!hasSignature) { showToast('Tanda tangan belum ada', 'Tanda tangan Agent diperlukan sebelum pengajuan dikirim.'); return; }
+  const amount = Number($('#applyAmount').value.replace(/\D/g, '')) || 0;
+  if (!amount) { showToast('Nominal belum sesuai', 'Masukkan nominal modal yang ingin diajukan.'); return; }
   const applications = getCapitalApplications();
-  applications.unshift({ id: `KM-${Date.now().toString().slice(-8)}`, owner: $('#capitalOwner').value.trim(), whatsapp: $('#capitalWhatsapp').value.trim(), amount, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
+  applications.unshift({ id: `KM-${Date.now().toString().slice(-8)}`, owner: $('#applyAgentName').value.trim(), whatsapp: $('#applyWhatsapp').value.trim(), shop: $('#applyShopName').value.trim(), amount, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
   localStorage.setItem(capitalStorageKey(), JSON.stringify(applications));
   renderCapitalPage();
   event.target.reset();
-  $$('.capital-upload').forEach(label => { label.classList.remove('uploaded'); label.querySelector('b').textContent = 'Belum diunggah'; });
-  showToast('Pengajuan berhasil dikirim', 'Pengajuan kredit masuk ke riwayat dengan status Pending.');
-  $('#capitalHistory').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $$('.camera-documents label').forEach(row => row.classList.remove('captured'));
+  showPage('capital');
+  showToast('Pengajuan terkirim', 'Pengajuan masuk ke antrean Operator dengan status Pending.');
 });
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
