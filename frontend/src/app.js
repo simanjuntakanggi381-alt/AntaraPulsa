@@ -10,6 +10,7 @@ import './styles/login-polish.css';
 import './styles/capital.css';
 import './styles/capital-application.css';
 import './styles/marketing-capital.css';
+import './styles/role-finance.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -539,6 +540,9 @@ $('#topupBtn').onclick = () => showPage('topup');
 $('#accountMenu').addEventListener('click', event => {
   const button = event.target.closest('[data-account-action]');
   if (button?.dataset.accountAction === 'topup') showPage('topup');
+  if (button?.dataset.accountAction === 'balance') showPage('balance');
+  if (button?.dataset.accountAction === 'fees') showPage('fees');
+  if (button?.dataset.accountAction === 'withdraw') showPage('withdraw');
   if (button?.dataset.accountAction === 'capital') {
     if (String(state.user?.level || '').toLowerCase() === 'marketing') {
       renderMarketingCapital();
@@ -643,6 +647,14 @@ $('#capitalDetailForm').addEventListener('submit', event => {
 });
 $('#marketingCapitalBack').onclick = () => showPage('account');
 $('#refreshMarketingCapital').onclick = () => { renderMarketingCapital(); showToast('Pemantauan diperbarui', 'Data pengajuan Agent sudah dimuat ulang.'); };
+const todayISO = new Date().toISOString().slice(0, 10);
+$('#balanceTo').value = todayISO;
+$('#balanceFrom').value = `${todayISO.slice(0, 8)}01`;
+$('#applyBalanceFilter').onclick = () => showToast('Filter diterapkan', 'Riwayat mutasi diperbarui sesuai rentang tanggal.');
+$('#resetBalanceFilter').onclick = () => { $('#balanceFrom').value = `${todayISO.slice(0, 8)}01`; $('#balanceTo').value = todayISO; };
+$('#refreshBalance').onclick = () => showToast('Mutasi diperbarui', 'Belum ada riwayat mutasi saldo.');
+$('#refreshFees').onclick = () => showToast('Fee diperbarui', 'Belum ada fee retail yang dibukukan.');
+$('#requestWithdraw').onclick = () => showToast('Saldo fee belum tersedia', 'Withdraw dapat diajukan setelah saldo fee tersedia.');
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 
