@@ -10,6 +10,7 @@ type User struct {
 	Password string `json:"-"`
 	Balance  int64  `json:"balance"`
 	Level    string `json:"level"`
+	ParentID int64  `json:"parent_id,omitempty"`
 }
 
 type Transaction struct {

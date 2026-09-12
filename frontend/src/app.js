@@ -11,6 +11,7 @@ import './styles/capital.css';
 import './styles/capital-application.css';
 import './styles/marketing-capital.css';
 import './styles/role-finance.css';
+import './styles/network.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -543,6 +544,7 @@ $('#accountMenu').addEventListener('click', event => {
   if (button?.dataset.accountAction === 'balance') showPage('balance');
   if (button?.dataset.accountAction === 'fees') showPage('fees');
   if (button?.dataset.accountAction === 'withdraw') showPage('withdraw');
+  if (button?.dataset.accountAction === 'network') { renderDownlines(); showPage('network'); }
   if (button?.dataset.accountAction === 'capital') {
     if (String(state.user?.level || '').toLowerCase() === 'marketing') {
       renderMarketingCapital();
@@ -655,6 +657,26 @@ $('#resetBalanceFilter').onclick = () => { $('#balanceFrom').value = `${todayISO
 $('#refreshBalance').onclick = () => showToast('Mutasi diperbarui', 'Belum ada riwayat mutasi saldo.');
 $('#refreshFees').onclick = () => showToast('Fee diperbarui', 'Belum ada fee retail yang dibukukan.');
 $('#requestWithdraw').onclick = () => showToast('Saldo fee belum tersedia', 'Withdraw dapat diajukan setelah saldo fee tersedia.');
+async function renderDownlines() {
+  try {
+    const users = await api('/api/downlines');
+    $('#downlineCount').textContent = `${users.length} downline terhubung`;
+    $('#downlineList').innerHTML = users.length ? users.map(user => `<article><span>${escapeHTML(initials(user.name))}</span><div><b>${escapeHTML(user.name)}</b><small>${escapeHTML(user.email || user.phone)}</small><em>${escapeHTML(user.level)} · Downline aktif</em></div><aside><strong>AKTIF</strong><small>Rp ${money(user.balance)}</small></aside></article>`).join('') : '<div class="network-empty"><b>Belum ada downline</b><p>Tambahkan akun pertama ke jaringanmu.</p></div>';
+  } catch (err) { showToast('Gagal memuat jaringan', err.message); }
+}
+const closeDownlineModal = () => { $('#downlineModal').classList.remove('show'); $('#downlineModal').setAttribute('aria-hidden','true'); };
+$('#openDownlineModal').onclick = () => {
+  const marketing = String(state.user?.level || '').toLowerCase() === 'marketing';
+  $('#downlineRole').innerHTML = `<option value="Member">User / Member</option>${marketing ? '<option value="Agent">Agent</option>' : ''}`;
+  $('#downlineError').textContent = ''; $('#downlineModal').classList.add('show'); $('#downlineModal').setAttribute('aria-hidden','false');
+};
+$('#closeDownlineModal').onclick = closeDownlineModal;
+$('#downlineModal').addEventListener('click', event => { if (event.target === $('#downlineModal')) closeDownlineModal(); });
+$('#downlineForm').addEventListener('submit', async event => {
+  event.preventDefault(); const submit = event.currentTarget.querySelector('.downline-submit'); submit.disabled = true; $('#downlineError').textContent = '';
+  try { await api('/api/downlines',{method:'POST',body:JSON.stringify({name:$('#downlineName').value.trim(),username:$('#downlineUsername').value.trim(),email:$('#downlineEmail').value.trim(),password:$('#downlinePassword').value,level:$('#downlineRole').value})}); event.currentTarget.reset(); closeDownlineModal(); await renderDownlines(); showToast('Akun berhasil dibuat','Username dan password baru sudah dapat digunakan untuk login.'); }
+  catch(err) { $('#downlineError').textContent = err.message; } finally { submit.disabled = false; }
+});
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 

@@ -45,6 +45,8 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("PATCH /api/me", h.withAuth(h.updateMe))
 	mux.HandleFunc("GET /api/products", h.withAuth(h.products))
 	mux.HandleFunc("GET /api/transactions", h.withAuth(h.transactions))
+	mux.HandleFunc("GET /api/downlines", h.withAuth(h.downlines))
+	mux.HandleFunc("POST /api/downlines", h.withAuth(h.createDownline))
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
 	mux.HandleFunc("POST /api/h2hr/callback/{token}", h.h2hrCallback)
@@ -317,6 +319,46 @@ func (h *Handler) products(w http.ResponseWriter, _ *http.Request, _ int64) {
 }
 func (h *Handler) transactions(w http.ResponseWriter, _ *http.Request, id int64) {
 	respond(w, 200, h.store.Transactions(id))
+}
+func (h *Handler) downlines(w http.ResponseWriter, _ *http.Request, id int64) {
+	respond(w, 200, h.store.Downlines(id))
+}
+func (h *Handler) createDownline(w http.ResponseWriter, r *http.Request, id int64) {
+	parent, ok := h.store.User(id)
+	if !ok {
+		respond(w, 404, map[string]string{"error": "Akun tidak ditemukan"})
+		return
+	}
+	role := strings.ToLower(strings.TrimSpace(parent.Level))
+	if role != "agent" && role != "marketing" {
+		respond(w, 403, map[string]string{"error": "Akun tidak memiliki akses menambah downline"})
+		return
+	}
+	var in struct {
+		Name     string `json:"name"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+		Level    string `json:"level"`
+	}
+	if decode(r, &in) != nil {
+		respond(w, 400, map[string]string{"error": "Data tidak valid"})
+		return
+	}
+	level := strings.Title(strings.ToLower(strings.TrimSpace(in.Level)))
+	if level == "User" {
+		level = "Member"
+	}
+	if level != "Member" && !(role == "marketing" && level == "Agent") {
+		respond(w, 403, map[string]string{"error": "Role downline tidak diizinkan"})
+		return
+	}
+	u, err := h.store.CreateDownline(id, strings.TrimSpace(in.Name), strings.TrimSpace(in.Username), strings.TrimSpace(in.Email), in.Password, level)
+	if err != nil {
+		respond(w, 400, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, 201, u)
 }
 func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
 	var in struct{ ProductID, Target string }

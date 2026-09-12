@@ -2,6 +2,24 @@ package store
 
 import "testing"
 
+func TestCreateDownlineCanAuthenticate(t *testing.T) {
+	s := New()
+	u, err := s.CreateDownline(1, "User Baru", "userbaru", "user@example.com", "rahasia123", "Member")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if u.ParentID != 1 || u.Level != "Member" {
+		t.Fatalf("unexpected downline: %+v", u)
+	}
+	loggedIn, ok := s.Authenticate("userbaru", "rahasia123")
+	if !ok || loggedIn.ID != u.ID {
+		t.Fatal("new downline cannot authenticate")
+	}
+	if got := s.Downlines(1); len(got) != 1 || got[0].ID != u.ID {
+		t.Fatalf("unexpected downlines: %+v", got)
+	}
+}
+
 func TestPurchaseDeductsBalance(t *testing.T) {
 	s := New()
 	// Saldo hanya disiapkan untuk skenario test; akun baru di aplikasi tetap Rp0.

@@ -61,6 +61,7 @@ func (s *Store) migrate(ctx context.Context) error {
 	for _, q := range []string{
 		`CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password TEXT NOT NULL, balance BIGINT NOT NULL DEFAULT 0, level TEXT NOT NULL, google_sub TEXT UNIQUE)`,
 		`ALTER TABLE users ADD COLUMN IF NOT EXISTS google_sub TEXT UNIQUE`,
+		`ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id BIGINT REFERENCES users(id)`,
 		`CREATE SEQUENCE IF NOT EXISTS users_id_seq`,
 		`SELECT setval('users_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM users), 0), 1), true)`,
 		`CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, provider TEXT NOT NULL, name TEXT NOT NULL, type TEXT NOT NULL, price BIGINT NOT NULL, color TEXT NOT NULL)`,
@@ -166,6 +167,69 @@ func (s *Store) User(id int64) (*model.User, bool) {
 	}
 	o := *u
 	return &o, true
+}
+func (s *Store) CreateDownline(parentID int64, name, username, email, password, level string) (*model.User, error) {
+	if name == "" || username == "" || password == "" {
+		return nil, errors.New("nama, username, dan password wajib diisi")
+	}
+	if len(password) < 6 {
+		return nil, errors.New("password minimal 6 karakter")
+	}
+	if s.db != nil {
+		u := &model.User{}
+		err := s.db.QueryRow(`INSERT INTO users (id,name,phone,email,password,balance,level,parent_id) VALUES (nextval('users_id_seq'),$1,$2,$3,$4,0,$5,$6) RETURNING id,name,phone,email,password,balance,level,parent_id`, name, username, email, password, level, parentID).Scan(&u.ID, &u.Name, &u.Phone, &u.Email, &u.Password, &u.Balance, &u.Level, &u.ParentID)
+		if err != nil {
+			if strings.Contains(strings.ToLower(err.Error()), "unique") {
+				return nil, errors.New("username sudah digunakan")
+			}
+			return nil, err
+		}
+		return u, nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if _, exists := s.byPhone[username]; exists {
+		return nil, errors.New("username sudah digunakan")
+	}
+	var id int64 = 1
+	for {
+		if _, used := s.users[id]; !used {
+			break
+		}
+		id++
+	}
+	u := &model.User{ID: id, Name: name, Phone: username, Email: email, Password: password, Level: level, ParentID: parentID}
+	s.users[id], s.byPhone[username] = u, id
+	copy := *u
+	return &copy, nil
+}
+func (s *Store) Downlines(parentID int64) []model.User {
+	if s.db != nil {
+		rows, err := s.db.Query(`SELECT id,name,phone,email,balance,level,parent_id FROM users WHERE parent_id=$1 ORDER BY id DESC`, parentID)
+		if err != nil {
+			return nil
+		}
+		defer rows.Close()
+		out := []model.User{}
+		for rows.Next() {
+			var u model.User
+			if rows.Scan(&u.ID, &u.Name, &u.Phone, &u.Email, &u.Balance, &u.Level, &u.ParentID) == nil {
+				out = append(out, u)
+			}
+		}
+		return out
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := []model.User{}
+	for _, u := range s.users {
+		if u.ParentID == parentID {
+			copy := *u
+			out = append(out, copy)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID > out[j].ID })
+	return out
 }
 func (s *Store) Products() []model.Product {
 	if s.db != nil {
