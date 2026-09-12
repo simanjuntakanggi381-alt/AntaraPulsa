@@ -12,6 +12,7 @@ import './styles/capital-application.css';
 import './styles/marketing-capital.css';
 import './styles/role-finance.css';
 import './styles/network.css';
+import './styles/document-review.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -569,9 +570,12 @@ const getMonitoredApplications = () => {
 function renderMarketingCapital() {
   const applications = getMonitoredApplications();
   const empty = '<div class="marketing-monitor-empty"><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 15a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/><path d="m15 18 2 2"/></svg></span><b>Belum ada pengajuan Agent</b><p>Dokumen dan pengajuan Agent akan tampil otomatis setelah dikirim.</p></div>';
-  $('#marketingDocuments').innerHTML = applications.length ? applications.map(item => `<article><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/></svg></span><div><b>${escapeHTML(item.owner)}</b><small>4 dokumen lengkap · ${escapeHTML(item.shop || 'Toko belum diberi nama')}</small></div><strong>Lengkap</strong></article>`).join('') : empty;
+  $('#marketingDocuments').innerHTML = applications.length ? applications.map((item,index) => `<div class="monitor-document"><button type="button" data-monitor-doc="${index}"><div><b>${escapeHTML(item.owner)}</b><small>${item.documents?.length || 0} dokumen · klik untuk melihat semua</small></div><strong>${escapeHTML(item.status)}</strong><i>⌄</i></button><div class="monitor-document-files hidden">${renderDocumentFiles(item.documents)}</div></div>`).join('') : empty;
   $('#marketingApplications').innerHTML = applications.length ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || '-')} · ${escapeHTML(item.date)}</small></div><div><strong>Rp ${money(item.amount)}</strong><i>${escapeHTML(item.status)}</i></div></article>`).join('') : empty;
 }
+const documentNames = ['KTP pemilik konter','Foto konter','Foto bersama marketing','Dokumen pengajuan kredit'];
+const renderDocumentFiles = documents => (documents?.length ? documents.map((doc,index) => `<figure><img src="${doc.data}" alt="${escapeHTML(documentNames[index])}"><figcaption>${escapeHTML(documentNames[index])}<b>Terkirim</b></figcaption></figure>`).join('') : '<p class="document-unavailable">Dokumen foto belum tersedia.</p>');
+const imageData = file => new Promise((resolve,reject) => { const reader=new FileReader(); reader.onerror=reject; reader.onload=()=>{ const img=new Image(); img.onerror=reject; img.onload=()=>{ const scale=Math.min(1,720/Math.max(img.width,img.height)); const canvas=document.createElement('canvas'); canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale); canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height); resolve({name:file.name,data:canvas.toDataURL('image/jpeg',.68)}); }; img.src=reader.result; }; reader.readAsDataURL(file); });
 function renderCapitalPage() {
   const applications = getCapitalApplications();
   $('#capitalOwner').value ||= state.user?.name || '';
@@ -581,7 +585,13 @@ function renderCapitalPage() {
   $('#capitalHistory').innerHTML = applications.length
     ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · ${escapeHTML(item.owner)}</small></div><strong>${escapeHTML(item.status)}</strong></article>`).join('')
     : '<div class="capital-empty"><span>Belum ada riwayat pengajuan kredit.</span></div>';
+  const latest = applications[0];
+  $('#capitalPendingPanel').classList.toggle('hidden', !latest);
+  $('#capitalPendingPanel').innerHTML = latest ? `<span>PENGAJUAN DIPROSES</span><h2>1 pengajuan menunggu Operator</h2><article><div><b>Pengajuan Kredit</b><small>${escapeHTML(latest.id)} · Status diperbarui otomatis</small></div><strong>Rp ${money(latest.amount)}<i>${escapeHTML(latest.status)}</i></strong></article>` : '';
+  $('#capitalDocumentDetails').innerHTML = latest ? renderDocumentFiles(latest.documents) : '';
 }
+$('#capitalDocToggle').onclick = () => { if (!getCapitalApplications().length) return; $('#capitalDocumentDetails').classList.toggle('hidden'); $('#capitalDocToggle').classList.toggle('open'); };
+$('#marketingDocuments').addEventListener('click', event => { const button=event.target.closest('[data-monitor-doc]'); if (!button) return; button.classList.toggle('open'); button.nextElementSibling.classList.toggle('hidden'); });
 $('#capitalBack').onclick = () => showPage('account');
 $('#capitalAmount').addEventListener('input', event => {
   const amount = Number(event.target.value.replace(/\D/g, '')) || 0;
@@ -630,13 +640,14 @@ const drawSignature = event => { if (!signing) return; event.preventDefault(); c
 ['pointerdown'].forEach(name => signatureCanvas.addEventListener(name, startSignature));
 signatureCanvas.addEventListener('pointermove', drawSignature); window.addEventListener('pointerup', () => { signing = false; });
 $('#clearSignature').onclick = resetSignatureCanvas;
-$('#capitalDetailForm').addEventListener('submit', event => {
+$('#capitalDetailForm').addEventListener('submit', async event => {
   event.preventDefault();
   if (!hasSignature) { showToast('Tanda tangan belum ada', 'Tanda tangan Agent diperlukan sebelum pengajuan dikirim.'); return; }
   const amount = Number($('#applyAmount').value.replace(/\D/g, '')) || 0;
   if (!amount) { showToast('Nominal belum sesuai', 'Masukkan nominal modal yang ingin diajukan.'); return; }
+  const documents = await Promise.all($$('.camera-documents input').map(input => imageData(input.files[0])));
   const applications = getCapitalApplications();
-  applications.unshift({ id: `KM-${Date.now().toString().slice(-8)}`, owner: $('#applyAgentName').value.trim(), whatsapp: $('#applyWhatsapp').value.trim(), shop: $('#applyShopName').value.trim(), amount, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
+  applications.unshift({ id: `KSA-${Date.now().toString(36).slice(-8).toUpperCase()}`, owner: $('#applyAgentName').value.trim(), whatsapp: $('#applyWhatsapp').value.trim(), shop: $('#applyShopName').value.trim(), amount, documents, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
   localStorage.setItem(capitalStorageKey(), JSON.stringify(applications));
   const monitored = getMonitoredApplications();
   monitored.unshift(applications[0]);
