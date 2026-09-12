@@ -17,6 +17,7 @@ import './styles/operator.css';
 import './styles/operator-credit.css';
 import './styles/operator-migration.css';
 import './styles/operator-inactive.css';
+import './styles/operator-turnover.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -143,17 +144,19 @@ $('#operatorLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $$('[data-operator-page]').forEach(button => button.onclick = () => {
   const page = button.dataset.operatorPage; $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === page)); $('.operator-sidebar').classList.remove('open');
-  const dedicatedPage = ['credit', 'migration', 'inactive'].includes(page);
+  const dedicatedPage = ['credit', 'migration', 'inactive', 'turnover'].includes(page);
   $('.operator-main').classList.toggle('hidden', dedicatedPage);
   $('#operatorCreditView').classList.toggle('hidden', page !== 'credit');
   $('#operatorMigrationView').classList.toggle('hidden', page !== 'migration');
   $('#operatorInactiveView').classList.toggle('hidden', page !== 'inactive');
-  if (page === 'credit') renderOperatorCredit(); else if (page === 'inactive') renderInactiveCounters(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
+  $('#operatorTurnoverView').classList.toggle('hidden', page !== 'turnover');
+  if (page === 'credit') renderOperatorCredit(); else if (page === 'inactive') renderInactiveCounters(); else if (page === 'turnover') renderTurnover(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
 });
 $('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
 $('#operatorCreditMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $('#operatorMigrationMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $('#operatorInactiveMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
+$('#operatorTurnoverMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $('#legacySearchForm').onsubmit = event => {
   event.preventDefault();
   const query = $('#legacyMasterSearch').value.trim();
@@ -188,6 +191,23 @@ $('#applyInactiveDays').onclick = () => { const value = Number($('#inactiveCusto
 $('#inactiveFilterForm').onsubmit = event => { event.preventDefault(); renderInactiveCounters(); };
 $('#inactiveSearch').oninput = () => { clearTimeout($('#inactiveSearch')._timer); $('#inactiveSearch')._timer = setTimeout(renderInactiveCounters, 350); };
 $('#refreshInactive').onclick = renderInactiveCounters;
+
+let turnoverDays = 3;
+function renderTurnover() {
+  const query = $('#turnoverSearch').value.trim().toLowerCase();
+  const rows = getMonitoredApplications().filter(item => ['aktif', 'lunas'].includes(String(item.status).toLowerCase()) && `${item.owner} ${item.shop || ''}`.toLowerCase().includes(query));
+  $('#turnoverPeriodLabel').textContent = `Total perputaran ${turnoverDays} hari`;
+  $('#turnoverCount').textContent = `${rows.length} konter`;
+  $('#turnoverTotal').textContent = 'Rp 0';
+  $('#turnoverList').innerHTML = rows.length ? rows.map(item => {
+    const wa = whatsappLink(item.whatsapp);
+    const paid = Number(item.paid || 0); const remaining = Math.max(0, Number(item.amount || 0) - paid);
+    return `<article class="turnover-counter"><header><div><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || item.owner)} · ${escapeHTML(item.date || '')}</small>${wa ? `<a href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</div><section><span>Transaksi sukses<b>0</b></span><span>Perputaran<b>Rp 0</b></span><span>Rata-rata/hari<b>Rp 0</b></span><span>Dari periode lalu<b>0.00%</b></span></section></header><footer><span>Kredit dicairkan<b>Rp ${money(item.amount)}</b></span><span>Dibayar<b>Rp ${money(paid)}</b></span><span>Sisa kredit<b>Rp ${money(remaining)}</b></span><span>Sisa saldo<b>Rp 0</b></span></footer></article>`;
+  }).join('') : '<div class="inactive-empty"><b>Belum ada konter penerima modal</b><p>Konter baru muncul setelah pengajuan disetujui Operator.</p></div>';
+}
+$$('[data-turnover-days]').forEach(button => button.onclick = () => { turnoverDays=Number(button.dataset.turnoverDays); $$('[data-turnover-days]').forEach(item=>item.classList.toggle('active',item===button)); $('#turnoverCustomDays').value=''; renderTurnover(); });
+$('#applyTurnoverDays').onclick = () => { const value=Number($('#turnoverCustomDays').value); if(value<3||value>365){showToast('Jumlah hari tidak valid','Gunakan rentang 3 sampai 365 hari.');return;} turnoverDays=value; $$('[data-turnover-days]').forEach(item=>item.classList.remove('active')); renderTurnover(); };
+$('#turnoverSearch').oninput = renderTurnover; $('#refreshTurnover').onclick = renderTurnover;
 
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
@@ -638,7 +658,7 @@ let operatorCreditTab = 'applications';
 let previewApplicationIndex = -1;
 function updateOperatorApplication(index, status) {
   const applications = getMonitoredApplications(); if (!applications[index]) return;
-  applications[index].status = status; localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
+  applications[index].status = status; if (status === 'Aktif') applications[index].approvedAt = new Date().toISOString(); localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
   showToast(status === 'Aktif' ? 'Pengajuan disetujui' : 'Pengajuan ditolak', `Status ${applications[index].id} berhasil diperbarui.`);
 }
 function renderOperatorCredit() {
