@@ -598,7 +598,7 @@ function resetSignatureCanvas() {
   signatureCanvas.width = Math.max(1, bounds.width * ratio);
   signatureCanvas.height = Math.max(1, bounds.height * ratio);
   signatureContext.setTransform(ratio, 0, 0, ratio, 0, 0);
-  signatureContext.lineWidth = 2.2; signatureContext.lineCap = 'round'; signatureContext.strokeStyle = '#263b72';
+  signatureContext.lineWidth = 2.2; signatureContext.lineCap = 'round'; signatureContext.strokeStyle = '#087c47';
   hasSignature = false; $('#signatureHint').hidden = false;
 }
 const signaturePoint = event => { const rect = signatureCanvas.getBoundingClientRect(); const touch = event.touches?.[0] || event; return { x: touch.clientX - rect.left, y: touch.clientY - rect.top }; };
