@@ -25,6 +25,17 @@ type Transaction struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type InactiveCounter struct {
+	ID              int64      `json:"id"`
+	Name            string     `json:"name"`
+	Phone           string     `json:"phone"`
+	Email           string     `json:"email"`
+	Level           string     `json:"level"`
+	Balance         int64      `json:"balance"`
+	LastTransaction *time.Time `json:"last_transaction,omitempty"`
+	InactiveDays    int        `json:"inactive_days"`
+}
+
 type Product struct {
 	ID        string `json:"id"`
 	Provider  string `json:"provider"`

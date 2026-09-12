@@ -231,6 +231,57 @@ func (s *Store) Downlines(parentID int64) []model.User {
 	sort.Slice(out, func(i, j int) bool { return out[i].ID > out[j].ID })
 	return out
 }
+func (s *Store) InactiveCounters(days int, query string) []model.InactiveCounter {
+	cutoff := time.Now().AddDate(0, 0, -days)
+	needle := strings.ToLower(query)
+	if s.db != nil {
+		rows, err := s.db.Query(`SELECT u.id,u.name,u.phone,u.email,u.level,u.balance,MAX(t.created_at) FROM users u LEFT JOIN transactions t ON t.user_id=u.id WHERE LOWER(u.level) <> 'operator' AND (LOWER(u.name) LIKE $2 OR LOWER(u.email) LIKE $2 OR LOWER(u.phone) LIKE $2) GROUP BY u.id,u.name,u.phone,u.email,u.level,u.balance HAVING MAX(t.created_at) IS NULL OR MAX(t.created_at) < $1 ORDER BY MAX(t.created_at) NULLS FIRST,u.name`, cutoff, "%"+needle+"%")
+		if err != nil {
+			return nil
+		}
+		defer rows.Close()
+		out := []model.InactiveCounter{}
+		for rows.Next() {
+			var item model.InactiveCounter
+			var last sql.NullTime
+			if rows.Scan(&item.ID, &item.Name, &item.Phone, &item.Email, &item.Level, &item.Balance, &last) == nil {
+				if last.Valid {
+					item.LastTransaction = &last.Time
+					item.InactiveDays = int(time.Since(last.Time).Hours() / 24)
+				}
+				out = append(out, item)
+			}
+		}
+		return out
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	lastByUser := map[int64]time.Time{}
+	for _, tx := range s.transactions {
+		if tx.CreatedAt.After(lastByUser[tx.UserID]) {
+			lastByUser[tx.UserID] = tx.CreatedAt
+		}
+	}
+	out := []model.InactiveCounter{}
+	for _, u := range s.users {
+		if strings.EqualFold(u.Level, "operator") || (needle != "" && !strings.Contains(strings.ToLower(u.Name+" "+u.Email+" "+u.Phone), needle)) {
+			continue
+		}
+		last, exists := lastByUser[u.ID]
+		if exists && !last.Before(cutoff) {
+			continue
+		}
+		item := model.InactiveCounter{ID: u.ID, Name: u.Name, Phone: u.Phone, Email: u.Email, Level: u.Level, Balance: u.Balance}
+		if exists {
+			copy := last
+			item.LastTransaction = &copy
+			item.InactiveDays = int(time.Since(last).Hours() / 24)
+		}
+		out = append(out, item)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
+	return out
+}
 func (s *Store) Products() []model.Product {
 	if s.db != nil {
 		rows, err := s.db.Query(`SELECT id,provider,name,type,price,color,price_type,fee FROM products ORDER BY id`)

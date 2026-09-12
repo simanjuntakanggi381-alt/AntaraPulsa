@@ -16,6 +16,7 @@ import './styles/document-review.css';
 import './styles/operator.css';
 import './styles/operator-credit.css';
 import './styles/operator-migration.css';
+import './styles/operator-inactive.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -142,15 +143,17 @@ $('#operatorLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $$('[data-operator-page]').forEach(button => button.onclick = () => {
   const page = button.dataset.operatorPage; $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === page)); $('.operator-sidebar').classList.remove('open');
-  const dedicatedPage = page === 'credit' || page === 'migration';
+  const dedicatedPage = ['credit', 'migration', 'inactive'].includes(page);
   $('.operator-main').classList.toggle('hidden', dedicatedPage);
   $('#operatorCreditView').classList.toggle('hidden', page !== 'credit');
   $('#operatorMigrationView').classList.toggle('hidden', page !== 'migration');
-  if (page === 'credit') renderOperatorCredit(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
+  $('#operatorInactiveView').classList.toggle('hidden', page !== 'inactive');
+  if (page === 'credit') renderOperatorCredit(); else if (page === 'inactive') renderInactiveCounters(); else if (!['dashboard', 'migration'].includes(page)) showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
 });
 $('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
 $('#operatorCreditMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $('#operatorMigrationMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
+$('#operatorInactiveMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 $('#legacySearchForm').onsubmit = event => {
   event.preventDefault();
   const query = $('#legacyMasterSearch').value.trim();
@@ -159,6 +162,32 @@ $('#legacySearchForm').onsubmit = event => {
   result.classList.remove('hidden');
   result.innerHTML = '<b>Master tidak ditemukan</b><p>Belum ada data lama yang cocok dengan pencarian tersebut.</p>';
 };
+
+let inactiveDays = 3;
+const whatsappLink = phone => {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return digits ? `https://wa.me/${digits.startsWith('0') ? `62${digits.slice(1)}` : digits}` : '';
+};
+async function renderInactiveCounters() {
+  const list = $('#inactiveList');
+  list.innerHTML = '<div class="inactive-empty"><b>Memuat data konter...</b></div>';
+  const query = $('#inactiveSearch').value.trim();
+  try {
+    const rows = await api(`/api/operator/inactive-counters?days=${inactiveDays}&q=${encodeURIComponent(query)}`);
+    $('#inactiveDescription').textContent = `Tidak transaksi minimal ${inactiveDays} hari`;
+    $('#inactiveCount').textContent = `${rows.length} konter`;
+    list.innerHTML = rows.length ? rows.map(item => {
+      const wa = whatsappLink(item.phone);
+      const last = item.last_transaction ? dateFmt(item.last_transaction) : 'Belum pernah transaksi';
+      return `<article class="inactive-counter"><div><b>${escapeHTML(item.name)}</b><small>${escapeHTML(item.email || item.phone)}</small><em>${escapeHTML(item.level)}${wa ? ` · <a href="${wa}" target="_blank" rel="noopener">WhatsApp</a>` : ''}</em><strong>${item.inactive_days ? `Tidak transaksi ${item.inactive_days} hari` : 'Belum pernah transaksi'}</strong><small>Transaksi terakhir: ${escapeHTML(last)}</small></div><aside><span>Saldo</span><b>Rp ${money(item.balance)}</b><span>Tagihan kredit</span><strong>Rp 0</strong></aside></article>`;
+    }).join('') : '<div class="inactive-empty"><b>Tidak ada konter tidak transaksi</b><p>Semua konter masih aktif pada periode yang dipilih.</p></div>';
+  } catch (error) { list.innerHTML = `<div class="inactive-empty"><b>Data belum dapat dimuat</b><p>${escapeHTML(error.message)}</p></div>`; }
+}
+$$('[data-inactive-days]').forEach(button => button.onclick = () => { inactiveDays = Number(button.dataset.inactiveDays); $$('[data-inactive-days]').forEach(item => item.classList.toggle('active', item === button)); $('#inactiveCustomDays').value = ''; renderInactiveCounters(); });
+$('#applyInactiveDays').onclick = () => { const value = Number($('#inactiveCustomDays').value); if (value < 3 || value > 365) { showToast('Jumlah hari tidak valid', 'Gunakan rentang 3 sampai 365 hari.'); return; } inactiveDays = value; $$('[data-inactive-days]').forEach(item => item.classList.remove('active')); renderInactiveCounters(); };
+$('#inactiveFilterForm').onsubmit = event => { event.preventDefault(); renderInactiveCounters(); };
+$('#inactiveSearch').oninput = () => { clearTimeout($('#inactiveSearch')._timer); $('#inactiveSearch')._timer = setTimeout(renderInactiveCounters, 350); };
+$('#refreshInactive').onclick = renderInactiveCounters;
 
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
