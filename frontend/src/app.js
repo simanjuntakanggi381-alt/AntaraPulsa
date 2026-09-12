@@ -128,6 +128,12 @@ const providerAssets = {
 const bankProviderKeys = new Set([
   'allobank','bca','bjb','bni','bpdbali','bri','bsi','btn','btpn','bankaceh','bankaladinsyariah','bankarthagraha','bankbanten','bankbengkulu','bankbumiarta','bankctbc','bankcapital','bankchinaconstruction','bankdbs','bankdiy','bankdki','bankganesha','bankhana','bankibk','bankinaperdana','bankindex','bankjago','bankjambi','bankjateng','bankjatim','bankkalbar','bankkalsel','bankkalteng','bankkaltim','banklampung','bankmnc','bankmalukumalut','bankmandiritaspen','bankmaspion','bankmayora','bankmestika','bankntb','bankntt','banknagari','banknobu','bankpapua','bankqnb','bankrayabriagro','bankresonaperdania','bankriaukepri','banksahabatsampoerna','bankshinhan','banksulselbar','banksulteng','banksultra','banksulut','banksumselbabel','banksumut','bankvictoria','bankwoorisaudara','blubcadigital','bukopin','cimbniaga','citibank','commonwealth','danamon','hsbc','hibank','mandiri','maybank','mega','muamalat','neocommerce','ocbcnisp','panin','permata','seabank','sinarmas','superbank','uob'
 ]);
+const bankSymbolAssets = {
+  bankaceh:'/assets/banks/symbols/provider-bank-bankaceh-symbol.png',
+  bankaladinsyariah:'/assets/banks/symbols/provider-bank-bankaladinsyariah-symbol.png',
+  bankdiy:'/assets/banks/symbols/provider-bank-bankdiy-symbol.png',
+  bankdki:'/assets/banks/symbols/provider-bank-bankdki-symbol.png'
+};
 const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
   'Token PLN':'service-listrik-3d-compact.png', Listrik:'service-listrik-3d-compact.png', Game:'service-category-14.png',
@@ -145,6 +151,7 @@ function providerDomain(name) {
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
   if (pdamProviderAssets[normalized]) return pdamProviderAssets[normalized];
+  if (bankSymbolAssets[normalized]) return bankSymbolAssets[normalized];
   if (bankProviderKeys.has(normalized)) return `/assets/banks/provider-bank-${normalized}.svg`;
   const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key.replace(/[^a-z0-9]/g, '')));
   return alias ? providerAssets[alias] : '';

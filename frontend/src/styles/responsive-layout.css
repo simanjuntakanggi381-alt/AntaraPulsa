@@ -305,8 +305,8 @@
 .provider-logo-biznet { background-color: #fff; }
 .provider-choices button > .provider-logo-shell { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: #fff; }
 .provider-choices button > .provider-logo-shell > img { width: 31px; height: 31px; max-width: 31px; max-height: 31px; }
-.provider-choices button > .provider-logo-bank { width: 58px; height: 44px; flex-basis: 58px; }
-.provider-choices button > .provider-logo-bank > img { width: 50px; height: 34px; max-width: 50px; max-height: 34px; object-fit: contain; object-position: center; }
+.provider-choices button > .provider-logo-bank { width: 50px; height: 50px; flex-basis: 50px; }
+.provider-choices button > .provider-logo-bank > img { width: 40px; height: 40px; max-width: 40px; max-height: 40px; object-fit: contain; object-position: center; }
 .product > .product-provider-logo { width: 42px; height: 42px; margin-bottom: 11px; }
 .product > .product-provider-logo > img { width: 30px; height: 30px; }
 .tx-provider-logo { width: 38px; height: 38px; flex-basis: 38px; border-radius: 11px; box-shadow: none; }
