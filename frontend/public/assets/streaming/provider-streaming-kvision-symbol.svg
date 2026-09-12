@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="K-Vision">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#91d744"/><stop offset="1" stop-color="#259b45"/></linearGradient>
+    <linearGradient id="y" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd83e"/><stop offset="1" stop-color="#f5a900"/></linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6bcbed"/><stop offset="1" stop-color="#2385c6"/></linearGradient>
+    <linearGradient id="r" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff5255"/><stop offset="1" stop-color="#d7192d"/></linearGradient>
+  </defs>
+  <path d="M10.5 29A22 22 0 0 1 29 10.5" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M35 10.5A22 22 0 0 1 53.5 29" fill="none" stroke="url(#y)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M53.5 35A22 22 0 0 1 35 53.5" fill="none" stroke="url(#b)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M29 53.5A22 22 0 0 1 10.5 35" fill="none" stroke="url(#r)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M25 6.5 34 10l-7 6" fill="#259b45"/><path d="M57.5 25 54 34l-6-7" fill="#f5a900"/>
+  <path d="M39 57.5 30 54l7-6" fill="#2385c6"/><path d="M6.5 39 10 30l6 7" fill="#d7192d"/>
+</svg>
