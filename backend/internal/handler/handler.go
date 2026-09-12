@@ -47,6 +47,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("GET /api/transactions", h.withAuth(h.transactions))
 	mux.HandleFunc("GET /api/downlines", h.withAuth(h.downlines))
 	mux.HandleFunc("GET /api/operator/inactive-counters", h.withAuth(h.inactiveCounters))
+	mux.HandleFunc("POST /api/operator/credit-payment", h.withAuth(h.operatorCreditPayment))
 	mux.HandleFunc("POST /api/downlines", h.withAuth(h.createDownline))
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
@@ -338,6 +339,27 @@ func (h *Handler) inactiveCounters(w http.ResponseWriter, r *http.Request, id in
 		days = 365
 	}
 	respond(w, 200, h.store.InactiveCounters(days, strings.TrimSpace(r.URL.Query().Get("q"))))
+}
+func (h *Handler) operatorCreditPayment(w http.ResponseWriter, r *http.Request, id int64) {
+	u, ok := h.store.User(id)
+	if !ok || !strings.EqualFold(u.Level, "operator") {
+		respond(w, 403, map[string]string{"error": "Akses khusus Operator"})
+		return
+	}
+	var in struct {
+		Username string `json:"username"`
+		Amount   int64  `json:"amount"`
+	}
+	if decode(r, &in) != nil || strings.TrimSpace(in.Username) == "" || in.Amount <= 0 {
+		respond(w, 400, map[string]string{"error": "Data pembayaran tidak valid"})
+		return
+	}
+	agent, err := h.store.AddCreditPayment(strings.TrimSpace(in.Username), in.Amount)
+	if err != nil {
+		respond(w, 400, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, 200, agent)
 }
 func (h *Handler) createDownline(w http.ResponseWriter, r *http.Request, id int64) {
 	parent, ok := h.store.User(id)

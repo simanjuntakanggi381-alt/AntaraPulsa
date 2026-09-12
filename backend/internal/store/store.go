@@ -282,6 +282,28 @@ func (s *Store) InactiveCounters(days int, query string) []model.InactiveCounter
 	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
 	return out
 }
+func (s *Store) AddCreditPayment(username string, amount int64) (*model.User, error) {
+	if s.db != nil {
+		var u model.User
+		err := s.db.QueryRow(`UPDATE users SET balance=balance+$1 WHERE phone=$2 AND LOWER(level)='agent' RETURNING id,name,phone,email,balance,level,COALESCE(parent_id,0)`, amount, username).Scan(&u.ID, &u.Name, &u.Phone, &u.Email, &u.Balance, &u.Level, &u.ParentID)
+		if err == sql.ErrNoRows {
+			return nil, errors.New("akun Agent tidak ditemukan")
+		}
+		if err != nil {
+			return nil, err
+		}
+		return &u, nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	id, ok := s.byPhone[username]
+	if !ok || !strings.EqualFold(s.users[id].Level, "agent") {
+		return nil, errors.New("akun Agent tidak ditemukan")
+	}
+	s.users[id].Balance += amount
+	copy := *s.users[id]
+	return &copy, nil
+}
 func (s *Store) Products() []model.Product {
 	if s.db != nil {
 		rows, err := s.db.Query(`SELECT id,provider,name,type,price,color,price_type,fee FROM products ORDER BY id`)
