@@ -9,6 +9,7 @@ import './styles/responsive-layout.css';
 import './styles/login-polish.css';
 import './styles/capital.css';
 import './styles/capital-application.css';
+import './styles/marketing-capital.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -25,6 +26,7 @@ const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '
 const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', balanceVisible: true, returnPage: 'dashboard' };
 const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
 const CAPITAL_APPLICATION_KEY = 'antarapulsa-capital-applications-v1';
+const CAPITAL_MONITOR_KEY = 'antarapulsa-capital-monitor-v1';
 const showToast = createToast('#toast');
 
 const appIcons = {
@@ -538,6 +540,11 @@ $('#accountMenu').addEventListener('click', event => {
   const button = event.target.closest('[data-account-action]');
   if (button?.dataset.accountAction === 'topup') showPage('topup');
   if (button?.dataset.accountAction === 'capital') {
+    if (String(state.user?.level || '').toLowerCase() === 'marketing') {
+      renderMarketingCapital();
+      showPage('marketingCapital');
+      return;
+    }
     renderCapitalPage();
     showPage('capital');
   }
@@ -549,6 +556,16 @@ const getCapitalApplications = () => {
   try { return JSON.parse(localStorage.getItem(capitalStorageKey()) || '[]'); }
   catch { return []; }
 };
+const getMonitoredApplications = () => {
+  try { return JSON.parse(localStorage.getItem(CAPITAL_MONITOR_KEY) || '[]'); }
+  catch { return []; }
+};
+function renderMarketingCapital() {
+  const applications = getMonitoredApplications();
+  const empty = '<div class="marketing-monitor-empty"><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 15a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/><path d="m15 18 2 2"/></svg></span><b>Belum ada pengajuan Agent</b><p>Dokumen dan pengajuan Agent akan tampil otomatis setelah dikirim.</p></div>';
+  $('#marketingDocuments').innerHTML = applications.length ? applications.map(item => `<article><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/></svg></span><div><b>${escapeHTML(item.owner)}</b><small>4 dokumen lengkap · ${escapeHTML(item.shop || 'Toko belum diberi nama')}</small></div><strong>Lengkap</strong></article>`).join('') : empty;
+  $('#marketingApplications').innerHTML = applications.length ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || '-')} · ${escapeHTML(item.date)}</small></div><div><strong>Rp ${money(item.amount)}</strong><i>${escapeHTML(item.status)}</i></div></article>`).join('') : empty;
+}
 function renderCapitalPage() {
   const applications = getCapitalApplications();
   $('#capitalOwner').value ||= state.user?.name || '';
@@ -615,12 +632,17 @@ $('#capitalDetailForm').addEventListener('submit', event => {
   const applications = getCapitalApplications();
   applications.unshift({ id: `KM-${Date.now().toString().slice(-8)}`, owner: $('#applyAgentName').value.trim(), whatsapp: $('#applyWhatsapp').value.trim(), shop: $('#applyShopName').value.trim(), amount, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
   localStorage.setItem(capitalStorageKey(), JSON.stringify(applications));
+  const monitored = getMonitoredApplications();
+  monitored.unshift(applications[0]);
+  localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(monitored));
   renderCapitalPage();
   event.target.reset();
   $$('.camera-documents label').forEach(row => row.classList.remove('captured'));
   showPage('capital');
   showToast('Pengajuan terkirim', 'Pengajuan masuk ke antrean Operator dengan status Pending.');
 });
+$('#marketingCapitalBack').onclick = () => showPage('account');
+$('#refreshMarketingCapital').onclick = () => { renderMarketingCapital(); showToast('Pemantauan diperbarui', 'Data pengajuan Agent sudah dimuat ulang.'); };
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 
