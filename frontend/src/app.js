@@ -13,6 +13,7 @@ import './styles/marketing-capital.css';
 import './styles/role-finance.css';
 import './styles/network.css';
 import './styles/document-review.css';
+import './styles/operator.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -104,11 +105,19 @@ function resetViewport() {
 }
 function showApp() {
   $('#loginView').hidden = true; $('#loginView').classList.add('hidden');
+  if (String(state.user?.level || '').toLowerCase() === 'operator') {
+    $('#appView').hidden = true; $('#appView').classList.add('hidden');
+    $('#operatorView').hidden = false; $('#operatorView').classList.remove('hidden');
+    $('#operatorName').textContent = state.user?.name || 'Operator AntaraPulsa';
+    resetViewport(); return;
+  }
+  $('#operatorView').hidden = true; $('#operatorView').classList.add('hidden');
   $('#appView').hidden = false; $('#appView').classList.remove('hidden');
   resetViewport();
 }
 function showLogin() {
   $('#appView').hidden = true; $('#appView').classList.add('hidden');
+  $('#operatorView').hidden = true; $('#operatorView').classList.add('hidden');
   $('#loginView').hidden = false; $('#loginView').classList.remove('hidden');
   resetViewport();
 }
@@ -127,6 +136,10 @@ $('#togglePassword').onclick = () => { const input = $('#loginPassword'); input.
 $('.google-login').onclick = () => { window.location.assign('/api/auth/google/login'); };
 $('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showLogin(); showPage('dashboard', { replace: true }); };
 $('#accountLogout').onclick = () => $('#logoutBtn').click();
+$('#operatorLogout').onclick = () => $('#logoutBtn').click();
+$('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
+$$('[data-operator-page]').forEach(button => button.onclick = () => { $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === button.dataset.operatorPage)); $('.operator-sidebar').classList.remove('open'); if (button.dataset.operatorPage !== 'dashboard') showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.'); });
+$('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
 
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
