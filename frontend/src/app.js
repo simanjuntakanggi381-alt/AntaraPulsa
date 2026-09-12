@@ -7,6 +7,7 @@ import './styles/dashboard-premium.css';
 import './styles/mobile-polish.css';
 import './styles/responsive-layout.css';
 import './styles/login-polish.css';
+import './styles/capital.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -19,8 +20,10 @@ if ('serviceWorker' in navigator) {
 
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
+const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
 const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', balanceVisible: true, returnPage: 'dashboard' };
 const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
+const CAPITAL_APPLICATION_KEY = 'antarapulsa-capital-applications-v1';
 const showToast = createToast('#toast');
 
 const appIcons = {
@@ -533,8 +536,51 @@ $('#topupBtn').onclick = () => showPage('topup');
 $('#accountMenu').addEventListener('click', event => {
   const button = event.target.closest('[data-account-action]');
   if (button?.dataset.accountAction === 'topup') showPage('topup');
+  if (button?.dataset.accountAction === 'capital') {
+    renderCapitalPage();
+    showPage('capital');
+  }
 });
 $('#walletTopupBtn').onclick = () => showPage('topup');
+
+const capitalStorageKey = () => `${CAPITAL_APPLICATION_KEY}:${state.user?.phone || state.user?.id || 'agent'}`;
+const getCapitalApplications = () => {
+  try { return JSON.parse(localStorage.getItem(capitalStorageKey()) || '[]'); }
+  catch { return []; }
+};
+function renderCapitalPage() {
+  const applications = getCapitalApplications();
+  $('#capitalOwner').value ||= state.user?.name || '';
+  $('#capitalWhatsapp').value ||= /^\d+$/.test(state.user?.phone || '') ? state.user.phone : '';
+  $('#capitalDocumentCount').textContent = applications.length ? '4 dokumen · tersimpan pada pengajuan terakhir' : '0 dokumen · klik untuk melihat semua';
+  $('#capitalDocumentStatus').textContent = applications.length ? 'Lengkap' : 'Belum ada';
+  $('#capitalHistory').innerHTML = applications.length
+    ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>Rp ${money(item.amount)}</b><small>${escapeHTML(item.date)} · ${escapeHTML(item.owner)}</small></div><strong>${escapeHTML(item.status)}</strong></article>`).join('')
+    : '<div class="capital-empty"><span>Belum ada riwayat pengajuan kredit.</span></div>';
+}
+$('#capitalBack').onclick = () => showPage('account');
+$('#capitalAmount').addEventListener('input', event => {
+  const amount = Number(event.target.value.replace(/\D/g, '')) || 0;
+  event.target.value = amount ? money(amount) : '';
+});
+$$('.capital-upload input').forEach(input => input.addEventListener('change', () => {
+  const label = input.closest('.capital-upload');
+  label.classList.toggle('uploaded', Boolean(input.files?.length));
+  label.querySelector('b').textContent = input.files?.[0]?.name || 'Belum diunggah';
+}));
+$('#capitalApplicationForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const amount = Number($('#capitalAmount').value.replace(/\D/g, '')) || 0;
+  if (!amount) { showToast('Nominal belum sesuai', 'Masukkan nominal kredit yang ingin diajukan.'); return; }
+  const applications = getCapitalApplications();
+  applications.unshift({ id: `KM-${Date.now().toString().slice(-8)}`, owner: $('#capitalOwner').value.trim(), whatsapp: $('#capitalWhatsapp').value.trim(), amount, status: 'Pending', date: new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date()) });
+  localStorage.setItem(capitalStorageKey(), JSON.stringify(applications));
+  renderCapitalPage();
+  event.target.reset();
+  $$('.capital-upload').forEach(label => { label.classList.remove('uploaded'); label.querySelector('b').textContent = 'Belum diunggah'; });
+  showToast('Pengajuan berhasil dikirim', 'Pengajuan kredit masuk ke riwayat dengan status Pending.');
+  $('#capitalHistory').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });
 

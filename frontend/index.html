@@ -197,6 +197,27 @@
           <button id="accountLogout" class="account-logout" type="button">Keluar dari akun</button>
         </section>
 
+        <section id="capitalPage" class="page capital-page">
+          <div class="capital-page-head"><button type="button" id="capitalBack" aria-label="Kembali ke akun"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><div><span>KREDIT MODAL</span><h1>Modal usaha Agent</h1><p>Ajukan tambahan modal untuk mengembangkan transaksi retailmu.</p></div></div>
+          <section class="capital-overview"><div class="capital-overview-title"><div><span>MODAL AKTIF</span><strong>Rp 0</strong></div><b>0 fasilitas aktif</b></div><div class="capital-overview-stats"><div><small>Total pembayaran</small><strong>Rp 0</strong></div><div><small>Modal berjalan</small><strong>Rp 0</strong></div></div></section>
+          <form id="capitalApplicationForm" class="capital-card capital-form">
+            <div class="capital-card-title"><span><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 14v5h14v-5"/></svg></span><h2>Upload Dokumen</h2></div>
+            <label for="capitalOwner">Nama lengkap pemilik toko</label><input id="capitalOwner" type="text" autocomplete="name" required>
+            <label for="capitalWhatsapp">Nomor WhatsApp pemilik toko</label><input id="capitalWhatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Contoh: 081234567890" required>
+            <label for="capitalAmount">Nominal kredit yang diajukan</label><div class="capital-amount"><span>Rp</span><input id="capitalAmount" inputmode="numeric" placeholder="Contoh: 1.000.000" required></div>
+            <div class="capital-uploads">
+              <label class="capital-upload"><span>KTP pemilik konter</span><input type="file" accept="image/*,.pdf" required><b>Belum diunggah</b></label>
+              <label class="capital-upload"><span>Foto konter</span><input type="file" accept="image/*" required><b>Belum diunggah</b></label>
+              <label class="capital-upload"><span>Foto bersama marketing</span><input type="file" accept="image/*" required><b>Belum diunggah</b></label>
+              <label class="capital-upload"><span>Dokumen pengajuan kredit</span><input type="file" accept="image/*,.pdf" required><b>Belum diunggah</b></label>
+            </div>
+            <button class="capital-submit" type="submit"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Ajukan Kenaikan/Tambah Kredit</button>
+          </form>
+          <section class="capital-card capital-documents"><div class="capital-card-title"><span><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/></svg></span><h2>Dokumen Pengajuan</h2></div><div><b>Dokumen Saya</b><small id="capitalDocumentCount">0 dokumen · klik untuk melihat semua</small><span id="capitalDocumentStatus">Belum ada</span></div></section>
+          <section class="capital-card capital-history"><h2>Riwayat Pengajuan</h2><div id="capitalHistory"></div></section>
+          <aside class="capital-notice"><span><svg viewBox="0 0 24 24"><path d="M12 22s8-3.5 8-10V6l-8-3-8 3v6c0 6.5 8 10 8 10Z"/><path d="M9 12l2 2 4-5"/></svg></span><div><b>Pemisahan wewenang aktif</b><p>Marketing hanya mendampingi pendaftaran. Seluruh pemeriksaan dan keputusan modal dilakukan Operator.</p></div></aside>
+        </section>
+
         <section id="helpPage" class="page"><div class="simple-head"><span>BANTUAN 24/7</span><h1>Ada yang bisa dibantu?</h1><p>Temukan jawaban cepat atau hubungi tim kami.</p></div><div class="help-grid"><button class="panel help-card"><span>◌</span><h3>Panduan transaksi</h3><p>Cara membeli pulsa dan produk digital.</p></button><button class="panel help-card"><span>⌁</span><h3>Transaksi bermasalah</h3><p>Kami bantu cek status transaksi.</p></button><button class="panel help-card"><span>◉</span><h3>Hubungi support</h3><p>Chat langsung dengan tim AntaraPulsa.</p></button></div></section>
         <section id="topupPage" class="page topup-page">
           <div class="simple-head"><span>ISI SALDO</span><h1>Top up dengan QRIS.</h1><p>Tambahkan saldo akun secara praktis melalui aplikasi pembayaran pilihanmu.</p></div>
