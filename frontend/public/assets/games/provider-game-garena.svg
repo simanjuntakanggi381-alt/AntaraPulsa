@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Garena">
+  <circle cx="64" cy="64" r="57" fill="#ed1c24"/>
+  <path fill="#fff" fill-rule="evenodd" d="M98 37C83 18 49 17 29 36 9 55 18 91 45 104c18 9 40 4 53-10V57H59v17h19v11c-9 6-23 5-31-2-13-11-12-31 1-41 12-9 29-7 39 4z"/>
+</svg>

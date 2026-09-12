@@ -99,6 +99,14 @@ const providerDomains = {
   bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
 };
 const providerAssets = {
+  arenaofvalor:'/assets/games/provider-game-arena-of-valor.png', bloodstrike:'/assets/games/provider-game-blood-strike.png',
+  callofdutymobile:'/assets/games/provider-game-call-of-duty-symbol.svg', fcmobile:'/assets/games/provider-game-fc-mobile.png',
+  freefire:'/assets/games/provider-game-free-fire.png', garena:'/assets/games/provider-game-garena.svg',
+  honkaiimpact3:'/assets/games/provider-game-honkai-impact-3.png', honorofkings:'/assets/games/provider-game-honor-of-kings.png',
+  leagueoflegends:'/assets/games/provider-game-league-of-legends.svg', minecraft:'/assets/games/provider-game-minecraft-symbol.svg',
+  mobilelegends:'/assets/games/provider-game-mobile-legends.png', pointblank:'/assets/games/provider-game-point-blank.svg',
+  pubgmobile:'/assets/games/provider-game-pubg-symbol.svg', roblox:'/assets/games/provider-game-roblox.png',
+  steamwallet:'/assets/games/provider-game-steam.png', valorant:'/assets/games/provider-game-valorant.svg',
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
   iconnet:'/assets/provider-iconnet-symbol.png?v=3',
   indihome:'/assets/provider-indihome.svg',
@@ -145,7 +153,7 @@ function providerLogoMarkup(provider, type, className = '') {
   const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
-  const providerClass = source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
+  const providerClass = source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
 }
 function txRow(tx, detailed = false) {
