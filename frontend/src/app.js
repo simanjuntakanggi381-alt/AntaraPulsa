@@ -33,6 +33,11 @@ const appIcons = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   ledger: '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h4M8 16h3M15 14v5M12.5 16.5h5"/>',
   walletPlus: '<path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M4 9h16M15 13v4M13 15h4"/>',
+  capital: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/>',
+  fees: '<path d="M8 7h8a5 5 0 0 1 0 10H8A5 5 0 0 1 8 7Z"/><path d="M9 12h6"/>',
+  qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM15 14h2v2h-2zM18 17h2v3h-3M13 19h2"/>',
+  withdraw: '<path d="M4 9h16v11H4zM2 9l10-5 10 5M8 12v5M12 12v5M16 12v5M3 20h18"/>',
+  network: '<circle cx="12" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="m10 9-2.5 5M14 9l2.5 5M9 17h6"/>',
   guide: '<path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>',
   shield: '<path d="M12 22s8-3.5 8-10V6l-8-3-8 3v6c0 6.5 8 10 8 10Z"/><path d="M12 8v5M12 16h.01"/>',
   chat: '<path d="M21 12a8 8 0 0 1-8 8H6l-4 2 1.3-4A9 9 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>'
@@ -40,12 +45,35 @@ const appIcons = {
 const installIcon = (selector, name) => document.querySelectorAll(selector).forEach(el => { el.classList.add('svg-icon'); el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${appIcons[name]}</svg>`; });
 [['.extra-services .service-card:nth-child(1) .service-icon','game'],['.extra-services .service-card:nth-child(2) .service-icon','ticket'],['.extra-services .service-card:nth-child(3) .service-icon','phone'],['.extra-services .service-card:nth-child(4) .service-icon','bill'],['.account-field:nth-child(2)>span','user'],['.account-field:nth-child(3)>span','phone'],['.account-field:nth-child(4)>span','mail'],['.account-menu button:nth-of-type(1) .account-menu-icon','ledger'],['.account-menu .topup-icon','walletPlus'],['.help-card:nth-child(1)>span','guide'],['.help-card:nth-child(2)>span','shield'],['.help-card:nth-child(3)>span','chat']].forEach(([selector,name]) => installIcon(selector,name));
 
+function renderAccountMenu(user) {
+  const role = String(user?.level || '').toLowerCase();
+  const privileged = role === 'agent' || role === 'marketing';
+  const items = privileged
+    ? [
+        ['capital','Kredit Modal','Pengajuan dan informasi kredit modal','capital'],
+        ['ledger','Mutasi Saldo','Riwayat pemasukan dan pengeluaran saldo','balance'],
+        ['fees','Fees Retail','Ringkasan fee transaksi retail','fees'],
+        ['qr','Topup Saldo','Tambahkan saldo akun AntaraPulsa','topup'],
+        ['withdraw','Withdraw Fee','Pencairan fee yang tersedia','withdraw'],
+        ['network','Jaringan Retail','Kelola dan pantau jaringan retail','network']
+      ]
+    : [
+        ['ledger','Mutasi saldo','Lihat pemasukan dan pengeluaran saldo','balance'],
+        ['walletPlus','Isi saldo','Tambahkan saldo akun AntaraPulsa','topup']
+      ];
+  $('#accountMenu').innerHTML = `<h2>Menu akun</h2>${items.map(([icon,title,description,action], index) => `<button type="button" data-account-action="${action}" class="account-role-item account-role-item-${index + 1}"><span class="account-menu-icon"></span><div><b>${title}</b><small>${description}</small></div><i>›</i></button>`).join('')}`;
+  items.forEach(([icon], index) => installIcon(`.account-role-item-${index + 1} .account-menu-icon`, icon));
+  $('#accountMenu').classList.toggle('role-menu', privileged);
+}
+
 function setUser(user) {
   state.user = user;
   $('#balance').textContent = money(user.balance); $('#miniName').textContent = user.name;
   $('#mainBalanceDetail').textContent = `Rp ${money(user.balance)}`;
   $('#profileName').textContent = user.name; $('#profileNameInput').value = user.name;
   $('#profilePhone').value = user.phone; $('#profileEmail').value = user.email;
+  $('#accountHandle').textContent = user.level || 'Agen terpercaya';
+  renderAccountMenu(user);
   $$('.avatar, .profile-avatar').forEach(el => el.textContent = initials(user.name));
   const first = user.name.split(' ')[0];
   $('#greeting').textContent = `Halo, ${first}`;
@@ -501,7 +529,10 @@ $('#clearTopup').onclick = () => { $('#topupAmount').value = ''; updateTopupSumm
 $('#qrisTopupForm').addEventListener('submit', e => { e.preventDefault(); showToast('QRIS segera tersedia', 'Integrasi mitra pembayaran sedang dipersiapkan.'); });
 $('#refreshTopup').onclick = () => showToast('Riwayat diperbarui', 'Belum ada top up QRIS pada akun ini.');
 $('#topupBtn').onclick = () => showPage('topup');
-$('#accountPage #topupBtn').onclick = () => showPage('topup');
+$('#accountMenu').addEventListener('click', event => {
+  const button = event.target.closest('[data-account-action]');
+  if (button?.dataset.accountAction === 'topup') showPage('topup');
+});
 $('#walletTopupBtn').onclick = () => showPage('topup');
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('.topbar .search input')?.focus(); } });

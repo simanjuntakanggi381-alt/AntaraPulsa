@@ -189,10 +189,10 @@
             <div class="account-field"><span></span><div><small>Email</small><input id="profileEmail" type="email" class="account-input" placeholder="Tambahkan email"></div></div>
             <button class="account-save" type="submit">Simpan perubahan</button>
           </form>
-          <section class="account-menu">
+          <section id="accountMenu" class="account-menu">
             <h2>Menu akun</h2>
             <button type="button"><span class="account-menu-icon balance-icon"></span><div><b>Mutasi saldo</b><small>Lihat pemasukan dan pengeluaran saldo</small></div><i>›</i></button>
-            <button id="topupBtn" type="button"><span class="account-menu-icon topup-icon"></span><div><b>Isi saldo</b><small>Tambahkan saldo akun AntaraPulsa</small></div><i>›</i></button>
+            <button type="button" data-account-action="topup"><span class="account-menu-icon topup-icon"></span><div><b>Isi saldo</b><small>Tambahkan saldo akun AntaraPulsa</small></div><i>›</i></button>
           </section>
           <button id="accountLogout" class="account-logout" type="button">Keluar dari akun</button>
         </section>
