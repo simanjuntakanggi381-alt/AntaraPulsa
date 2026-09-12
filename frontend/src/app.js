@@ -14,6 +14,7 @@ import './styles/role-finance.css';
 import './styles/network.css';
 import './styles/document-review.css';
 import './styles/operator.css';
+import './styles/operator-credit.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
@@ -138,8 +139,13 @@ $('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}
 $('#accountLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
-$$('[data-operator-page]').forEach(button => button.onclick = () => { $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === button.dataset.operatorPage)); $('.operator-sidebar').classList.remove('open'); if (button.dataset.operatorPage !== 'dashboard') showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.'); });
+$$('[data-operator-page]').forEach(button => button.onclick = () => {
+  const page = button.dataset.operatorPage; $$('[data-operator-page]').forEach(item => item.classList.toggle('active', item.dataset.operatorPage === page)); $('.operator-sidebar').classList.remove('open');
+  $('.operator-main').classList.toggle('hidden', page === 'credit'); $('#operatorCreditView').classList.toggle('hidden', page !== 'credit');
+  if (page === 'credit') renderOperatorCredit(); else if (page !== 'dashboard') showToast('Menu siap diisi', 'Isi halaman ini dapat dilanjutkan sesuai konsep berikutnya.');
+});
 $('#addMarketingBtn').onclick = () => showToast('Tambah Marketing', 'Form akun Marketing akan dibuat pada tahap berikutnya.');
+$('#operatorCreditMenu').onclick = () => $('.operator-sidebar').classList.toggle('open');
 
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
@@ -586,6 +592,30 @@ function renderMarketingCapital() {
   $('#marketingDocuments').innerHTML = applications.length ? applications.map((item,index) => `<div class="monitor-document"><button type="button" data-monitor-doc="${index}"><div><b>${escapeHTML(item.owner)}</b><small>${item.documents?.length || 0} dokumen · klik untuk melihat semua</small></div><strong>${escapeHTML(item.status)}</strong><i>⌄</i></button><div class="monitor-document-files hidden">${renderDocumentFiles(item.documents)}</div></div>`).join('') : empty;
   $('#marketingApplications').innerHTML = applications.length ? applications.map(item => `<article><div><span>${escapeHTML(item.id)}</span><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || '-')} · ${escapeHTML(item.date)}</small></div><div><strong>Rp ${money(item.amount)}</strong><i>${escapeHTML(item.status)}</i></div></article>`).join('') : empty;
 }
+let operatorCreditTab = 'applications';
+let previewApplicationIndex = -1;
+function updateOperatorApplication(index, status) {
+  const applications = getMonitoredApplications(); if (!applications[index]) return;
+  applications[index].status = status; localStorage.setItem(CAPITAL_MONITOR_KEY, JSON.stringify(applications)); renderOperatorCredit();
+  showToast(status === 'Disetujui' ? 'Pengajuan disetujui' : 'Pengajuan ditolak', `Status ${applications[index].id} berhasil diperbarui.`);
+}
+function renderOperatorCredit() {
+  const query = ($('#creditSearch')?.value || '').toLowerCase(); const filter = $('#creditStatus')?.value || 'Pending';
+  const all = getMonitoredApplications(); const rows = all.map((item,index)=>({item,index})).filter(({item}) => (filter === 'Semua' || item.status === filter) && `${item.id} ${item.owner} ${item.shop || ''}`.toLowerCase().includes(query));
+  if (!rows.length) { $('#operatorCreditList').innerHTML = '<div class="operator-credit-empty"><b>Belum ada pengajuan nyata</b><p>Pengajuan Agent akan muncul otomatis setelah benar-benar dikirim.</p></div>'; return; }
+  $('#operatorCreditList').innerHTML = operatorCreditTab === 'documents'
+    ? rows.map(({item,index}) => `<section class="operator-doc-agent"><header><div><b>${escapeHTML(item.owner)}</b><small>${item.documents?.length || 0} dokumen · ${escapeHTML(item.shop || '-')}</small></div><span>${escapeHTML(item.status)}</span></header><div>${(item.documents || []).map((doc,docIndex)=>`<article><div><b>${escapeHTML(documentNames[docIndex])}</b><small>${escapeHTML(doc.name)}</small></div><i>${escapeHTML(item.status)}</i><button data-open-document="${index}:${docIndex}">Buka</button><button class="approve" data-credit-action="Disetujui:${index}">Approve</button><button class="reject" data-credit-action="Ditolak:${index}">Reject</button></article>`).join('')}</div></section>`).join('')
+    : rows.map(({item,index}) => `<section class="operator-application"><button data-credit-expand="${index}"><div><b>${escapeHTML(item.owner)}</b><small>${escapeHTML(item.shop || '-')} · 1 riwayat kredit</small></div><i>⌄</i></button><div class="hidden"><div><b>${escapeHTML(item.id)} · ${escapeHTML(item.owner)}</b><small>Tujuan: ${escapeHTML(item.shop || 'Modal usaha')}</small></div><aside><strong>Rp ${money(item.amount)}</strong><span>${escapeHTML(item.status)}</span></aside><footer><button class="approve" data-credit-action="Disetujui:${index}">Approve</button><button class="reject" data-credit-action="Ditolak:${index}">Reject</button></footer></div></section>`).join('');
+}
+$$('[data-credit-tab]').forEach(button => button.onclick = () => { operatorCreditTab=button.dataset.creditTab; $$('[data-credit-tab]').forEach(item=>item.classList.toggle('active',item===button)); renderOperatorCredit(); });
+$('#creditStatus').onchange = renderOperatorCredit; $('#creditSearch').oninput = renderOperatorCredit; $('#refreshOperatorCredit').onclick = renderOperatorCredit;
+$('#operatorCreditList').addEventListener('click', event => {
+  const expand=event.target.closest('[data-credit-expand]'); if(expand){ expand.classList.toggle('open'); expand.nextElementSibling.classList.toggle('hidden'); return; }
+  const action=event.target.closest('[data-credit-action]'); if(action){ const [status,index]=action.dataset.creditAction.split(':'); updateOperatorApplication(Number(index),status); return; }
+  const open=event.target.closest('[data-open-document]'); if(open){ const [appIndex,docIndex]=open.dataset.openDocument.split(':').map(Number); const app=getMonitoredApplications()[appIndex]; if(!app?.documents?.[docIndex])return; previewApplicationIndex=appIndex; $('#operatorPreviewImage').src=app.documents[docIndex].data; $('#operatorDocumentPreview').classList.remove('hidden'); }
+});
+const closeOperatorPreview=()=>$('#operatorDocumentPreview').classList.add('hidden'); $('#closeDocumentPreview').onclick=closeOperatorPreview; $('#closePreviewFooter').onclick=closeOperatorPreview;
+$$('[data-preview-action]').forEach(button=>button.onclick=()=>{ updateOperatorApplication(previewApplicationIndex,button.dataset.previewAction); closeOperatorPreview(); });
 const documentNames = ['KTP pemilik konter','Foto konter','Foto bersama marketing','Dokumen pengajuan kredit'];
 const renderDocumentFiles = documents => (documents?.length ? documents.map((doc,index) => `<figure><img src="${doc.data}" alt="${escapeHTML(documentNames[index])}"><figcaption>${escapeHTML(documentNames[index])}<b>Terkirim</b></figcaption></figure>`).join('') : '<p class="document-unavailable">Dokumen foto belum tersedia.</p>');
 const imageData = file => new Promise((resolve,reject) => { const reader=new FileReader(); reader.onerror=reject; reader.onload=()=>{ const img=new Image(); img.onerror=reject; img.onload=()=>{ const scale=Math.min(1,720/Math.max(img.width,img.height)); const canvas=document.createElement('canvas'); canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale); canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height); resolve({name:file.name,data:canvas.toDataURL('image/jpeg',.68)}); }; img.src=reader.result; }; reader.readAsDataURL(file); });
