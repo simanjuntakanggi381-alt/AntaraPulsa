@@ -58,26 +58,28 @@ func roleAccountsFromEnv() []model.RoleAccount {
 }
 
 func syncH2HRProducts(dataStore *store.Store) {
-	client := h2hr.New(h2hr.ConfigFromEnv())
-	if !h2hr.ConfigFromEnv().Ready() {
+	snapshot, snapshotErr := catalog.Snapshot()
+	if snapshotErr != nil {
+		log.Printf("snapshot katalog Pulsa24Jam gagal: %v", snapshotErr)
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	response, err := client.Call(ctx, h2hr.Request{Commands: "PRODUK"})
-	if err != nil {
-		log.Printf("sinkronisasi katalog H2HR dilewati: %v", err)
-		return
-	}
-	products := catalogProducts(response.Items)
-	if len(products) == 0 {
-		snapshot, snapshotErr := catalog.Snapshot()
-		if snapshotErr != nil {
-			log.Printf("sinkronisasi katalog H2HR tidak menemukan SKU aktif; snapshot gagal: %v", snapshotErr)
-			return
+	products := catalogProducts(snapshot)
+
+	config := h2hr.ConfigFromEnv()
+	if config.Ready() {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		response, err := h2hr.New(config).Call(ctx, h2hr.Request{Commands: "PRODUK"})
+		if err != nil {
+			log.Printf("PRODUK H2HR tidak tersedia; memakai snapshot pemilik akun (%d SKU valid): %v", len(products), err)
+		} else if live := catalogProducts(response.Items); len(live) >= len(products) {
+			products = live
+			log.Printf("memakai katalog live Pulsa24Jam (%d SKU valid)", len(products))
+		} else {
+			log.Printf("PRODUK H2HR tidak lengkap (%d SKU); memakai snapshot pemilik akun (%d SKU valid)", len(live), len(products))
 		}
-		products = catalogProducts(snapshot)
-		log.Printf("PRODUK H2HR kosong; memakai snapshot pemilik akun (%d SKU valid)", len(products))
+	} else {
+		log.Printf("konfigurasi H2HR belum aktif; memakai snapshot pemilik akun (%d SKU valid)", len(products))
 	}
 	if err := dataStore.ReplaceProducts(products); err != nil {
 		log.Printf("sinkronisasi katalog H2HR gagal disimpan: %v", err)
