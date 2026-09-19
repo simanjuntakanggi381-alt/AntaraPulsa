@@ -13,6 +13,14 @@ type User struct {
 	ParentID int64  `json:"parent_id,omitempty"`
 }
 
+type RoleAccount struct {
+	Name     string
+	Phone    string
+	Email    string
+	Password string
+	Level    string
+}
+
 type Transaction struct {
 	ID        string    `json:"id"`
 	UserID    int64     `json:"-"`

@@ -1,3 +1,5 @@
+name: antarapulsa
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -29,6 +31,20 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URL: ${GOOGLE_REDIRECT_URL:-}
+
+      MARKETING_NAME: ${MARKETING_NAME:-}
+      MARKETING_PHONE: ${MARKETING_PHONE:-}
+      MARKETING_EMAIL: ${MARKETING_EMAIL:-}
+      MARKETING_PASSWORD: ${MARKETING_PASSWORD:-}
+      AGENT_NAME: ${AGENT_NAME:-}
+      AGENT_PHONE: ${AGENT_PHONE:-}
+      AGENT_EMAIL: ${AGENT_EMAIL:-}
+      AGENT_PASSWORD: ${AGENT_PASSWORD:-}
+      OPERATOR_NAME: ${OPERATOR_NAME:-}
+      OPERATOR_PHONE: ${OPERATOR_PHONE:-}
+      OPERATOR_EMAIL: ${OPERATOR_EMAIL:-}
+      OPERATOR_PASSWORD: ${OPERATOR_PASSWORD:-}
+
       PULSA24JAM_H2HR_ENABLED: ${PULSA24JAM_H2HR_ENABLED:-false}
       PULSA24JAM_H2HR_URL: ${PULSA24JAM_H2HR_URL:-https://api.pulsa24jam.net/v2/trx}
       PULSA24JAM_H2HR_API_KEY: ${PULSA24JAM_H2HR_API_KEY:-}
@@ -49,6 +65,14 @@ services:
       - backend
     ports:
       - "127.0.0.1:5174:80"
+    networks:
+      - default
+      - npm_proxy
 
 volumes:
   antarapulsa_postgres_data:
+
+networks:
+  npm_proxy:
+    external: true
+    name: nginx_default

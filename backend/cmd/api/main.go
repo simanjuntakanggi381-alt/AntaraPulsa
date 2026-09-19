@@ -34,6 +34,9 @@ func main() {
 		}
 		defer dataStore.Close()
 		log.Printf("AntaraPulsa memakai PostgreSQL")
+		if err = dataStore.ProvisionRoleAccounts(ctx, roleAccountsFromEnv()); err != nil {
+			log.Fatalf("akun role produksi tidak siap: %v", err)
+		}
 	} else {
 		dataStore = store.New()
 		log.Printf("DATABASE_URL belum diatur; memakai penyimpanan sementara")
@@ -43,6 +46,14 @@ func main() {
 	log.Printf("AntaraPulsa API aktif di http://localhost:%s", port)
 	if err := http.ListenAndServe(":"+port, app.Routes()); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func roleAccountsFromEnv() []model.RoleAccount {
+	return []model.RoleAccount{
+		{Name: os.Getenv("MARKETING_NAME"), Phone: os.Getenv("MARKETING_PHONE"), Email: os.Getenv("MARKETING_EMAIL"), Password: os.Getenv("MARKETING_PASSWORD"), Level: "Marketing"},
+		{Name: os.Getenv("AGENT_NAME"), Phone: os.Getenv("AGENT_PHONE"), Email: os.Getenv("AGENT_EMAIL"), Password: os.Getenv("AGENT_PASSWORD"), Level: "Agent"},
+		{Name: os.Getenv("OPERATOR_NAME"), Phone: os.Getenv("OPERATOR_PHONE"), Email: os.Getenv("OPERATOR_EMAIL"), Password: os.Getenv("OPERATOR_PASSWORD"), Level: "Operator"},
 	}
 }
 
@@ -97,8 +108,18 @@ func catalogProducts(items []h2hr.Product) []model.Product {
 			continue
 		}
 		seen[sku] = struct{}{}
-		provider := normalizeProvider(item.Brand, item.Category, sku, name)
-		category := normalizeCategory(item.Category, item.Group, name)
+		// Pulsa24Jam is authoritative: retain its category/provider hierarchy.
+		provider := strings.TrimSpace(item.Brand)
+		category := strings.TrimSpace(item.Category)
+		if provider == "" {
+			provider = "Pulsa24Jam"
+		}
+		if category == "" {
+			category = strings.TrimSpace(item.Group)
+		}
+		if category == "" {
+			category = "Lainnya"
+		}
 		price := item.Price
 		if priceType != "OPEN_AMOUNT" {
 			price += item.AdditionalFee

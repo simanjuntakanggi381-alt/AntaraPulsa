@@ -1,6 +1,10 @@
 package store
 
-import "testing"
+import (
+	"testing"
+
+	"antarapulsa/backend/internal/model"
+)
 
 func TestCreateDownlineCanAuthenticate(t *testing.T) {
 	s := New()
@@ -22,10 +26,11 @@ func TestCreateDownlineCanAuthenticate(t *testing.T) {
 
 func TestPurchaseDeductsBalance(t *testing.T) {
 	s := New()
+	s.products = []model.Product{{ID: "TEST10", Provider: "Telkomsel", Name: "Produk test", Type: "Pulsa", Price: 11200, PriceType: "FIXED"}}
 	// Saldo hanya disiapkan untuk skenario test; akun baru di aplikasi tetap Rp0.
 	s.users[1].Balance = 100_000
 	before, _ := s.User(1)
-	tx, err := s.Purchase(1, "tsel-10", "081299999999")
+	tx, err := s.Purchase(1, "TEST10", "081299999999")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,5 +81,16 @@ func TestCreditApplicationVisibleToMarketingAndOperator(t *testing.T) {
 	}
 	if got := s.CreditApplications(agent.ID, "Agent"); got[0]["status"] != "Aktif" {
 		t.Fatalf("agent status: %v", got[0]["status"])
+	}
+	approved, _ := s.User(agent.ID)
+	if approved.Balance != 500000 {
+		t.Fatalf("saldo kredit tidak dicairkan: %d", approved.Balance)
+	}
+	if err = s.UpdateCreditApplicationStatus("KSA-TEST", "Aktif"); err != nil {
+		t.Fatal(err)
+	}
+	idempotent, _ := s.User(agent.ID)
+	if idempotent.Balance != 500000 {
+		t.Fatalf("approval ulang menggandakan saldo: %d", idempotent.Balance)
 	}
 }

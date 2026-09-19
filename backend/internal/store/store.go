@@ -32,7 +32,7 @@ type creditRecord struct {
 }
 
 func New() *Store {
-	s := &Store{users: map[int64]*model.User{}, byPhone: map[string]int64{}, byGoogle: map[string]int64{}, products: seedProducts()}
+	s := &Store{users: map[int64]*model.User{}, byPhone: map[string]int64{}, byGoogle: map[string]int64{}, products: []model.Product{}}
 	// Akun awal tidak diberi saldo contoh. Saldo hanya bertambah melalui top up
 	// atau data yang benar-benar tersimpan dari transaksi.
 	u := &model.User{ID: 1, Name: "Mikael Putra", Phone: "081234567890", Email: "mikael@antarapulsa.id", Password: "pulsa123", Balance: 0, Level: "Gold Partner"}
@@ -64,6 +64,42 @@ func (s *Store) Close() error {
 	}
 	return nil
 }
+
+// ProvisionRoleAccounts upserts the operational role chain configured by the
+// deployment. Empty roles are skipped; partially configured roles fail fast.
+func (s *Store) ProvisionRoleAccounts(ctx context.Context, accounts []model.RoleAccount) error {
+	if s.db == nil {
+		return nil
+	}
+	ids := map[string]int64{}
+	for _, account := range accounts {
+		account.Name, account.Phone, account.Email = strings.TrimSpace(account.Name), strings.TrimSpace(account.Phone), strings.TrimSpace(account.Email)
+		if account.Name == "" && account.Phone == "" && account.Email == "" && account.Password == "" {
+			continue
+		}
+		if account.Name == "" || account.Phone == "" || account.Email == "" || len(account.Password) < 8 {
+			return fmt.Errorf("konfigurasi akun %s wajib berisi nama, telepon, email, dan password minimal 8 karakter", account.Level)
+		}
+		var parent any
+		if account.Level == "Agent" {
+			marketingID, ok := ids["Marketing"]
+			if !ok {
+				return errors.New("akun Marketing wajib dikonfigurasi sebelum Agent")
+			}
+			parent = marketingID
+		}
+		var id int64
+		err := s.db.QueryRowContext(ctx, `INSERT INTO users (id,name,phone,email,password,balance,level,parent_id)
+			VALUES (nextval('users_id_seq'),$1,$2,$3,$4,0,$5,$6)
+			ON CONFLICT (phone) DO UPDATE SET name=EXCLUDED.name,email=EXCLUDED.email,password=EXCLUDED.password,level=EXCLUDED.level,parent_id=EXCLUDED.parent_id
+			RETURNING id`, account.Name, account.Phone, account.Email, account.Password, account.Level, parent).Scan(&id)
+		if err != nil {
+			return fmt.Errorf("menyiapkan akun %s: %w", account.Level, err)
+		}
+		ids[account.Level] = id
+	}
+	return nil
+}
 func (s *Store) migrate(ctx context.Context) error {
 	for _, q := range []string{
 		`CREATE TABLE IF NOT EXISTS users (id BIGINT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL UNIQUE, email TEXT NOT NULL, password TEXT NOT NULL, balance BIGINT NOT NULL DEFAULT 0, level TEXT NOT NULL, google_sub TEXT UNIQUE)`,
@@ -86,11 +122,6 @@ func (s *Store) migrate(ctx context.Context) error {
 	}
 	if _, err := s.db.ExecContext(ctx, `INSERT INTO users (id,name,phone,email,password,balance,level) VALUES (1,'Mikael Putra','081234567890','mikael@antarapulsa.id','pulsa123',0,'Gold Partner') ON CONFLICT (id) DO NOTHING`); err != nil {
 		return err
-	}
-	for _, p := range seedProducts() {
-		if _, err := s.db.ExecContext(ctx, `INSERT INTO products (id,provider,name,type,price,color,price_type,fee) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (id) DO NOTHING`, p.ID, p.Provider, p.Name, p.Type, p.Price, p.Color, p.PriceType, p.Fee); err != nil {
-			return err
-		}
 	}
 	return nil
 }
@@ -185,25 +216,77 @@ func (s *Store) UpdateCreditApplicationStatus(id, status string) error {
 		return errors.New("status pengajuan tidak valid")
 	}
 	if s.db != nil {
-		result, err := s.db.Exec(`UPDATE credit_applications SET status=$1,payload=jsonb_set(payload,'{status}',to_jsonb($1::text)),updated_at=NOW() WHERE id=$2`, status, id)
+		tx, err := s.db.Begin()
 		if err != nil {
 			return err
 		}
-		n, _ := result.RowsAffected()
-		if n == 0 {
+		defer tx.Rollback()
+		var userID, amount int64
+		var current string
+		if err = tx.QueryRow(`SELECT user_id,status,COALESCE((payload->>'amount')::bigint,0) FROM credit_applications WHERE id=$1 FOR UPDATE`, id).Scan(&userID, &current, &amount); err == sql.ErrNoRows {
 			return errors.New("pengajuan tidak ditemukan")
+		} else if err != nil {
+			return err
 		}
-		return nil
+		if current == status {
+			return tx.Commit()
+		}
+		if current == "Lunas" || (current == "Aktif" && status != "Lunas") {
+			return errors.New("perubahan status pengajuan tidak diizinkan")
+		}
+		if status == "Aktif" {
+			if amount <= 0 {
+				return errors.New("nominal pengajuan tidak valid")
+			}
+			if _, err = tx.Exec(`UPDATE users SET balance=balance+$1 WHERE id=$2`, amount, userID); err != nil {
+				return err
+			}
+		}
+		if _, err = tx.Exec(`UPDATE credit_applications SET status=$1,payload=jsonb_set(payload,'{status}',to_jsonb($1::text)),updated_at=NOW() WHERE id=$2`, status, id); err != nil {
+			return err
+		}
+		return tx.Commit()
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for i := range s.creditApplications {
 		if s.creditApplications[i].Payload["id"] == id {
+			current, _ := s.creditApplications[i].Payload["status"].(string)
+			if current == status {
+				return nil
+			}
+			if current == "Lunas" || (current == "Aktif" && status != "Lunas") {
+				return errors.New("perubahan status pengajuan tidak diizinkan")
+			}
+			if status == "Aktif" {
+				amount, ok := numericAmount(s.creditApplications[i].Payload["amount"])
+				if !ok || amount <= 0 {
+					return errors.New("nominal pengajuan tidak valid")
+				}
+				u := s.users[s.creditApplications[i].UserID]
+				if u == nil {
+					return errors.New("akun Agent tidak ditemukan")
+				}
+				u.Balance += amount
+			}
 			s.creditApplications[i].Payload["status"] = status
 			return nil
 		}
 	}
 	return errors.New("pengajuan tidak ditemukan")
+}
+
+func numericAmount(value any) (int64, bool) {
+	switch amount := value.(type) {
+	case int:
+		return int64(amount), true
+	case int64:
+		return amount, true
+	case float64:
+		return int64(amount), amount == float64(int64(amount))
+	default:
+		return 0, false
+	}
 }
 
 func (s *Store) RecordH2HRCallback(refID, status string, payload []byte) error {
@@ -246,18 +329,6 @@ func (s *Store) FindOrCreateGoogleUser(googleSub, name, email string) (*model.Us
 	return &copy, nil
 }
 
-func seedProducts() []model.Product {
-	return []model.Product{
-		{ID: "tsel-10", Provider: "Telkomsel", Name: "Pulsa 10.000", Type: "Pulsa", Price: 11200, Color: "#ef3340", PriceType: "FIXED"},
-		{ID: "tsel-50", Provider: "Telkomsel", Name: "Pulsa 50.000", Type: "Pulsa", Price: 50200, Color: "#ef3340", PriceType: "FIXED"},
-		{ID: "tsel-100", Provider: "Telkomsel", Name: "Pulsa 100.000", Type: "Pulsa", Price: 98500, Color: "#ef3340", PriceType: "FIXED"},
-		{ID: "isat-25gb", Provider: "Indosat", Name: "Freedom 25 GB", Type: "Paket Data", Price: 62500, Color: "#f6c700", PriceType: "FIXED"},
-		{ID: "xl-15gb", Provider: "XL", Name: "Xtra Combo 15 GB", Type: "Paket Data", Price: 54750, Color: "#2f49d1", PriceType: "FIXED"},
-		{ID: "tri-20gb", Provider: "Tri", Name: "Happy 20 GB", Type: "Paket Data", Price: 48900, Color: "#ff6b35", PriceType: "FIXED"},
-		{ID: "pln-100", Provider: "PLN", Name: "Token 100.000", Type: "Token PLN", Price: 101500, Color: "#19a7ce", PriceType: "FIXED"},
-		{ID: "pln-200", Provider: "PLN", Name: "Token 200.000", Type: "Token PLN", Price: 201500, Color: "#19a7ce", PriceType: "FIXED"},
-	}
-}
 func (s *Store) Authenticate(phone, password string) (*model.User, bool) {
 	if s.db != nil {
 		u := &model.User{}

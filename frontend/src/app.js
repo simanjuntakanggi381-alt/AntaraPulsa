@@ -219,7 +219,10 @@ const providerDomains = {
   telkomsel:'telkomsel.com', indosat:'im3.id', im3:'im3.id', axis:'axis.co.id', xl:'xl.co.id', smartfren:'smartfren.com', 'by.u':'byu.id', byu:'byu.id', tri:'tri.co.id', three:'tri.co.id',
   pln:'pln.co.id', dana:'dana.id', ovo:'ovo.id', gopay:'gojek.com', gojek:'gojek.com', shopeepay:'shopeepay.co.id', shopee:'shopee.co.id', linkaja:'linkaja.id', astrapay:'astrapay.com', grab:'grab.com', maxim:'taximaxim.com',
   bca:'bca.co.id', bri:'bri.co.id', bni:'bni.co.id', mandiri:'bankmandiri.co.id', btn:'btn.co.id', bsi:'bankbsi.co.id', cimb:'cimbniaga.co.id', permata:'permatabank.com', danamon:'danamon.co.id', maybank:'maybank.co.id', panin:'panin.co.id', seabank:'seabank.co.id', jago:'jago.com', neocommerce:'bankneo.co.id',
-  bpjs:'bpjs-kesehatan.go.id', indihome:'indihome.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', netflix:'netflix.com', spotify:'spotify.com', vidio:'vidio.com', viu:'viu.com', steam:'steampowered.com', garena:'garena.co.id', 'mobile legends':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com'
+  bpjs:'bpjs-kesehatan.go.id', 'bpjs kesehatan':'bpjs-kesehatan.go.id', 'bpjs ketenagakerjaan':'bpjsketenagakerjaan.go.id',
+  indihome:'indihome.co.id', telkom:'telkom.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', bnetfit:'bnetfit.id', bstation:'bilibili.tv', cbn:'cbn.id', centrin:'centrin.net.id', globalxtreme:'globalxtreme.net', iconnet:'iconnet.id', oxygen:'oxygen.id', transvision:'transvision.co.id', wetv:'wetv.vip', 'xl home':'xlhome.co.id',
+  vidio:'vidio.com', garena:'garena.co.id', 'tix id':'tix.id', steam:'steampowered.com', 'mobile legend':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com', roblox:'roblox.com', valorant:'playvalorant.com',
+  '8 ball pool':'miniclip.com', 'age of empires mobile':'aoemobile.com', 'arena breakout':'arenabreakout.com', 'arena of valor':'arenaofvalor.com', 'black clover m':'bcm.garena.com', 'blood strike':'blood-strike.com', 'call of duty mobile':'callofduty.com', 'crystal of atlan':'coa.nvsgames.com', 'delta force':'playdeltaforce.com', 'dragon raja':'dragonraja.archosaur.com', 'farlight 84':'farlight84.com', 'fc mobile':'ea.com', 'football master 2':'footballmaster2.com', 'genshin impact':'genshin.hoyoverse.com', growtopia:'growtopiagame.com', hago:'hago.me', 'honkai impact 3':'honkaiimpact3.hoyoverse.com', 'honkai star rail':'hsr.hoyoverse.com', 'honor of king':'honorofkings.com', 'identity v':'identityvgame.com', 'lords mobile':'lordsmobile.igg.com', 'magic chess':'magicchessgogo.com', 'marvel rivals':'marvelrivals.com', 'marvel snap':'marvelsnap.com', 'metal slug awakening':'metalslugawk.vnggames.com', 'point blank':'pointblank.id', 'pokemon unite':'unite.pokemon.com', 'racing master':'racingmaster.game', 'sausage man':'sausageman.com', 'speed drifters':'speed.garena.co.id', 'state of survival':'stateofsurvival.com', 'super sus':'supersus.io', undawn:'undawn.garena.com', 'wuthering waves':'wutheringwaves.kurogames.com', 'zenless zone zero':'zenless.hoyoverse.com'
 };
 const providerAssets = {
   kvision:'/assets/streaming/provider-streaming-kvision-symbol.png', nexparabola:'/assets/streaming/provider-streaming-nex-symbol.png',
@@ -232,9 +235,9 @@ const providerAssets = {
   freefire:'/assets/games/provider-game-free-fire.png',
   honkaiimpact3:'/assets/games/provider-game-honkai-impact-3.png', honorofkings:'/assets/games/provider-game-honor-of-kings.png',
   leagueoflegends:'/assets/games/provider-game-league-of-legends.svg', minecraft:'/assets/games/provider-game-minecraft-symbol.svg',
-  mobilelegends:'/assets/games/provider-game-mobile-legends.png', pointblank:'/assets/games/provider-game-point-blank.svg',
+  mobilelegend:'/assets/games/provider-game-mobile-legends.png', mobilelegends:'/assets/games/provider-game-mobile-legends.png', pointblank:'/assets/games/provider-game-point-blank.svg',
   pubgmobile:'/assets/games/provider-game-pubg-official.png', roblox:'/assets/games/provider-game-roblox.png',
-  steamwallet:'/assets/games/provider-game-steam.png', valorant:'/assets/games/provider-game-valorant.svg',
+  steam:'/assets/games/provider-game-steam.png', steamwallet:'/assets/games/provider-game-steam.png', valorant:'/assets/games/provider-game-valorant.svg',
   indosat:'/assets/provider-indosat.png?v=2', im3:'/assets/provider-indosat.png?v=2',
   iconnet:'/assets/provider-iconnet-symbol.png?v=3',
   indihome:'/assets/provider-indihome.svg',
@@ -261,7 +264,7 @@ const providerFallbacks = {
   Pulsa:'service-pulsa-3d-compact.png', 'Paket Data':'service-data-3d-compact.png', 'E-Wallet':'service-wallet-3d-compact.png',
   'Token PLN':'service-listrik-3d-compact.png', Listrik:'service-listrik-3d-compact.png', Game:'service-category-14.png',
   'Aktivasi Perdana':'service-category-01.png', 'Masa Aktif':'service-category-02.png', 'Paket Telepon':'service-category-03.png',
-  'HP Pascabayar':'service-category-00.png', 'Transfer Bank':'service-category-05.png', PDAM:'service-category-09.png', BPJS:'service-category-10.png',
+  'HP Pascabayar':'service-category-00.png', Pascabayar:'service-category-00.png', 'Transfer Bank':'service-category-05.png', 'Bank Transfer':'service-category-05.png', PDAM:'service-category-09.png', 'Tagihan Air':'service-category-09.png', BPJS:'service-category-10.png', PLN:'service-listrik-3d-compact.png',
   'Internet & TV':'service-category-11.png', 'TV & Streaming':'service-category-15.png', Voucher:'service-category-16.png', 'Voucher Digital':'service-category-16.png'
 };
 function providerFallback(type) { return `/assets/${providerFallbacks[type] || 'service-lainnya-3d-compact.png'}`; }

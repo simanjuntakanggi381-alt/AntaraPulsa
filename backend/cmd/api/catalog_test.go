@@ -18,15 +18,15 @@ func TestCatalogProductsMapsProviderCategoryAndPrice(t *testing.T) {
 	if pulsa.ID != "TSEL10" || pulsa.Provider != "Telkomsel" || pulsa.Type != "Pulsa" || pulsa.Price != 10750 {
 		t.Fatalf("unexpected pulsa mapping: %+v", pulsa)
 	}
-	if data.Provider != "XL" || data.Type != "Paket Data" {
+	if data.Provider != "Pulsa24Jam" || data.Type != "Data" {
 		t.Fatalf("unexpected data mapping: %+v", data)
 	}
 }
 
 func TestCatalogProductsKeepsOpenAmountAndRejectsDuplicates(t *testing.T) {
 	got := catalogProducts([]h2hr.Product{
-		{SKU: "DANA", Name: "DANA bebas nominal", Brand: "DANA", PriceType: "OPEN_AMOUNT", AdditionalFee: 1000},
-		{SKU: "T5", Name: "Pulsa Telkomsel 5.000", PriceType: "FIXED", Price: 5500},
+		{SKU: "DANA", Name: "DANA bebas nominal", Category: "E-Wallet", Brand: "DANA", PriceType: "OPEN_AMOUNT", AdditionalFee: 1000},
+		{SKU: "T5", Name: "Pulsa Telkomsel 5.000", Category: "Pulsa", Brand: "Telkomsel", PriceType: "FIXED", Price: 5500},
 		{SKU: "t5", Name: "Duplikat", PriceType: "FIXED", Price: 5600},
 		{SKU: "", Name: "Tanpa SKU", PriceType: "FIXED", Price: 1000},
 	})
@@ -42,7 +42,7 @@ func TestCatalogProductsKeepsOpenAmountAndRejectsDuplicates(t *testing.T) {
 	if !foundOpen {
 		t.Fatalf("open-amount metadata was not preserved: %+v", got)
 	}
-	if got[1].ID != "T5" || got[1].Provider != "Telkomsel" {
+	if got[1].ID != "T5" || got[1].Provider != "Telkomsel" || got[1].Type != "Pulsa" {
 		t.Fatalf("unexpected fixed product: %+v", got[1])
 	}
 }
