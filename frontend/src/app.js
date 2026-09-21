@@ -227,6 +227,9 @@ const providerDomains = {
   '8 ball pool':'miniclip.com', 'age of empires mobile':'aoemobile.com', 'arena breakout':'arenabreakout.com', 'arena of valor':'arenaofvalor.com', 'black clover m':'bcm.garena.com', 'blood strike':'blood-strike.com', 'call of duty mobile':'callofduty.com', 'crystal of atlan':'coa.nvsgames.com', 'delta force':'playdeltaforce.com', 'dragon raja':'dragonraja.archosaur.com', 'farlight 84':'farlight84.com', 'fc mobile':'ea.com', 'football master 2':'footballmaster2.com', 'genshin impact':'genshin.hoyoverse.com', growtopia:'growtopiagame.com', hago:'hago.me', 'honkai impact 3':'honkaiimpact3.hoyoverse.com', 'honkai star rail':'hsr.hoyoverse.com', 'honor of king':'honorofkings.com', 'identity v':'identityvgame.com', 'lords mobile':'lordsmobile.igg.com', 'magic chess':'magicchessgogo.com', 'marvel rivals':'marvelrivals.com', 'marvel snap':'marvelsnap.com', 'metal slug awakening':'metalslugawk.vnggames.com', 'point blank':'pointblank.id', 'pokemon unite':'unite.pokemon.com', 'racing master':'racingmaster.game', 'sausage man':'sausageman.com', 'speed drifters':'speed.garena.co.id', 'state of survival':'stateofsurvival.com', 'super sus':'supersus.io', undawn:'undawn.garena.com', 'wuthering waves':'wutheringwaves.kurogames.com', 'zenless zone zero':'zenless.hoyoverse.com'
 };
 const providerAssets = {
+  axis:'/assets/providers/provider-axis.png', byu:'/assets/providers/provider-byu.png', smartfren:'/assets/providers/provider-smartfren.png',
+  telkomsel:'/assets/providers/provider-telkomsel.png', tri:'/assets/providers/provider-tri.png', three:'/assets/providers/provider-tri.png',
+  xl:'/assets/providers/provider-xl.png', xlaxis:'/assets/providers/provider-xl.png',
   kvision:'/assets/streaming/provider-streaming-kvision-symbol.png', nexparabola:'/assets/streaming/provider-streaming-nex-symbol.png',
   vidio:'/assets/streaming/provider-streaming-vidio.png', wetv:'/assets/streaming/provider-streaming-wetv.png',
   canva:'/assets/digital/provider-digital-canva.png', chatgpt:'/assets/digital/provider-digital-chatgpt.png',
@@ -276,16 +279,28 @@ function providerDomain(name) {
   const match = Object.keys(providerDomains).find(key => key.length >= 5 && normalized.includes(key));
   return match ? providerDomains[match] : '';
 }
+function pdamLookupKey(value) {
+  return String(value || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '')
+    .replace(/^(?:pdam|pam|perumdam|perumda|ptair)/, '')
+    .replace(/(?:kabupaten|kab|kota|perusahaan|daerah|airminum|tirta|jateng|jatim|jabar)/g, '');
+}
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
   if (pdamProviderAssets[normalized]) return pdamProviderAssets[normalized];
-  const pdamAlias = Object.keys(pdamProviderAssets)
-    .filter(key => key.length >= 9 && (normalized.includes(key) || key.includes(normalized)))
-    .sort((a,b) => b.length - a.length)[0];
-  if (pdamAlias) return pdamProviderAssets[pdamAlias];
+  if (normalized.length >= 9 && /^(pdam|pam|perumda|perumdam|ptair)/.test(normalized)) {
+    const lookup = pdamLookupKey(normalized);
+    const pdamAlias = Object.keys(pdamProviderAssets)
+      .filter(key => {
+        const candidate = pdamLookupKey(key);
+        return lookup.length >= 4 && candidate.length >= 4 && (lookup.includes(candidate) || candidate.includes(lookup));
+      })
+      .sort((a,b) => Math.abs(pdamLookupKey(a).length - lookup.length) - Math.abs(pdamLookupKey(b).length - lookup.length))[0];
+    if (pdamAlias) return pdamProviderAssets[pdamAlias];
+  }
   if (bankSymbolAssets[normalized]) return bankSymbolAssets[normalized];
   if (bankProviderKeys.has(normalized)) return `/assets/banks/provider-bank-${normalized}.svg`;
-  const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key.replace(/[^a-z0-9]/g, '')));
+  if (providerAssets[normalized]) return providerAssets[normalized];
+  const alias = Object.keys(providerAssets).find(key => normalized.includes(key.replace(/[^a-z0-9]/g, '')));
   return alias ? providerAssets[alias] : '';
 }
 function providerLogoMarkup(provider, type, className = '') {
