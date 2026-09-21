@@ -382,6 +382,7 @@ function transactionInputConfig(type) {
   if (type === 'E-Wallet') return { label:'Nomor E-Wallet', prefix:'HP', placeholder:'Masukkan nomor e-wallet aktif', autocomplete:'tel' };
   if (type === 'Token PLN') return { label:'Nomor meter / ID pelanggan', prefix:'ID', placeholder:'Masukkan nomor meter atau ID pelanggan', autocomplete:'off' };
   if (type === 'Game') return { label:'User ID / Zone ID', prefix:'ID', placeholder:'Masukkan user ID tujuan', autocomplete:'off' };
+  if (canonicalProductType(type) === 'Transfer Bank') return { label:'Nomor rekening tujuan', prefix:'BANK', placeholder:'Masukkan nomor rekening sesuai bank yang dipilih', autocomplete:'off' };
   return { label:'Nomor tujuan / ID pelanggan', prefix:'ID', placeholder:'Masukkan nomor atau ID tujuan', autocomplete:'off' };
 }
 
@@ -423,24 +424,29 @@ function restoreTransactionDraft() {
 
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
-  $('#detectedProvider').textContent = provider || (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Nomor belum dikenali' : 'Pilih provider di bawah');
+  $('#detectedProvider').textContent = provider || 'Pilih provider di atas';
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
-  $('#detectionStatus').textContent = provider ? 'Terpilih' : 'Otomatis';
+  $('#detectionStatus').textContent = provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
   saveTransactionDraft();
 }
 
-function renderProviderChoices() {
+function renderProviderChoices(query = '') {
   const providers = availableProviders(state.selectedType);
-  $('#providerCount').textContent = `${providers.length} provider`;
-  $('#providerChoices').innerHTML = providers.length
-    ? providers.map(provider => {
+  const needle = String(query).trim().toLocaleLowerCase('id');
+  const visible = needle ? providers.filter(provider => provider.toLocaleLowerCase('id').includes(needle)) : providers;
+  $('#providerCount').textContent = needle ? `${visible.length} dari ${providers.length}` : `${providers.length} provider`;
+  $('#providerChoices').innerHTML = visible.length
+    ? visible.map(provider => {
       const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && product.provider === provider).length;
-      return `<button type="button" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
+      return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
     }).join('')
-    : '<p class="provider-empty">Provider sedang disinkronkan dari Pulsa24Jam.</p>';
-  $$('#providerChoices button').forEach(button => button.onclick = () => updateProviderDetection(button.dataset.provider));
+    : '<p class="provider-empty">Provider tidak ditemukan.</p>';
+  $$('#providerChoices button').forEach(button => button.onclick = () => {
+    updateProviderDetection(button.dataset.provider);
+    $('#targetInput').focus();
+  });
 }
 
 function prepareProductFinder(type) {
@@ -455,6 +461,7 @@ function prepareProductFinder(type) {
   $('#targetPrefix').textContent = inputConfig.prefix;
   $('#targetInput').placeholder = inputConfig.placeholder;
   $('#targetInput').autocomplete = inputConfig.autocomplete;
+  $('#providerSearch').value = '';
   hideProductSelection();
   $('#targetInput').value = '';
   renderProviderChoices();
@@ -593,9 +600,13 @@ $('#allServices').onclick = () => showPage('services');
 
 $('#targetInput').addEventListener('input', event => {
   if (['Pulsa','Paket Data'].includes(state.selectedType)) {
-    updateProviderDetection(matchingAvailableProvider(detectOperator(event.target.value)));
+    const detected = matchingAvailableProvider(detectOperator(event.target.value));
+    if (detected) updateProviderDetection(detected);
+    else saveTransactionDraft();
   } else saveTransactionDraft();
 });
+
+$('#providerSearch').addEventListener('input', event => renderProviderChoices(event.target.value));
 
 $('#showProductsBtn').onclick = () => {
   const target = $('#targetInput').value.trim();
