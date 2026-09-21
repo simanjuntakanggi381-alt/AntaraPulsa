@@ -111,7 +111,7 @@ func catalogProducts(items []h2hr.Product) []model.Product {
 		}
 		seen[sku] = struct{}{}
 		// Pulsa24Jam is authoritative: retain its category/provider hierarchy.
-		provider := strings.TrimSpace(item.Brand)
+		provider := displayProvider(item.Brand, item.Category, sku, name)
 		category := strings.TrimSpace(item.Category)
 		if provider == "" {
 			provider = "Pulsa24Jam"

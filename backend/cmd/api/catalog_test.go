@@ -1,8 +1,10 @@
 package main
 
 import (
+	"strings"
 	"testing"
 
+	"antarapulsa/backend/internal/catalog"
 	"antarapulsa/backend/internal/h2hr"
 )
 
@@ -18,7 +20,7 @@ func TestCatalogProductsMapsProviderCategoryAndPrice(t *testing.T) {
 	if pulsa.ID != "TSEL10" || pulsa.Provider != "Telkomsel" || pulsa.Type != "Pulsa" || pulsa.Price != 10750 {
 		t.Fatalf("unexpected pulsa mapping: %+v", pulsa)
 	}
-	if data.Provider != "Pulsa24Jam" || data.Type != "Data" {
+	if data.Provider != "XL" || data.Type != "Data" {
 		t.Fatalf("unexpected data mapping: %+v", data)
 	}
 }
@@ -68,5 +70,32 @@ func TestNormalizeCategoryPreservesOrMapsProviderCategory(t *testing.T) {
 	}
 	if got := normalizeCategory("Produk Khusus", "", "Layanan premium"); got != "Produk Khusus" {
 		t.Fatalf("unknown provider category should remain visible, got %q", got)
+	}
+}
+
+func TestCatalogHasSpecificProvidersForEveryH2HRProduct(t *testing.T) {
+	items, err := catalog.Snapshot()
+	if err != nil {
+		t.Fatal(err)
+	}
+	products := catalogProducts(items)
+	if len(products) != 15026 {
+		t.Fatalf("want 15026 products, got %d", len(products))
+	}
+	generic := map[string]bool{"": true, "asuransi": true, "multifinance": true, "pbb": true, "paket data": true, "samsat": true, "pdam": true, "gas": true, "bank": true, "voucher": true}
+	providersByCategory := map[string]map[string]struct{}{}
+	for _, product := range products {
+		if providersByCategory[product.Type] == nil {
+			providersByCategory[product.Type] = map[string]struct{}{}
+		}
+		providersByCategory[product.Type][product.Provider] = struct{}{}
+		if generic[strings.ToLower(strings.TrimSpace(product.Provider))] {
+			t.Errorf("SKU %s still has generic provider %q", product.ID, product.Provider)
+		}
+	}
+	for category, minimum := range map[string]int{"Bank Transfer": 80, "Transfer Bank": 100, "Tagihan Air": 300, "Multifinance": 50, "Game": 50} {
+		if len(providersByCategory[category]) < minimum {
+			t.Errorf("%s only has %d specific providers, want at least %d", category, len(providersByCategory[category]), minimum)
+		}
 	}
 }

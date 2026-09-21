@@ -222,6 +222,8 @@ const providerDomains = {
   bpjs:'bpjs-kesehatan.go.id', 'bpjs kesehatan':'bpjs-kesehatan.go.id', 'bpjs ketenagakerjaan':'bpjsketenagakerjaan.go.id',
   indihome:'indihome.co.id', telkom:'telkom.co.id', firstmedia:'firstmedia.com', myrepublic:'myrepublic.co.id', bnetfit:'bnetfit.id', bstation:'bilibili.tv', cbn:'cbn.id', centrin:'centrin.net.id', globalxtreme:'globalxtreme.net', iconnet:'iconnet.id', oxygen:'oxygen.id', transvision:'transvision.co.id', wetv:'wetv.vip', 'xl home':'xlhome.co.id',
   vidio:'vidio.com', garena:'garena.co.id', 'tix id':'tix.id', steam:'steampowered.com', 'mobile legend':'mobilelegends.com', 'free fire':'ff.garena.com', pubg:'pubgmobile.com', roblox:'roblox.com', valorant:'playvalorant.com',
+  'acc finance':'acc.co.id', 'adira finance':'adira.co.id', 'aeon cicilan':'aeon.co.id', 'baf':'baf.id', 'bca finance':'bcafinance.co.id', 'bfi finance':'bfi.co.id', 'clipan finance':'clipan.co.id', 'fifgroup':'fifgroup.co.id', 'home credit':'homecredit.co.id', 'indomobil finance':'indomobilfinance.com', 'kredit plus (finansia)':'kreditplus.com', 'mandala finance':'mandalafinance.com', 'mandiri tunas finance':'mtf.co.id', 'mega auto finance':'maf.co.id', 'oto kredit motor':'oto.co.id', 'suzuki finance':'suzukifinance.co.id', 'wom finance':'wom.co.id',
+  'prudential':'prudential.co.id', 'ifg life':'ifg-life.id', 'jiwasraya':'jiwasraya.co.id', 'tokio marine':'tokiomarine.com',
   '8 ball pool':'miniclip.com', 'age of empires mobile':'aoemobile.com', 'arena breakout':'arenabreakout.com', 'arena of valor':'arenaofvalor.com', 'black clover m':'bcm.garena.com', 'blood strike':'blood-strike.com', 'call of duty mobile':'callofduty.com', 'crystal of atlan':'coa.nvsgames.com', 'delta force':'playdeltaforce.com', 'dragon raja':'dragonraja.archosaur.com', 'farlight 84':'farlight84.com', 'fc mobile':'ea.com', 'football master 2':'footballmaster2.com', 'genshin impact':'genshin.hoyoverse.com', growtopia:'growtopiagame.com', hago:'hago.me', 'honkai impact 3':'honkaiimpact3.hoyoverse.com', 'honkai star rail':'hsr.hoyoverse.com', 'honor of king':'honorofkings.com', 'identity v':'identityvgame.com', 'lords mobile':'lordsmobile.igg.com', 'magic chess':'magicchessgogo.com', 'marvel rivals':'marvelrivals.com', 'marvel snap':'marvelsnap.com', 'metal slug awakening':'metalslugawk.vnggames.com', 'point blank':'pointblank.id', 'pokemon unite':'unite.pokemon.com', 'racing master':'racingmaster.game', 'sausage man':'sausageman.com', 'speed drifters':'speed.garena.co.id', 'state of survival':'stateofsurvival.com', 'super sus':'supersus.io', undawn:'undawn.garena.com', 'wuthering waves':'wutheringwaves.kurogames.com', 'zenless zone zero':'zenless.hoyoverse.com'
 };
 const providerAssets = {
@@ -271,12 +273,16 @@ function providerFallback(type) { return `/assets/${providerFallbacks[type] || '
 function providerDomain(name) {
   const normalized = String(name || '').toLowerCase().replace(/[^a-z0-9. ]/g,'').trim();
   if (providerDomains[normalized]) return providerDomains[normalized];
-  const match = Object.keys(providerDomains).find(key => normalized.includes(key));
+  const match = Object.keys(providerDomains).find(key => key.length >= 5 && normalized.includes(key));
   return match ? providerDomains[match] : '';
 }
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
   if (pdamProviderAssets[normalized]) return pdamProviderAssets[normalized];
+  const pdamAlias = Object.keys(pdamProviderAssets)
+    .filter(key => key.length >= 9 && (normalized.includes(key) || key.includes(normalized)))
+    .sort((a,b) => b.length - a.length)[0];
+  if (pdamAlias) return pdamProviderAssets[pdamAlias];
   if (bankSymbolAssets[normalized]) return bankSymbolAssets[normalized];
   if (bankProviderKeys.has(normalized)) return `/assets/banks/provider-bank-${normalized}.svg`;
   const alias = Object.keys(providerAssets).find(key => normalized === key || normalized.includes(key.replace(/[^a-z0-9]/g, '')));
@@ -352,8 +358,15 @@ function availableProviders(type) {
 
 function canonicalProductType(type) {
   const normalized = String(type || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (normalized === 'listrik' || normalized === 'tokenpln') return 'Token PLN';
-  if (normalized === 'rtol') return 'Transfer Bank';
+  if (normalized === 'listrik' || normalized === 'tokenpln' || normalized === 'pln') return 'Token PLN';
+  if (normalized === 'rtol' || normalized === 'banktransfer') return 'Transfer Bank';
+  if (normalized === 'tagihanair') return 'PDAM';
+  if (normalized === 'tagihangas') return 'Gas';
+  if (normalized === 'pajakdaerah' || normalized === 'samsat') return 'Pajak';
+  if (normalized === 'pascabayar') return 'HP Pascabayar';
+  if (normalized === 'internettelco') return 'Internet & TV';
+  if (normalized === 'emoney') return 'E-Wallet';
+  if (normalized === 'pembayaran') return 'PPOB';
   if (normalized === 'tv' || normalized === 'tvstreaming') return 'TV & Streaming';
   return String(type || 'Lainnya');
 }
