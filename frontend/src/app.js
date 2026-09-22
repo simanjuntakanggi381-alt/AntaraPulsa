@@ -324,7 +324,7 @@ $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter')
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || p.provider === provider));
+  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || productMatchesProvider(p, provider, filter)));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
@@ -356,8 +356,18 @@ function availableProviders(type) {
   return [...new Set(state.products
     .filter(product => canonicalProductType(product.type) === canonicalType)
     .map(product => product.provider)
+    .filter(provider => !(canonicalType === 'Pulsa' && provider.toLowerCase() === 'xl/axis'))
     .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))]
     .sort((a, b) => a.localeCompare(b, 'id'));
+}
+
+// XL/Axis is one shared upstream brand, not a third mobile operator. Keep all
+// 40 real H2HR SKUs visible inside both operator pages without a duplicate card.
+function productMatchesProvider(product, provider, type) {
+  if (product.provider === provider) return true;
+  return canonicalProductType(type) === 'Pulsa'
+    && product.provider.toLowerCase() === 'xl/axis'
+    && ['xl', 'axis'].includes(provider.toLowerCase());
 }
 
 function canonicalProductType(type) {
@@ -443,7 +453,7 @@ function renderProviderChoices(query = '') {
   $('#providerCount').textContent = needle ? `${visible.length} dari ${providers.length}` : `${providers.length} provider`;
   $('#providerChoices').innerHTML = visible.length
     ? visible.map(provider => {
-      const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && product.provider === provider).length;
+      const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && productMatchesProvider(product, provider, state.selectedType)).length;
       return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
     }).join('')
     : '<p class="provider-empty">Provider tidak ditemukan.</p>';
