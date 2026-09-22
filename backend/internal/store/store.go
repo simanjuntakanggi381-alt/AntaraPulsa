@@ -545,6 +545,9 @@ func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Trans
 	if p.PriceType == "OPEN_AMOUNT" {
 		return nil, p, errors.New("produk nominal bebas belum dapat dibeli")
 	}
+	if p.Price <= 0 {
+		return nil, p, errors.New("harga produk H2HR belum tersedia")
+	}
 	if s.db == nil {
 		return nil, p, errors.New("transaksi H2HR memerlukan PostgreSQL")
 	}

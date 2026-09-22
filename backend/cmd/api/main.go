@@ -72,11 +72,11 @@ func syncH2HRProducts(dataStore *store.Store) {
 		response, err := h2hr.New(config).Call(ctx, h2hr.Request{Commands: "PRODUK"})
 		if err != nil {
 			log.Printf("PRODUK H2HR tidak tersedia; memakai snapshot pemilik akun (%d SKU valid): %v", len(products), err)
-		} else if live := catalogProducts(response.Items); len(live) >= len(products) {
+		} else if live := catalogProducts(response.Items); liveCatalogUsable(live, products) {
 			products = live
 			log.Printf("memakai katalog live Pulsa24Jam (%d SKU valid)", len(products))
 		} else {
-			log.Printf("PRODUK H2HR tidak lengkap (%d SKU); memakai snapshot pemilik akun (%d SKU valid)", len(live), len(products))
+			log.Printf("PRODUK H2HR tidak lengkap atau harga/fee tidak valid (%d SKU); memakai snapshot pemilik akun (%d SKU valid)", len(live), len(products))
 		}
 	} else {
 		log.Printf("konfigurasi H2HR belum aktif; memakai snapshot pemilik akun (%d SKU valid)", len(products))
@@ -86,6 +86,34 @@ func syncH2HRProducts(dataStore *store.Store) {
 		return
 	}
 	log.Printf("katalog H2HR tersinkron: %d SKU aktif", len(products))
+}
+
+// A count alone cannot establish that an upstream export is usable for sales:
+// the dashboard may list every SKU while withholding all OPEN_AMOUNT fees.
+func liveCatalogUsable(live, snapshot []model.Product) bool {
+	if len(live) != len(snapshot) {
+		return false
+	}
+	known := make(map[string]model.Product, len(snapshot))
+	for _, product := range snapshot {
+		known[product.ID] = product
+	}
+	var liveFees, snapshotFees int64
+	for _, product := range live {
+		original, ok := known[product.ID]
+		if !ok || product.Type != original.Type || product.Name != original.Name || product.PriceType != original.PriceType {
+			return false
+		}
+		if product.PriceType == "OPEN_AMOUNT" {
+			liveFees += product.Fee
+		}
+	}
+	for _, product := range snapshot {
+		if product.PriceType == "OPEN_AMOUNT" {
+			snapshotFees += product.Fee
+		}
+	}
+	return snapshotFees == 0 || liveFees > 0
 }
 
 // catalogProducts converts every active Pulsa24Jam SKU into a retail item while
@@ -102,9 +130,6 @@ func catalogProducts(items []h2hr.Product) []model.Product {
 		}
 		if priceType == "" {
 			priceType = "FIXED"
-		}
-		if priceType != "OPEN_AMOUNT" && item.Price <= 0 {
-			continue
 		}
 		if _, duplicate := seen[sku]; duplicate {
 			continue

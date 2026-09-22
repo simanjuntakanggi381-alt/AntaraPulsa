@@ -275,9 +275,7 @@ const providerFallbacks = {
 function providerFallback(type) { return `/assets/${providerFallbacks[type] || 'service-lainnya-3d-compact.png'}`; }
 function providerDomain(name) {
   const normalized = String(name || '').toLowerCase().replace(/[^a-z0-9. ]/g,'').trim();
-  if (providerDomains[normalized]) return providerDomains[normalized];
-  const match = Object.keys(providerDomains).find(key => key.length >= 5 && normalized.includes(key));
-  return match ? providerDomains[match] : '';
+  return providerDomains[normalized] || '';
 }
 function pdamLookupKey(value) {
   return String(value || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '')
@@ -287,33 +285,24 @@ function pdamLookupKey(value) {
 function localProviderAsset(name) {
   const normalized = String(name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
   if (pdamProviderAssets[normalized]) return pdamProviderAssets[normalized];
-  if (normalized.length >= 9 && /^(pdam|pam|perumda|perumdam|ptair)/.test(normalized)) {
-    const lookup = pdamLookupKey(normalized);
-    const pdamAlias = Object.keys(pdamProviderAssets)
-      .filter(key => {
-        const candidate = pdamLookupKey(key);
-        return lookup.length >= 4 && candidate.length >= 4 && (lookup.includes(candidate) || candidate.includes(lookup));
-      })
-      .sort((a,b) => Math.abs(pdamLookupKey(a).length - lookup.length) - Math.abs(pdamLookupKey(b).length - lookup.length))[0];
-    if (pdamAlias) return pdamProviderAssets[pdamAlias];
-  }
   if (bankSymbolAssets[normalized]) return bankSymbolAssets[normalized];
   if (bankProviderKeys.has(normalized)) return `/assets/banks/provider-bank-${normalized}.svg`;
   if (providerAssets[normalized]) return providerAssets[normalized];
-  const alias = Object.keys(providerAssets).find(key => normalized.includes(key.replace(/[^a-z0-9]/g, '')));
-  return alias ? providerAssets[alias] : '';
+  return '';
 }
 function providerLogoMarkup(provider, type, className = '') {
-  const fallback = providerFallback(type), domain = providerDomain(provider);
   const providerKey = String(provider || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
   if (providerKey.includes('biznet') || providerKey.includes('bizznet')) {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
-  const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : fallback);
+  const domain = providerDomain(provider);
+  const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
+  const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
+  if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
   const providerClass = source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
-  return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" data-fallback="${fallback}" alt="" loading="lazy" decoding="async" onerror="if(this.src!==this.dataset.fallback)this.src=this.dataset.fallback"></span>`;
+  return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"/><span class="provider-logo-initials-fallback" hidden>${escapeText(initials)}</span></span>`;
 }
 function txRow(tx, detailed = false) {
   if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
@@ -336,7 +325,7 @@ $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-st
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
   const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || p.provider === provider));
-  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Nominal bebas · admin Rp ${money(p.fee)}` : `Rp ${money(p.price)}`}</strong></button>`).join('');
+  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? 'Nominal bebas · belum tersedia' : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
   $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
@@ -599,9 +588,10 @@ function selectProduct(id) {
   $('#selectedLogo').innerHTML = providerLogoMarkup(state.selected.provider,state.selected.type,'selected-provider-logo'); $('#selectedLogo').style.background = 'transparent';
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
-  $('#selectedPrice').textContent = openAmount ? `Nominal bebas + admin Rp ${money(state.selected.fee)}` : `Rp ${money(state.selected.price)}`;
-  $('#payBtn').disabled = openAmount;
-  $('#payBtn').firstChild.textContent = openAmount ? 'Nominal bebas segera tersedia ' : 'Bayar sekarang ';
+  const unavailable = openAmount || state.selected.price <= 0;
+  $('#selectedPrice').textContent = openAmount ? 'Nominal bebas · belum tersedia' : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
+  $('#payBtn').disabled = unavailable;
+  $('#payBtn').firstChild.textContent = unavailable ? 'Produk belum bisa dibeli ' : 'Bayar sekarang ';
   $('#checkoutTarget').textContent = $('#targetInput').value.trim();
   $('.checkout-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
@@ -634,6 +624,7 @@ $('#showProductsBtn').onclick = () => {
 };
 
 $('#payBtn').onclick = async () => {
+  if (!state.selected || state.selected.price_type === 'OPEN_AMOUNT' || state.selected.price <= 0) return;
   const target = $('#targetInput').value.trim(); if (!target) { showToast('Nomor belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
   const btn = $('#payBtn'); btn.disabled = true; btn.firstChild.textContent = 'Memproses... ';
   try {

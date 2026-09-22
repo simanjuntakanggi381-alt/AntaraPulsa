@@ -43,6 +43,14 @@ func TestPurchaseDeductsBalance(t *testing.T) {
 	}
 }
 
+func TestH2HRPurchaseRejectsMissingPrice(t *testing.T) {
+	s := New()
+	s.products = []model.Product{{ID: "H2HR-ZERO", Provider: "Telkomsel", Name: "Produk H2HR", Type: "Pulsa", Price: 0, PriceType: "FIXED"}}
+	if _, _, err := s.PrepareH2HRPurchase(1, "H2HR-ZERO", "081299999999"); err == nil || err.Error() != "harga produk H2HR belum tersedia" {
+		t.Fatalf("harga nol harus ditolak sebelum debit, got %v", err)
+	}
+}
+
 func TestAuthentication(t *testing.T) {
 	s := New()
 	if _, ok := s.Authenticate("081234567890", "pulsa123"); !ok {

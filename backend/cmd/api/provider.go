@@ -71,12 +71,15 @@ var namedAliases = []providerAlias{
 	{"GoPay", []string{"GOPAY"}}, {"OVO", []string{" OVO "}}, {"ShopeePay", []string{"SHOPEE"}},
 }
 
+var walletAliases = []providerAlias{
+	{"DANA", []string{" DANA "}}, {"GoPay", []string{"GOPAY"}},
+	{"OVO", []string{" OVO "}}, {"ShopeePay", []string{"SHOPEE"}},
+	{"LinkAja", []string{"LINKAJA"}},
+}
+
 func displayProvider(brand, category, sku, name string) string {
 	brand = strings.TrimSpace(brand)
 	upperName := " " + strings.ToUpper(strings.Join(strings.Fields(name), " ")) + " "
-	if replacement := aliasMatch(upperName, namedAliases); replacement != "" && isGenericProvider(brand, category) {
-		return replacement
-	}
 	if !isGenericProvider(brand, category) {
 		if strings.EqualFold(brand, "shopee") {
 			return "ShopeePay"
@@ -111,6 +114,9 @@ func displayProvider(brand, category, sku, name string) string {
 		}
 		return publicProvider(upperName, "Voucher Pulsa24Jam")
 	case "paket data":
+		if provider := aliasMatch(upperName, namedAliases); provider != "" {
+			return provider
+		}
 		if strings.Contains(upperName, "PRODUK PO") {
 			return "Produk PO"
 		}
@@ -136,7 +142,7 @@ func bankProvider(upperName string) string {
 	text = strings.ReplaceAll(text, "PT. BANK ", "BANK ")
 	text = strings.ReplaceAll(text, "PT BANK ", "BANK ")
 	padded := " " + text + " "
-	if provider := aliasMatch(padded, namedAliases); provider != "" {
+	if provider := aliasMatch(padded, walletAliases); provider != "" {
 		return provider
 	}
 	if provider := aliasMatch(padded, bankAliases); provider != "" {

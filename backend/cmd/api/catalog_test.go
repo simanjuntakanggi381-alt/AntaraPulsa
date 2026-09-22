@@ -6,6 +6,7 @@ import (
 
 	"antarapulsa/backend/internal/catalog"
 	"antarapulsa/backend/internal/h2hr"
+	"antarapulsa/backend/internal/model"
 )
 
 func TestCatalogProductsMapsProviderCategoryAndPrice(t *testing.T) {
@@ -20,8 +21,35 @@ func TestCatalogProductsMapsProviderCategoryAndPrice(t *testing.T) {
 	if pulsa.ID != "TSEL10" || pulsa.Provider != "Telkomsel" || pulsa.Type != "Pulsa" || pulsa.Price != 10750 {
 		t.Fatalf("unexpected pulsa mapping: %+v", pulsa)
 	}
-	if data.Provider != "XL" || data.Type != "Data" {
+	if data.Provider != "Pulsa24Jam" || data.Type != "Data" {
 		t.Fatalf("unexpected data mapping: %+v", data)
+	}
+}
+
+func TestGenericProviderNamesStayWithinTheirService(t *testing.T) {
+	cases := []struct{ brand, category, sku, name, want string }{
+		{"PDAM", "Tagihan Air", "AIR001", "PDAM TRI TIRTA ACEH", "PDAM Tri Tirta Aceh"},
+		{"Multifinance", "Multifinance", "MFSMART", "SMART FINANCE", "Smart Finance"},
+		{"Bank", "Transfer Bank", "DBJAGO", "BANK JAGO", "Bank Jago"},
+		{"Bank", "Transfer Bank", "CEKDANA", "CEK NAMA DANA ELEKTRIK", "DANA"},
+		{"Voucher", "Voucher Data", "NETFLIX1", "VOUCHER NETFLIX HARIAN", "Netflix"},
+	}
+	for _, tc := range cases {
+		if got := displayProvider(tc.brand, tc.category, tc.sku, tc.name); got != tc.want {
+			t.Errorf("%s: want %q, got %q", tc.sku, tc.want, got)
+		}
+	}
+}
+
+func TestLiveCatalogRejectsMissingFees(t *testing.T) {
+	snapshot := []model.Product{{ID: "A", PriceType: "FIXED", Price: 1000}, {ID: "B", PriceType: "OPEN_AMOUNT", Fee: 1500}}
+	live := []model.Product{{ID: "A", PriceType: "FIXED", Price: 1000}, {ID: "B", PriceType: "OPEN_AMOUNT", Fee: 0}}
+	if liveCatalogUsable(live, snapshot) {
+		t.Fatal("live catalog with missing open-amount fees must not replace snapshot")
+	}
+	live[1].Fee = 1500
+	if !liveCatalogUsable(live, snapshot) {
+		t.Fatal("complete live catalog should be usable")
 	}
 }
 
@@ -81,6 +109,26 @@ func TestCatalogHasSpecificProvidersForEveryH2HRProduct(t *testing.T) {
 	products := catalogProducts(items)
 	if len(products) != 15026 {
 		t.Fatalf("want 15026 products, got %d", len(products))
+	}
+	bySKU := make(map[string]model.Product, len(products))
+	for _, product := range products {
+		bySKU[product.ID] = product
+	}
+	for _, item := range items {
+		product, ok := bySKU[item.SKU]
+		if !ok {
+			t.Fatalf("upstream SKU %s missing from retail catalog", item.SKU)
+		}
+		if product.Name != item.Name || product.Type != item.Category || product.PriceType != item.PriceType {
+			t.Fatalf("upstream fields changed for SKU %s: %+v", item.SKU, product)
+		}
+		if item.PriceType == "OPEN_AMOUNT" {
+			if product.Price != 0 || product.Fee != item.AdditionalFee {
+				t.Fatalf("open amount fee changed for SKU %s: %+v", item.SKU, product)
+			}
+		} else if product.Price != item.Price+item.AdditionalFee {
+			t.Fatalf("fixed price changed for SKU %s: %+v", item.SKU, product)
+		}
 	}
 	generic := map[string]bool{"": true, "asuransi": true, "multifinance": true, "pbb": true, "paket data": true, "samsat": true, "pdam": true, "gas": true, "bank": true, "voucher": true}
 	providersByCategory := map[string]map[string]struct{}{}
