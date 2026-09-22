@@ -589,7 +589,7 @@ function updateCheckoutAmount() {
   const unavailable = openAmount ? !validQty : state.selected.price <= 0;
   $('#selectedPrice').textContent = openAmount ? (validQty ? `Rp ${money(qty + state.selected.fee)} (termasuk admin Rp ${money(state.selected.fee)})` : 'Isi nominal untuk melihat total') : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
   $('#payBtn').disabled = unavailable;
-  $('#payBtn').firstChild.textContent = unavailable ? (openAmount ? 'Isi nominal dahulu ' : 'Harga belum tersedia ') : 'Bayar sekarang ';
+  $('#payBtn').firstChild.textContent = unavailable ? (openAmount ? 'Isi nominal dahulu ' : 'Harga belum tersedia ') : 'Lanjut Pembayaran ';
 }
 $('#openAmountInput').addEventListener('input', updateCheckoutAmount);
 function selectProduct(id) {
@@ -634,20 +634,62 @@ $('#showProductsBtn').onclick = () => {
   $('#productResults').scrollIntoView({ behavior:'smooth', block:'start' });
 };
 
-$('#payBtn').onclick = async () => {
+document.body.insertAdjacentHTML('beforeend', `<div id="checkoutSheet" class="checkout-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="checkoutSheetTitle"><div class="checkout-sheet-card"><div class="checkout-sheet-head"><div><small>CHECKOUT</small><h2 id="checkoutSheetTitle">Konfirmasi pembelian</h2></div><button id="closeCheckoutSheet" type="button" aria-label="Tutup checkout">×</button></div><div id="checkoutSheetDetails" class="checkout-sheet-details"></div><label class="checkout-sheet-label" for="checkoutSheetTarget">Nomor tujuan / ID pelanggan</label><input id="checkoutSheetTarget" class="checkout-sheet-target" autocomplete="off"><p id="checkoutSheetWarning" class="checkout-sheet-warning hidden"></p><button id="confirmPayBtn" class="primary-btn" type="button">Bayar</button><button id="checkoutTopupBtn" class="primary-btn hidden" type="button">Isi saldo dahulu</button><p class="checkout-sheet-note">Transaksi diproses melalui Pulsa24Jam. Pembayaran tidak dikirim ulang otomatis.</p></div></div>`);
+function checkoutTotal() {
+  return state.selected?.price_type === 'OPEN_AMOUNT' ? Number($('#openAmountInput').value) + Number(state.selected.fee || 0) : Number(state.selected?.price || 0);
+}
+function refreshCheckoutSheet() {
+  if (!state.selected) return;
+  const product = state.selected;
+  const total = checkoutTotal();
+  const balance = Number(state.user?.balance || 0);
+  const shortfall = Math.max(0, total - balance);
+  const rows = [
+    ['Produk', product.name],
+    ...(product.price_type === 'OPEN_AMOUNT' ? [['Nominal', `Rp ${money(Number($('#openAmountInput').value))}`], ['Fee admin', `Rp ${money(product.fee)}`]] : [['Harga', `Rp ${money(product.price)}`]]),
+    ['Saldo utama', `Rp ${money(balance)}`],
+    ['Total bayar', `Rp ${money(total)}`],
+  ];
+  $('#checkoutSheetTitle').textContent = product.name;
+  $('#checkoutSheetDetails').innerHTML = rows.map(([label,value]) => `<div><span>${escapeText(label)}</span><b>${escapeText(value)}</b></div>`).join('');
+  $('#checkoutSheetWarning').textContent = shortfall ? `Saldo kurang Rp ${money(shortfall)}. Isi saldo untuk melanjutkan pembelian.` : '';
+  $('#checkoutSheetWarning').classList.toggle('hidden', !shortfall);
+  $('#confirmPayBtn').classList.toggle('hidden', !!shortfall);
+  $('#checkoutTopupBtn').classList.toggle('hidden', !shortfall);
+}
+function closeCheckoutSheet() { $('#checkoutSheet').classList.add('hidden'); }
+$('#closeCheckoutSheet').onclick = closeCheckoutSheet;
+$('#checkoutSheet').onclick = event => { if (event.target.id === 'checkoutSheet') closeCheckoutSheet(); };
+$('#checkoutTopupBtn').onclick = () => { closeCheckoutSheet(); showPage('topup'); };
+$('#payBtn').onclick = () => {
   if (!state.selected) return;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
   const qty = openAmount ? Number($('#openAmountInput').value) : 0;
   if (openAmount ? !Number.isSafeInteger(qty) || qty <= 0 || qty > 1_000_000_000 : state.selected.price <= 0) return;
   const target = $('#targetInput').value.trim(); if (!target) { showToast('Nomor belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
-  const btn = $('#payBtn'); btn.disabled = true; btn.firstChild.textContent = 'Memproses... ';
+  $('#checkoutSheetTarget').value = target;
+  refreshCheckoutSheet();
+  $('#checkoutSheet').classList.remove('hidden');
+};
+$('#confirmPayBtn').onclick = async () => {
+  if (!state.selected) return;
+  const qty = state.selected.price_type === 'OPEN_AMOUNT' ? Number($('#openAmountInput').value) : 0;
+  const target = $('#checkoutSheetTarget').value.trim();
+  if (!target) { showToast('Tujuan belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
+  if (checkoutTotal() > Number(state.user?.balance || 0)) { refreshCheckoutSheet(); return; }
+  const btn = $('#confirmPayBtn'); btn.disabled = true; btn.textContent = 'Memproses...';
   try {
     const tx = await api('/api/purchase', {method:'POST', body:JSON.stringify({ProductID:state.selected.id, Target:target, Qty:qty})});
     state.transactions.unshift(tx); setUser(await api('/api/me')); renderRecent(); renderHistory();
-    $('#modalDetail').innerHTML = `<div><span>ID transaksi</span><b>${tx.id}</b></div><div><span>Produk</span><b>${tx.product}</b></div><div><span>Tujuan</span><b>${tx.target}</b></div><div><span>Total</span><b>Rp ${money(tx.amount)}</b></div>`;
-    $('#modal').classList.add('show'); $('#targetInput').value = '';
+    const refunded = tx.status === 'Dana dikembalikan';
+    const success = tx.status === 'Berhasil';
+    $('#modal .success-ring').textContent = refunded ? '↺' : success ? '✓' : '…';
+    $('#modal h2').textContent = refunded ? 'Dana dikembalikan ke saldo' : success ? 'Transaksi berhasil!' : 'Transaksi sedang diproses';
+    $('#modal .modal-card > p').textContent = refunded ? 'P24 menolak transaksi. Saldo utama sudah dikembalikan.' : success ? 'Produk telah berhasil diproses.' : 'Jangan bayar ulang. Pantau statusnya di riwayat transaksi.';
+    $('#modalDetail').innerHTML = `<div><span>Invoice</span><b>${escapeText(tx.id)}</b></div><div><span>Produk</span><b>${escapeText(tx.product)}</b></div><div><span>Tujuan</span><b>${escapeText(tx.target)}</b></div><div><span>Status</span><b>${escapeText(tx.status)}</b></div><div><span>Total bayar</span><b>Rp ${money(tx.amount)}</b></div><div><span>Metode bayar</span><b>Saldo utama</b></div>`;
+    closeCheckoutSheet(); $('#modal').classList.add('show'); $('#targetInput').value = '';
   } catch(err) { showToast('Transaksi gagal', err.message); }
-  finally { updateCheckoutAmount(); }
+  finally { btn.disabled = false; btn.textContent = 'Bayar'; updateCheckoutAmount(); }
 };
 
 $('#closeModal').onclick = () => $('#modal').classList.remove('show');

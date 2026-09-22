@@ -64,6 +64,14 @@ func TestH2HROpenAmountRequiresValidNominal(t *testing.T) {
 	}
 }
 
+func TestH2HRStatusMapping(t *testing.T) {
+	for input, want := range map[string]string{"2": "Berhasil", "success": "Berhasil", "3": "Gagal", "failed": "Gagal", "1": "Diproses"} {
+		if got := normalizePurchaseStatus(input); got != want {
+			t.Errorf("status %q: got %q, want %q", input, got, want)
+		}
+	}
+}
+
 func TestAuthentication(t *testing.T) {
 	s := New()
 	if _, ok := s.Authenticate("081234567890", "pulsa123"); !ok {

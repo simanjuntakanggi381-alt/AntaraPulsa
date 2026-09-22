@@ -470,9 +470,12 @@ func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
 		// A body from P24 proves that the request was rejected. When no body was
 		// received the outcome is ambiguous, so keep it pending for reconciliation.
 		if len(result.Raw) > 0 && !result.OK {
-			_ = h.store.ResolveH2HRPurchase(tx.ID, "failed")
-			tx.Status = "Gagal"
-			respond(w, http.StatusBadGateway, map[string]string{"error": providerErr.Error()})
+			if err := h.store.ResolveH2HRPurchase(tx.ID, "failed"); err != nil {
+				respond(w, http.StatusInternalServerError, map[string]string{"error": "Status refund belum dapat dipastikan; hubungi operator dengan ID " + tx.ID})
+				return
+			}
+			tx.Status = "Dana dikembalikan"
+			respond(w, 201, tx)
 			return
 		}
 		tx.Status = "Diproses"
@@ -483,11 +486,14 @@ func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
 	if providerStatus == 0 {
 		providerStatus = result.Status
 	}
-	_ = h.store.ResolveH2HRPurchase(tx.ID, strconv.Itoa(providerStatus))
+	if err := h.store.ResolveH2HRPurchase(tx.ID, strconv.Itoa(providerStatus)); err != nil {
+		respond(w, http.StatusInternalServerError, map[string]string{"error": "Status transaksi belum dapat dipastikan; hubungi operator dengan ID " + tx.ID})
+		return
+	}
 	if providerStatus == 2 {
 		tx.Status = "Berhasil"
 	} else if providerStatus == 3 {
-		tx.Status = "Gagal"
+		tx.Status = "Dana dikembalikan"
 	} else {
 		tx.Status = "Diproses"
 	}

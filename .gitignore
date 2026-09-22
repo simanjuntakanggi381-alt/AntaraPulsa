@@ -12,6 +12,8 @@ frontend/.npm-cache/
 .env
 **/.env
 *.log
+.antarapulsa-*-deploy
+.antarapulsa-*-deploy.pub
 
 # Editors / OS
 .vscode/

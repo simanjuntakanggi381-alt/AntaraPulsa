@@ -596,7 +596,7 @@ func (s *Store) ResolveH2HRPurchase(refID, status string) error {
 	if err = tx.QueryRow(`SELECT user_id,amount,status FROM transactions WHERE id=$1 FOR UPDATE`, refID).Scan(&uid, &amount, &current); err != nil {
 		return err
 	}
-	if current == "Berhasil" || current == "Gagal" {
+	if current == "Berhasil" || current == "Gagal" || current == "Dana dikembalikan" {
 		return tx.Commit()
 	}
 	switch normalizePurchaseStatus(status) {
@@ -604,7 +604,7 @@ func (s *Store) ResolveH2HRPurchase(refID, status string) error {
 		_, err = tx.Exec(`UPDATE transactions SET status='Berhasil' WHERE id=$1`, refID)
 	case "Gagal":
 		if _, err = tx.Exec(`UPDATE users SET balance=balance+$1 WHERE id=$2`, amount, uid); err == nil {
-			_, err = tx.Exec(`UPDATE transactions SET status='Gagal' WHERE id=$1`, refID)
+			_, err = tx.Exec(`UPDATE transactions SET status='Dana dikembalikan' WHERE id=$1`, refID)
 		}
 	default:
 		_, err = tx.Exec(`UPDATE transactions SET status='Diproses' WHERE id=$1`, refID)
