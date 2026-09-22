@@ -534,7 +534,7 @@ func (s *Store) Product(id string) (model.Product, bool) {
 
 // PrepareH2HRPurchase reserves the member balance and persists a pending
 // transaction before any request is sent to the upstream provider.
-func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Transaction, model.Product, error) {
+func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string, qty int64) (*model.Transaction, model.Product, error) {
 	p, ok := s.Product(pid)
 	if !ok {
 		return nil, p, errors.New("produk tidak ditemukan")
@@ -542,10 +542,19 @@ func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Trans
 	if target == "" {
 		return nil, p, errors.New("nomor tujuan wajib diisi")
 	}
+	amount := p.Price
 	if p.PriceType == "OPEN_AMOUNT" {
-		return nil, p, errors.New("produk nominal bebas belum dapat dibeli")
+		if qty <= 0 || qty > 1_000_000_000 {
+			return nil, p, errors.New("nominal harus antara Rp 1 dan Rp 1.000.000.000")
+		}
+		if p.Fee < 0 || p.Fee > 1_000_000_000 {
+			return nil, p, errors.New("biaya admin H2HR tidak valid")
+		}
+		amount = qty + p.Fee
+	} else if qty != 0 {
+		return nil, p, errors.New("nominal hanya boleh diisi untuk produk nominal bebas")
 	}
-	if p.Price <= 0 {
+	if amount <= 0 {
 		return nil, p, errors.New("harga produk H2HR belum tersedia")
 	}
 	if s.db == nil {
@@ -556,7 +565,7 @@ func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Trans
 		return nil, p, err
 	}
 	defer tx.Rollback()
-	r, err := tx.Exec(`UPDATE users SET balance=balance-$1 WHERE id=$2 AND balance >= $1`, p.Price, uid)
+	r, err := tx.Exec(`UPDATE users SET balance=balance-$1 WHERE id=$2 AND balance >= $1`, amount, uid)
 	if err != nil {
 		return nil, p, err
 	}
@@ -564,7 +573,7 @@ func (s *Store) PrepareH2HRPurchase(uid int64, pid, target string) (*model.Trans
 	if n == 0 {
 		return nil, p, errors.New("saldo tidak cukup atau akun tidak ditemukan")
 	}
-	x := &model.Transaction{ID: fmt.Sprintf("AP-%d", time.Now().UnixNano()), UserID: uid, Type: p.Type, Provider: p.Provider, Product: p.Name, Target: target, Amount: p.Price, Status: "Diproses", CreatedAt: time.Now()}
+	x := &model.Transaction{ID: fmt.Sprintf("AP-%d", time.Now().UnixNano()), UserID: uid, Type: p.Type, Provider: p.Provider, Product: p.Name, Target: target, Amount: amount, Status: "Diproses", CreatedAt: time.Now()}
 	if _, err = tx.Exec(`INSERT INTO transactions (id,user_id,type,provider,product,target,amount,status,created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, x.ID, x.UserID, x.Type, x.Provider, x.Product, x.Target, x.Amount, x.Status, x.CreatedAt); err != nil {
 		return nil, p, err
 	}

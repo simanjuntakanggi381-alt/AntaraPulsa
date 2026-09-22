@@ -298,6 +298,9 @@
 .provider-logo-shell > img { display: block; width: 32px; height: 32px; max-width: 32px; max-height: 32px; object-fit: contain; object-position: center; transform: none; filter: none; }
 .provider-logo-shell > img { image-rendering: auto; }
 .provider-logo-initials, .provider-logo-initials-fallback { color: var(--provider-color); font-size: 13px; font-weight: 800; letter-spacing: -.04em; }
+.open-amount-row { display: grid; gap: 8px; margin: 16px 0; font-weight: 700; }
+.open-amount-row.hidden { display: none; }
+.open-amount-row input { box-sizing: border-box; width: 100%; padding: 13px 15px; border: 1px solid #cdded7; border-radius: 12px; font: inherit; }
 .provider-logo-pgn { position: relative; }
 .provider-logo-pgn > img { position: absolute; left: 4px; width: 110px; height: 32px; max-width: none; max-height: none; object-fit: fill; }
 .provider-logo-indihome > img { width: 39px; height: 24px; max-width: 39px; max-height: 24px; }

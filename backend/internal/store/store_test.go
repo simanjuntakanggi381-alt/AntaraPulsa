@@ -46,8 +46,21 @@ func TestPurchaseDeductsBalance(t *testing.T) {
 func TestH2HRPurchaseRejectsMissingPrice(t *testing.T) {
 	s := New()
 	s.products = []model.Product{{ID: "H2HR-ZERO", Provider: "Telkomsel", Name: "Produk H2HR", Type: "Pulsa", Price: 0, PriceType: "FIXED"}}
-	if _, _, err := s.PrepareH2HRPurchase(1, "H2HR-ZERO", "081299999999"); err == nil || err.Error() != "harga produk H2HR belum tersedia" {
+	if _, _, err := s.PrepareH2HRPurchase(1, "H2HR-ZERO", "081299999999", 0); err == nil || err.Error() != "harga produk H2HR belum tersedia" {
 		t.Fatalf("harga nol harus ditolak sebelum debit, got %v", err)
+	}
+}
+
+func TestH2HROpenAmountRequiresValidNominal(t *testing.T) {
+	s := New()
+	s.products = []model.Product{{ID: "H2HR-OPEN", Provider: "DANA", Name: "DANA bebas nominal", Type: "E-Wallet", PriceType: "OPEN_AMOUNT", Fee: 0}}
+	for _, qty := range []int64{0, -1, 1_000_000_001} {
+		if _, _, err := s.PrepareH2HRPurchase(1, "H2HR-OPEN", "081299999999", qty); err == nil || err.Error() != "nominal harus antara Rp 1 dan Rp 1.000.000.000" {
+			t.Fatalf("nominal %d harus ditolak, got %v", qty, err)
+		}
+	}
+	if _, _, err := s.PrepareH2HRPurchase(1, "H2HR-OPEN", "081299999999", 11_000); err == nil || err.Error() != "transaksi H2HR memerlukan PostgreSQL" {
+		t.Fatalf("nominal valid harus melewati validasi nominal, got %v", err)
 	}
 }
 

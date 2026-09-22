@@ -447,7 +447,11 @@ func (h *Handler) createDownline(w http.ResponseWriter, r *http.Request, id int6
 	respond(w, 201, u)
 }
 func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
-	var in struct{ ProductID, Target string }
+	var in struct {
+		ProductID string
+		Target    string
+		Qty       int64
+	}
 	if decode(r, &in) != nil {
 		respond(w, 400, map[string]string{"error": "Data tidak valid"})
 		return
@@ -456,12 +460,12 @@ func (h *Handler) purchase(w http.ResponseWriter, r *http.Request, id int64) {
 		respond(w, http.StatusServiceUnavailable, map[string]string{"error": "Transaksi provider sedang dinonaktifkan sampai katalog tervalidasi"})
 		return
 	}
-	tx, product, err := h.store.PrepareH2HRPurchase(id, strings.ToUpper(strings.TrimSpace(in.ProductID)), strings.TrimSpace(in.Target))
+	tx, product, err := h.store.PrepareH2HRPurchase(id, strings.ToUpper(strings.TrimSpace(in.ProductID)), strings.TrimSpace(in.Target), in.Qty)
 	if err != nil {
 		respond(w, 400, map[string]string{"error": err.Error()})
 		return
 	}
-	result, providerErr := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PAY", Product: product.ID, Dest: strings.TrimSpace(in.Target), Qty: 1, RefID: tx.ID})
+	result, providerErr := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PAY", Product: product.ID, Dest: strings.TrimSpace(in.Target), Qty: in.Qty, RefID: tx.ID})
 	if providerErr != nil {
 		// A body from P24 proves that the request was rejected. When no body was
 		// received the outcome is ambiguous, so keep it pending for reconciliation.

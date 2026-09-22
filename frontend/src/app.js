@@ -325,7 +325,7 @@ $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-st
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
   const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || p.provider === provider));
-  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? 'Nominal bebas · belum tersedia' : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
+  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
   $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
@@ -580,6 +580,18 @@ function renderServiceCategories() {
   grid.innerHTML = activeGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}">${serviceCategoryVisual(service)}<b>${escapeText(service.label)}</b><small>${counts[service.category]} produk</small></button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
+$('#selectedProduct .price-row').insertAdjacentHTML('beforebegin', '<label id="openAmountRow" class="open-amount-row hidden" for="openAmountInput"><span>Nominal transaksi (Rp)</span><input id="openAmountInput" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="Masukkan nominal"></label>');
+function updateCheckoutAmount() {
+  if (!state.selected) return;
+  const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
+  const qty = Number($('#openAmountInput').value);
+  const validQty = Number.isSafeInteger(qty) && qty > 0 && qty <= 1_000_000_000;
+  const unavailable = openAmount ? !validQty : state.selected.price <= 0;
+  $('#selectedPrice').textContent = openAmount ? (validQty ? `Rp ${money(qty + state.selected.fee)} (termasuk admin Rp ${money(state.selected.fee)})` : 'Isi nominal untuk melihat total') : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
+  $('#payBtn').disabled = unavailable;
+  $('#payBtn').firstChild.textContent = unavailable ? (openAmount ? 'Isi nominal dahulu ' : 'Harga belum tersedia ') : 'Bayar sekarang ';
+}
+$('#openAmountInput').addEventListener('input', updateCheckoutAmount);
 function selectProduct(id) {
   state.selected = state.products.find(p => p.id === id);
   renderProducts(state.selectedType, state.selectedProvider);
@@ -588,10 +600,9 @@ function selectProduct(id) {
   $('#selectedLogo').innerHTML = providerLogoMarkup(state.selected.provider,state.selected.type,'selected-provider-logo'); $('#selectedLogo').style.background = 'transparent';
   $('#selectedName').textContent = state.selected.name; $('#selectedProvider').textContent = state.selected.provider;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
-  const unavailable = openAmount || state.selected.price <= 0;
-  $('#selectedPrice').textContent = openAmount ? 'Nominal bebas · belum tersedia' : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
-  $('#payBtn').disabled = unavailable;
-  $('#payBtn').firstChild.textContent = unavailable ? 'Produk belum bisa dibeli ' : 'Bayar sekarang ';
+  $('#openAmountRow').classList.toggle('hidden', !openAmount);
+  $('#openAmountInput').value = '';
+  updateCheckoutAmount();
   $('#checkoutTarget').textContent = $('#targetInput').value.trim();
   $('.checkout-card').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
@@ -624,16 +635,19 @@ $('#showProductsBtn').onclick = () => {
 };
 
 $('#payBtn').onclick = async () => {
-  if (!state.selected || state.selected.price_type === 'OPEN_AMOUNT' || state.selected.price <= 0) return;
+  if (!state.selected) return;
+  const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
+  const qty = openAmount ? Number($('#openAmountInput').value) : 0;
+  if (openAmount ? !Number.isSafeInteger(qty) || qty <= 0 || qty > 1_000_000_000 : state.selected.price <= 0) return;
   const target = $('#targetInput').value.trim(); if (!target) { showToast('Nomor belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
   const btn = $('#payBtn'); btn.disabled = true; btn.firstChild.textContent = 'Memproses... ';
   try {
-    const tx = await api('/api/purchase', {method:'POST', body:JSON.stringify({ProductID:state.selected.id, Target:target})});
+    const tx = await api('/api/purchase', {method:'POST', body:JSON.stringify({ProductID:state.selected.id, Target:target, Qty:qty})});
     state.transactions.unshift(tx); setUser(await api('/api/me')); renderRecent(); renderHistory();
     $('#modalDetail').innerHTML = `<div><span>ID transaksi</span><b>${tx.id}</b></div><div><span>Produk</span><b>${tx.product}</b></div><div><span>Tujuan</span><b>${tx.target}</b></div><div><span>Total</span><b>Rp ${money(tx.amount)}</b></div>`;
     $('#modal').classList.add('show'); $('#targetInput').value = '';
   } catch(err) { showToast('Transaksi gagal', err.message); }
-  finally { btn.disabled = false; btn.firstChild.textContent = 'Bayar sekarang '; }
+  finally { updateCheckoutAmount(); }
 };
 
 $('#closeModal').onclick = () => $('#modal').classList.remove('show');
