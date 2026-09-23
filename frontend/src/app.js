@@ -142,7 +142,7 @@ $('#loginForm').addEventListener('submit', async e => {
 
 $('#togglePassword').onclick = () => { const input = $('#loginPassword'); input.type = input.type === 'password' ? 'text' : 'password'; };
 $('.google-login').onclick = () => { window.location.assign('/api/auth/google/login'); };
-$('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showLogin(); showPage('dashboard', { replace: true }); };
+$('#logoutBtn').onclick = async () => { await api('/api/logout', {method:'POST'}); showPage.clearSaved(); showLogin(); showPage('dashboard', { replace: true }); };
 $('#accountLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorLogout').onclick = () => $('#logoutBtn').click();
 $('#operatorMenuToggle').onclick = () => $('.operator-sidebar').classList.toggle('open');
