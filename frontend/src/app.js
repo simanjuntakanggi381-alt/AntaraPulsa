@@ -308,6 +308,21 @@ function financeProviderDomain(name) {
   ];
   return aliases.find(([terms]) => terms.split('|').some(term => value.includes(term)))?.[1] || providerDomain(name);
 }
+function financeOfficialAsset(name) {
+  const value = String(name || '').toLowerCase();
+  const assets = [
+    ['astra credit|acc finance','/assets/finance-official/acc.png'],
+    ['adira','/assets/finance-official/adira.svg'],
+    ['aeon','/assets/finance-official/aeon.svg'],
+    ['bca finance|bcaf','/assets/finance-official/bca-finance.png'],
+    ['fif','/assets/finance-official/fifgroup.png'],
+    ['kredit plus|kreditplus|finansia','/assets/finance-official/kreditplus.png'],
+    ['mandiri tunas|mtf','/assets/finance-official/mtf.png'],
+    ['toyota astra|taf','/assets/finance-official/taf.svg'],
+    ['wom','/assets/finance-official/wom.png']
+  ];
+  return assets.find(([terms]) => terms.split('|').some(term => value.includes(term)))?.[1] || '';
+}
 function pdamLookupKey(value) {
   return String(value || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '')
     .replace(/^(?:pdam|pam|perumdam|perumda|ptair)/, '')
@@ -350,10 +365,6 @@ function financeBrandIdentity(provider) {
 
 function providerLogoMarkup(provider, type, className = '') {
   const providerKey = String(provider || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
-  if (canonicalProductType(type) === 'Multifinance') {
-    const brand = financeBrandIdentity(provider);
-    return `<span class="provider-logo-shell provider-logo-finance ${className}" role="img" aria-label="${escapeText(provider)}" style="--finance-color:${brand.color};--finance-accent:${brand.accent}"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="17"/><path d="M12 17h40"/><circle cx="49" cy="15" r="5"/><text x="32" y="39" text-anchor="middle">${escapeText(brand.label)}</text><path d="M15 49h34"/></svg></span>`;
-  }
   if (providerKey.includes('biznet') || providerKey.includes('bizznet')) {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
@@ -362,7 +373,7 @@ function providerLogoMarkup(provider, type, className = '') {
   // catalogue consistent and avoids a mix of crests and initial placeholders.
   const source = canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
-    : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
+    : financeOfficialAsset(provider) || localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
   const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
   if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
