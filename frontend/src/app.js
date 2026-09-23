@@ -471,8 +471,13 @@ function renderHistory() {
 $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter').addEventListener('change', renderHistory); $('#historyDate').addEventListener('change', renderHistory);
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
+function isHiddenProviderForService(provider, type) {
+  const name = String(provider || '').trim().toLowerCase();
+  const service = canonicalProductType(type);
+  return name === 'garena' && (service === 'Game' || service === 'Voucher Digital');
+}
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => productBelongsToService(p, filter) && (!provider || productMatchesProvider(p, provider, filter)));
+  const list = state.products.filter(p => productBelongsToService(p, filter) && !isHiddenProviderForService(p.provider, filter) && (!provider || productMatchesProvider(p, provider, filter)));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${/CEK PLN/i.test(p.name) ? 'Cek tagihan' : p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
@@ -542,7 +547,7 @@ function availableProviders(type) {
     .filter(product => productBelongsToService(product, canonicalType))
     .map(product => product.provider)
     .filter(provider => !(canonicalType === 'Pulsa' && provider.toLowerCase() === 'xl/axis'))
-    .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))];
+    .filter(provider => !isHiddenProviderForService(provider, canonicalType)))];
   if (canonicalType !== 'Transfer Bank') return providers.sort((a, b) => a.localeCompare(b, 'id'));
 
   // Upstream includes legacy codes and duplicate aliases. Show only verified
