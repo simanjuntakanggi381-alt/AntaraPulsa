@@ -213,6 +213,11 @@ $$('[data-turnover-days]').forEach(button => button.onclick = () => { turnoverDa
 $('#applyTurnoverDays').onclick = () => { const value=Number($('#turnoverCustomDays').value); if(value<3||value>365){showToast('Jumlah hari tidak valid','Gunakan rentang 3 sampai 365 hari.');return;} turnoverDays=value; $$('[data-turnover-days]').forEach(item=>item.classList.remove('active')); renderTurnover(); };
 $('#turnoverSearch').oninput = renderTurnover; $('#refreshTurnover').onclick = renderTurnover;
 
+const transactionPage = $('#transactionPage');
+transactionPage.insertAdjacentHTML('afterend', '<section id="productsPage" class="page products-page"><div class="simple-head product-page-title"><span>KATALOG PRODUK</span><h1>Pilih produk.</h1><p>Produk yang tersedia untuk provider dan tujuan pilihanmu.</p></div><div class="product-catalog-flow"></div></section>');
+const productCatalogFlow = $('.product-catalog-flow');
+productCatalogFlow.append($('#productResults'), transactionPage.querySelector('.checkout-card'));
+
 const showPage = createNavigation();
 $('#menuBtn').onclick = () => $('.sidebar').classList.toggle('open');
 
@@ -469,6 +474,18 @@ function hideProductSelection() {
   $('#selectedEmpty').classList.add('hidden');
 }
 
+function openProductCatalog({ scroll = true } = {}) {
+  $('#productResults').classList.remove('hidden');
+  showPage('products', { scroll });
+}
+
+function closeProductCatalog() {
+  hideProductSelection();
+  saveTransactionDraft();
+  showPage('transaction');
+  requestAnimationFrame(() => $('#targetInput').focus({ preventScroll:true }));
+}
+
 function readTransactionDraft() {
   try { return JSON.parse(sessionStorage.getItem(TRANSACTION_DRAFT_KEY) || 'null'); }
   catch { return null; }
@@ -501,7 +518,7 @@ function restoreTransactionDraft() {
   const provider = availableProviders(state.selectedType).find(item => item.toLowerCase() === String(draft.provider || '').toLowerCase()) || '';
   updateProviderDetection(provider);
   if (draft.productsVisible && provider && draft.target) {
-    $('#productResults').classList.remove('hidden');
+    openProductCatalog({ scroll:false });
     renderProducts(state.selectedType, provider);
   }
   saveTransactionDraft();
@@ -776,14 +793,17 @@ $('#targetInput').addEventListener('input', event => {
 
 $('#providerSearch').addEventListener('input', event => renderProviderChoices(event.target.value));
 
+$('.product-results-head').insertAdjacentHTML('afterbegin', '<button id="backToFinderBtn" class="product-back" type="button" aria-label="Kembali memilih provider"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>');
+$('.product-results-head').insertAdjacentHTML('afterend', '<p class="product-results-hint">Pilih nominal atau produk yang ingin dibeli.</p>');
+$('#backToFinderBtn').onclick = closeProductCatalog;
+
 $('#showProductsBtn').onclick = () => {
   const target = $('#targetInput').value.trim();
   if (!target) { showToast('Tujuan belum diisi', 'Masukkan nomor tujuan atau ID pelanggan terlebih dahulu.'); return; }
   if (!state.selectedProvider) { showToast('Provider belum dipilih', 'Pilih salah satu provider yang tersedia.'); return; }
-  $('#productResults').classList.remove('hidden');
+  openProductCatalog();
   renderProducts(state.selectedType, state.selectedProvider);
   saveTransactionDraft();
-  $('#productResults').scrollIntoView({ behavior:'smooth', block:'start' });
 };
 
 document.body.insertAdjacentHTML('beforeend', `<div id="checkoutSheet" class="checkout-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="checkoutSheetTitle"><div class="checkout-sheet-card"><div class="checkout-sheet-head"><div><small>CHECKOUT</small><h2 id="checkoutSheetTitle">Konfirmasi pembelian</h2></div><button id="closeCheckoutSheet" type="button" aria-label="Tutup checkout">×</button></div><div id="checkoutSheetDetails" class="checkout-sheet-details"></div><label class="checkout-sheet-label" for="checkoutSheetTarget">Nomor tujuan / ID pelanggan</label><input id="checkoutSheetTarget" class="checkout-sheet-target" autocomplete="off"><p id="checkoutSheetWarning" class="checkout-sheet-warning hidden"></p><button id="confirmPayBtn" class="primary-btn" type="button">Bayar</button><button id="checkoutTopupBtn" class="primary-btn hidden" type="button">Isi saldo dahulu</button><p class="checkout-sheet-note">Transaksi diproses melalui Pulsa24Jam. Pembayaran tidak dikirim ulang otomatis.</p></div></div>`);
