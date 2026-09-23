@@ -130,6 +130,7 @@ func displayProvider(brand, category, sku, name string) string {
 
 func bankProvider(upperName string) string {
 	text := strings.TrimSpace(upperName)
+	text = leadingCode.ReplaceAllString(text, "")
 	for _, prefix := range []string{
 		"WITHDRAWAL DEPOSIT TUJUAN ", "WITHDRAWAL ALL BANK ALTERNATIF ",
 		"WITHDRAWAL ALL BANK SECONDARY ", "WITHDRAWAL ALL BANK ", "WITHDRAWAL ",

@@ -31,6 +31,7 @@ func TestGenericProviderNamesStayWithinTheirService(t *testing.T) {
 		{"PDAM", "Tagihan Air", "AIR001", "PDAM TRI TIRTA ACEH", "PDAM Tri Tirta Aceh"},
 		{"Multifinance", "Multifinance", "MFSMART", "SMART FINANCE", "Smart Finance"},
 		{"Bank", "Transfer Bank", "DBJAGO", "BANK JAGO", "Bank Jago"},
+		{"Bank", "Transfer Bank", "026", "026 BANK LIPPO", "Bank Lippo"},
 		{"Bank", "Transfer Bank", "CEKDANA", "CEK NAMA DANA ELEKTRIK", "DANA"},
 		{"Voucher", "Voucher Data", "NETFLIX1", "VOUCHER NETFLIX HARIAN", "Netflix"},
 	}

@@ -396,18 +396,36 @@ function detectBankFromAccount(value) {
 
 function availableProviders(type) {
   const canonicalType = canonicalProductType(type);
-  return [...new Set(state.products
+  const providers = [...new Set(state.products
     .filter(product => canonicalProductType(product.type) === canonicalType)
     .map(product => product.provider)
     .filter(provider => !(canonicalType === 'Pulsa' && provider.toLowerCase() === 'xl/axis'))
-    .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))]
-    .sort((a, b) => a.localeCompare(b, 'id'));
+    .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))];
+  if (canonicalType !== 'Transfer Bank') return providers.sort((a, b) => a.localeCompare(b, 'id'));
+
+  // Upstream includes legacy codes and duplicate aliases. Show only verified
+  // banks with a local official SVG, grouping aliases by their logo asset.
+  const verified = new Map();
+  const preferredNames = new Set(Object.values(bankCodeProviders).map(name => name.toLowerCase()));
+  providers.forEach(provider => {
+    const asset = localProviderAsset(provider);
+    if (!asset.startsWith('/assets/banks/')) return;
+    const clean = String(provider).replace(/^\s*\d{3}\s*[-.]?\s*/, '').trim();
+    const current = verified.get(asset);
+    const score = name => (preferredNames.has(name.toLowerCase()) ? 0 : 100) + (name.match(/[^a-z0-9 ()&-]/gi)?.length || 0) * 10 + name.length;
+    if (!current || score(clean) < score(current)) verified.set(asset, clean);
+  });
+  return [...verified.values()].sort((a, b) => a.localeCompare(b, 'id'));
 }
 
 // XL/Axis is one shared upstream brand, not a third mobile operator. Keep all
 // 40 real H2HR SKUs visible inside both operator pages without a duplicate card.
 function productMatchesProvider(product, provider, type) {
   if (product.provider === provider) return true;
+  if (canonicalProductType(type) === 'Transfer Bank') {
+    const productAsset = localProviderAsset(product.provider);
+    return productAsset.startsWith('/assets/banks/') && productAsset === localProviderAsset(provider);
+  }
   return canonicalProductType(type) === 'Pulsa'
     && product.provider.toLowerCase() === 'xl/axis'
     && ['xl', 'axis'].includes(provider.toLowerCase());
