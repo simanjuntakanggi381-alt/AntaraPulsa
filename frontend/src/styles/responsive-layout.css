@@ -333,8 +333,8 @@
 .product-finder.gas-service-flow #detectedProvider span,.product-finder.gas-service-flow #detectedProvider strong,.product-finder.gas-service-flow #detectedProvider em{display:block}
 .product-finder.gas-service-flow #detectedProvider strong{color:#173d32;font:800 12px Manrope,sans-serif}
 .product-finder.gas-service-flow #detectedProvider em{margin-top:3px;color:#7c9189;font:500 8px DM Sans,sans-serif;font-style:normal}
-.product-finder.gas-service-flow .gas-selected-logo{width:36px;height:36px;flex-basis:36px;border-radius:8px;box-shadow:none}
-.product-finder.gas-service-flow .gas-selected-logo>img{position:static;width:31px;height:22px;max-width:31px;max-height:22px;object-fit:contain}
+.product-finder.gas-service-flow .gas-selected-logo{width:52px;height:38px;flex-basis:52px;padding:3px;border-radius:8px;box-shadow:none}
+.product-finder.gas-service-flow .gas-selected-logo>img{position:static;width:46px;height:25px;max-width:46px;max-height:25px;object-fit:contain}
 .product-finder.gas-service-flow .finder-label{position:absolute;width:1px;height:1px;margin:-1px!important;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .product-finder.gas-service-flow .finder-input{height:48px;padding:0 13px;display:block;border-color:#d7e8e1;border-radius:9px;background:#fff}
 .product-finder.gas-service-flow .finder-input:focus-within{border-color:#58aa91;box-shadow:0 0 0 3px rgba(8,120,94,.09)}
@@ -403,7 +403,7 @@
 .product-finder.bank-transfer-flow .pdam-provider-arrow{position:absolute;right:14px;top:50%;color:#7357e8;font:400 25px/1 Arial,sans-serif;transform:translateY(-52%)}
 .product-finder.bank-transfer-flow .finder-submit{margin-top:11px;background:#a694ea!important}
 .provider-logo-pgn { position: relative; }
-.provider-logo-pgn > img { position: absolute; left: 4px; width: 110px; height: 32px; max-width: none; max-height: none; object-fit: fill; }
+.provider-logo-pgn > img { position: static; width: 40px; height: 24px; max-width: 40px; max-height: 24px; object-fit: contain; }
 .provider-logo-indihome > img { width: 39px; height: 24px; max-width: 39px; max-height: 24px; }
 .provider-logo-tv > img { width: 39px; height: 31px; max-width: 39px; max-height: 31px; }
 .provider-logo-pdam > img { width: 35px; height: 35px; max-width: 35px; max-height: 35px; object-fit: contain; }

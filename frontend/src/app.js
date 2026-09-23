@@ -259,7 +259,7 @@ const providerAssets = {
   indovision:'/assets/provider-indovision.png', mncplay:'/assets/provider-mnc-play.png', myrepublik:'/assets/provider-myrepublic.svg',
   telkomvision:'/assets/provider-telkomvision.svg', toptv:'/assets/provider-top-tv.svg', transvision:'/assets/provider-transvision.svg', yestv:'/assets/provider-yes-tv.png',
   pln:'/assets/provider-pln.png',
-  pgn:'/assets/provider-pgn.svg',
+  pgn:'/assets/provider-pgn-official.png',
   brizzi:'/assets/provider-brizzi.png', dana:'/assets/provider-dana.png', emoneymandiri:'/assets/provider-emoney-mandiri.png',
   gopay:'/assets/provider-gopay.png', grab:'/assets/provider-grab.png', isaku:'/assets/provider-isaku.png',
   kaspro:'/assets/provider-kaspro.png', linkaja:'/assets/provider-linkaja.png', maxim:'/assets/provider-maxim.png',
