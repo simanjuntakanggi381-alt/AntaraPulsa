@@ -440,13 +440,24 @@ function restoreTransactionDraft() {
 
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
+  const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
+  $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow);
+  $('.product-finder').classList.toggle('pdam-provider-selected', pdamFlow && !!provider);
   $('#detectedProvider').textContent = provider || 'Pilih provider di atas';
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
-  $('#detectionStatus').textContent = provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
+  $('#detectionStatus').textContent = pdamFlow && provider ? 'Ganti provider' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
   saveTransactionDraft();
 }
+
+$('#detectionStatus').onclick = () => {
+  if (canonicalProductType(state.selectedType) === 'PDAM' && state.selectedProvider) {
+    updateProviderDetection('');
+    renderProviderChoices();
+    $('#providerSearch').focus();
+  }
+};
 
 function renderProviderChoices(query = '') {
   const providers = availableProviders(state.selectedType);
@@ -473,11 +484,26 @@ function prepareProductFinder(type) {
   const heading = $('#transactionPage .simple-head h1');
   if (heading) heading.textContent = state.selectedType;
   $('#electricityModes').classList.toggle('hidden', canonicalProductType(state.selectedType) !== 'Token PLN');
+  const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
+  const providerHead = $('.provider-picker-head');
+  if (pdamFlow) {
+    $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
+    $('.provider-choice-label').textContent = '1 · CARI & PILIH PDAM';
+    $('#showProductsBtn span').textContent = 'Cek Tagihan';
+  } else {
+    providerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
+    $('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
+    $('#showProductsBtn span').textContent = '3 · Lihat produk tersedia';
+  }
   const inputConfig = transactionInputConfig(state.selectedType);
   $('#targetLabel').textContent = `1 · ${inputConfig.label}`;
   $('#targetPrefix').textContent = inputConfig.prefix;
   $('#targetInput').placeholder = inputConfig.placeholder;
   $('#targetInput').autocomplete = inputConfig.autocomplete;
+  if (pdamFlow) {
+    $('#targetLabel').textContent = '2 · ID pelanggan PDAM';
+    $('#targetInput').placeholder = 'Masukkan nomor pelanggan PDAM';
+  }
   $('#providerSearch').value = '';
   hideProductSelection();
   $('#targetInput').value = '';
