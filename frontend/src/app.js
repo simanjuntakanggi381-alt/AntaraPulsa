@@ -292,19 +292,27 @@ function financeProviderDomain(name) {
   const aliases = [
     ['acc finance|astra credit','acc.co.id'], ['adira','adira.co.id'], ['aeon','aeon.co.id'],
     ['al ijarah','alijarahindonesia.com'], ['artha prima','ap-finance.com'], ['arthasia','arthasiafinance.co.id'],
-    ['bca finance|bcaf','bcafinance.co.id'], ['bfi','bfi.co.id'], ['blibli','blibli.com'],
+    ['almadani','almadani.co.id'], ['itc multi finance','itcfinance.com'],
+    ['bca multifinance','bcamultifinance.co.id'], ['bca finance|bcaf','bcafinance.co.id'],
+    ['bfi','bfi.co.id'], ['bima finance|bima multi','bimafinance.co.id'], ['blibli','blibli.com'],
+    ['bpr artha sukapura','arthasukapura.com'], ['bpr kredit mandiri','bprkreditmandiri.co.id'],
     ['btn kpr','btn.co.id'], ['buana finance','buanafinance.co.id'], ['bussan|busan|baf','baf.id'],
     ['capella','capellamultidana.co.id'], ['cimb niaga auto|cnaf','cnaf.co.id'], ['clipan','clipan.co.id'],
-    ['columbia','columbia.co.id'], ['fif','fifgroup.co.id'], ['home credit','homecredit.co.id'],
+    ['columbia','columbia.co.id'], ['fif','fifgroup.co.id'], ['heksa','heksa.co.id'], ['home credit','homecredit.co.id'],
     ['indomobil','indomobilfinance.com'], ['jaccs|mpm finance','jaccs-mpmfinance.com'],
+    ['jtrust olympindo|olympindo','lip.id'], ['kopnus','kopnus.com'],
     ['kredit plus|kreditplus|finansia','kreditplus.com'], ['kredivo','kredivo.com'],
     ['mandala','mandalafinance.com'], ['mandiri tunas|mtf','mtf.co.id'], ['mandiri utama','muf.co.id'],
-    ['maybank finance','maybankfinance.co.id'], ['mega auto|maf','maf.co.id'], ['mega central|mcf','mcf.co.id'],
-    ['mnc finance','mncfinance.com'], ['nusa surya|nsc finance','nscfinance.com'],
+    ['maybank finance','maybankfinance.co.id'], ['mega auto|maf','maf.co.id'], ['mega central|mcf','mcf.co.id'], ['mega finance','megafinance.co.id'],
+    ['mitra dana top','mitradanatop.co.id'], ['mnc finance','mncfinance.com'], ['multindo','multindo.co.id'],
+    ['nissan finance','nissanfinance.co.id'], ['nusa surya|nsc finance','nscfinance.com'],
+    ['orico balimor','orico.co.id'],
     ['oto kredit|summit oto','oto.co.id'], ['pegadaian','pegadaian.co.id'],
+    ['permata finance','permatabank.com'], ['pro car','procarfinance.co.id'], ['pro mitra','promitrafinance.co.id'],
     ['toyota astra|taf','taf.co.id'], ['suzuki finance','sfi.co.id'], ['radana','radanafinance.co.id'],
-    ['smart finance|smart multi','smartfinance.co.id'], ['trihamas','trihamas.co.id'],
-    ['verena','verenamultifinance.com'], ['wom','wom.co.id']
+    ['smart finance|smart multi','smartfinance.co.id'], ['sms finance','smsfinance.co.id'], ['trihamas','trihamas.co.id'],
+    ['varia intra','vif.co.id'], ['verena','verenamultifinance.com'], ['woka','wokafinance.co.id'], ['wom','wom.co.id'],
+    ['bank dbs','dbs.id'], ['ge master card|bank permata','permatabank.com']
   ];
   return aliases.find(([terms]) => terms.split('|').some(term => value.includes(term)))?.[1] || providerDomain(name);
 }
@@ -320,7 +328,6 @@ function financeOfficialAsset(name) {
     ['bca finance|bcaf','/assets/finance-official/bca-finance.png'],
     ['cimb niaga auto|cnaf','/assets/finance-official/cnaf-co-id.png'],
     ['fif','/assets/finance-official/fifgroup.png'],
-    ['indomobil','/assets/finance-official/indomobilfinance-com.svg'],
     ['jaccs|mpm finance','/assets/finance-official/jaccs-mpmfinance-com.png'],
     ['kredit plus|kreditplus|finansia','/assets/finance-official/kreditplus.png'],
     ['kredivo','/assets/finance-official/kredivo-com.png'],
@@ -328,7 +335,6 @@ function financeOfficialAsset(name) {
     ['mega auto|maf','/assets/finance-official/maf-co-id.png'],
     ['mnc finance','/assets/finance-official/mncfinance-com.png'],
     ['radana','/assets/finance-official/radanafinance-co-id.png'],
-    ['suzuki finance','/assets/finance-official/sfi-co-id.png'],
     ['toyota astra|taf','/assets/finance-official/taf.svg'],
     ['wom','/assets/finance-official/wom.png']
   ];
@@ -358,14 +364,17 @@ function providerLogoMarkup(provider, type, className = '') {
   const source = canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
     : canonicalProductType(type) === 'Multifinance'
-      ? financeOfficialAsset(provider)
+      ? financeOfficialAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=256` : '/assets/service-category-07.png')
       : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
   const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
   if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
   const providerClass = canonicalProductType(type) === 'Multifinance' ? 'provider-logo-finance' : source.includes('/assets/insurance/') ? 'provider-logo-insurance' : source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
-  return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"/><span class="provider-logo-initials-fallback" hidden>${escapeText(initials)}</span></span>`;
+  const imageFallback = canonicalProductType(type) === 'Multifinance'
+    ? `onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='/assets/service-category-07.png'}else{this.hidden=true}"`
+    : `onerror="this.hidden=true;this.nextElementSibling.hidden=false"`;
+  return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" alt="" loading="lazy" decoding="async" ${imageFallback}/><span class="provider-logo-initials-fallback" hidden>${escapeText(initials)}</span></span>`;
 }
 function txRow(tx, detailed = false) {
   if (detailed) return `<div class="history-row"><div><b>${tx.id}</b><br><small>${dateFmt(tx.created_at)}</small></div><div class="history-product">${providerLogoMarkup(tx.provider,tx.type,'tx-provider-logo')}<div><b>${tx.product}</b><br><small>${tx.provider}</small></div></div><span>${tx.target}</span><span class="status">${tx.status}</span><strong>Rp ${money(tx.amount)}</strong></div>`;
