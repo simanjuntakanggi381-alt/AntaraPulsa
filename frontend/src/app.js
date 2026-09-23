@@ -603,12 +603,14 @@ function prepareProductFinder(type) {
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
   const plnFlow = canonicalProductType(state.selectedType) === 'Token PLN';
+  const insuranceFlow = canonicalProductType(state.selectedType) === 'Asuransi';
   $('.product-finder').classList.toggle('pln-service-flow', plnFlow);
+  $('.product-finder').classList.toggle('insurance-service-flow', insuranceFlow);
   $('.pln-trust-strip').classList.toggle('hidden', !plnFlow);
   const providerHead = $('.provider-picker-head');
   if (pdamFlow) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
-    $('.provider-choice-label').textContent = '1 · CARI & PILIH PDAM';
+    $('.provider-choice-label').textContent = 'CARI & PILIH PDAM';
     $('#showProductsBtn span').textContent = 'Cek Tagihan';
     $('#providerSearch').placeholder = 'Cari nama PDAM atau daerah';
     $('#providerSearch').setAttribute('aria-label', 'Cari nama PDAM atau daerah');
@@ -618,24 +620,24 @@ function prepareProductFinder(type) {
     providerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
     $('#providerSearch').placeholder = 'Cari nama provider';
     $('#providerSearch').setAttribute('aria-label', 'Cari nama provider');
-    $('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
-    $('#showProductsBtn span').textContent = '3 · Lihat produk tersedia';
+    $('.provider-choice-label').textContent = 'PILIH PROVIDER';
+    $('#showProductsBtn span').textContent = 'Lihat produk tersedia';
     $('#transactionPage .simple-head p').textContent = 'Masukkan nomor tujuan terlebih dahulu, lalu pilih provider dan produk yang tersedia.';
   }
   const inputConfig = transactionInputConfig(state.selectedType);
-  $('#targetLabel').textContent = `1 · ${inputConfig.label}`;
+  $('#targetLabel').textContent = inputConfig.label;
   $('#targetPrefix').textContent = inputConfig.prefix;
   $('#targetInput').placeholder = inputConfig.placeholder;
   $('#targetInput').autocomplete = inputConfig.autocomplete;
   if (pdamFlow) {
-    $('#targetLabel').textContent = '2 · ID pelanggan PDAM';
+    $('#targetLabel').textContent = 'ID pelanggan PDAM';
     $('#targetInput').placeholder = 'Masukkan nomor pelanggan PDAM';
   }
   if (bankFlow) {
-    $('.provider-choice-label').textContent = '2 Â· PILIH BANK TUJUAN';
+    $('.provider-choice-label').textContent = 'PILIH BANK TUJUAN';
     $('#providerSearch').placeholder = 'Cari nama bank';
     $('#providerSearch').setAttribute('aria-label', 'Cari nama bank');
-    $('#targetLabel').textContent = '1 Â· Nomor rekening tujuan';
+    $('#targetLabel').textContent = 'Nomor rekening tujuan';
     $('#targetInput').placeholder = 'Contoh: 014 1234567890';
     $('#transactionPage .simple-head p').textContent = 'Masukkan nomor rekening. Sertakan kode bank untuk deteksi otomatis, atau pilih bank dari daftar.';
   }
@@ -759,9 +761,9 @@ $('.filter-tabs').insertAdjacentHTML('beforebegin', '<div id="electricityModes" 
 $('.product-finder').insertAdjacentHTML('afterend', '<div class="pln-trust-strip hidden"><span><b>⚡ Proses instan</b><small>Diproses otomatis</small></span><span><b>▣ Data aman</b><small>Terenkripsi</small></span><span><b>◷ Aktif 24 jam</b><small>Setiap hari</small></span></div>');
 const providerPickerHead = $('.provider-picker-head');
 providerPickerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
-$('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
+$('.provider-choice-label').textContent = 'PILIH PROVIDER';
 $('#transactionPage .simple-head p').textContent = 'Masukkan nomor tujuan terlebih dahulu, lalu pilih provider dan produk yang tersedia.';
-$$('[data-electricity-mode]').forEach(button => button.onclick = () => { state.electricityMode = button.dataset.electricityMode; $$('[data-electricity-mode]').forEach(item => item.classList.toggle('active', item === button)); state.selectedProvider = 'PLN'; hideProductSelection(); updateProviderDetection('PLN'); $('#targetLabel').textContent = '1 · Nomor meter / ID pelanggan PLN'; $('#showProductsBtn span').textContent = state.electricityMode === 'bill' ? '3 · Cek tagihan PLN' : '3 · Lihat token tersedia'; });
+$$('[data-electricity-mode]').forEach(button => button.onclick = () => { state.electricityMode = button.dataset.electricityMode; $$('[data-electricity-mode]').forEach(item => item.classList.toggle('active', item === button)); state.selectedProvider = 'PLN'; hideProductSelection(); updateProviderDetection('PLN'); $('#targetLabel').textContent = 'Nomor meter / ID pelanggan PLN'; $('#showProductsBtn span').textContent = state.electricityMode === 'bill' ? 'Cek tagihan PLN' : 'Lihat token tersedia'; });
 $('#selectedProduct .price-row').insertAdjacentHTML('beforebegin', '<label id="openAmountRow" class="open-amount-row hidden" for="openAmountInput"><span>Nominal transaksi (Rp)</span><input id="openAmountInput" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="Masukkan nominal"></label>');
 const isPLNInquiry = product => /CEK PLN/i.test(product?.name || '');
 function updateCheckoutAmount() {
