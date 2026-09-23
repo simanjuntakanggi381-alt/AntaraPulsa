@@ -315,9 +315,17 @@ function financeOfficialAsset(name) {
     ['adira','/assets/finance-official/adira.svg'],
     ['aeon','/assets/finance-official/aeon.svg'],
     ['bca finance|bcaf','/assets/finance-official/bca-finance.png'],
+    ['cimb niaga auto|cnaf','/assets/finance-official/cnaf-co-id.png'],
     ['fif','/assets/finance-official/fifgroup.png'],
+    ['indomobil','/assets/finance-official/indomobilfinance-com.svg'],
+    ['jaccs|mpm finance','/assets/finance-official/jaccs-mpmfinance-com.png'],
     ['kredit plus|kreditplus|finansia','/assets/finance-official/kreditplus.png'],
+    ['kredivo','/assets/finance-official/kredivo-com.png'],
     ['mandiri tunas|mtf','/assets/finance-official/mtf.png'],
+    ['mega auto|maf','/assets/finance-official/maf-co-id.png'],
+    ['mnc finance','/assets/finance-official/mncfinance-com.png'],
+    ['radana','/assets/finance-official/radanafinance-co-id.png'],
+    ['suzuki finance','/assets/finance-official/sfi-co-id.png'],
     ['toyota astra|taf','/assets/finance-official/taf.svg'],
     ['wom','/assets/finance-official/wom.png']
   ];
