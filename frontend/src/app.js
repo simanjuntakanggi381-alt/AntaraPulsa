@@ -19,6 +19,7 @@ import './styles/operator-migration.css';
 import './styles/operator-inactive.css';
 import './styles/operator-turnover.css';
 import './styles/operator-payments.css';
+import './styles/balance-polish.css';
 import { api, APIError } from './services/api.js';
 import { money, dateFmt, initials } from './utils/format.js';
 import { createToast } from './components/toast.js';
