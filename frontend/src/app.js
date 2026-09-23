@@ -321,8 +321,39 @@ function localProviderAsset(name) {
   if (providerAssets[normalized]) return providerAssets[normalized];
   return '';
 }
+function financeBrandIdentity(provider) {
+  const value = String(provider || '').toLowerCase();
+  const brands = [
+    ['astra credit|acc finance','ACC','#123c78','#ed1c24'], ['adira','ADIRA','#d71920','#f6c915'], ['aeon','AEON','#a21686','#eb6cae'],
+    ['al ijarah','ALIF','#159447','#f2b323'], ['artha prima','APF','#174d8f','#e7a51b'], ['arthasia','AAF','#e2252b','#163f85'],
+    ['bca finance|bcaf','BCA','#0874b9','#38a9e0'], ['bfi','BFI','#1262a3','#f5a623'], ['bima','BIMA','#17639c','#ef3340'],
+    ['blibli','blibli','#159bd7','#7bcdf4'], ['btn','BTN','#07549a','#e5252a'], ['buana','BUANA','#174d8f','#f1a51d'],
+    ['bussan|busan|baf','BAF','#0d4d96','#ed1b2e'], ['capella','CMF','#167a45','#efb426'], ['cimb niaga auto|cnaf','CNAF','#b71922','#8b1820'],
+    ['clipan','CLIPAN','#14579b','#e31e24'], ['columbia','COLUMBIA','#e1222b','#1866a8'], ['fif','FIFGROUP','#124b92','#e52929'],
+    ['home credit','HC','#e31937','#ffffff'], ['indomobil','IMFI','#005daa','#f58220'], ['jaccs|mpm finance','MPM','#ed1c24','#1c4587'],
+    ['kredit plus|kreditplus|finansia','K+','#ef3123','#ffbf19'], ['kredivo','KREDIVO','#f36523','#ffffff'],
+    ['mandala','MANDALA','#144b8c','#f2bd1c'], ['mandiri tunas|mtf','MTF','#17488b','#f7b719'], ['mandiri utama','MUF','#1d4a87','#f2b519'],
+    ['maybank','MAYBANK','#ffc600','#111827'], ['mega auto|maf','MAF','#0c579b','#f2b51b'], ['mega central|mcf','MCF','#0c579b','#eb2737'],
+    ['mnc','MNC','#1671b8','#ed1c24'], ['multindo','MULTINDO','#195b9d','#e42d30'], ['nissan','NISSAN','#c3002f','#4b5563'],
+    ['nusa surya|nsc','NSC','#e1262d','#174c8e'], ['olympindo|jtrust','JTO','#e3212c','#172f63'],
+    ['oto kredit|summit oto','OTO','#e1262d','#164d8e'], ['pegadaian','PEGADAIAN','#159447','#f3c21b'],
+    ['toyota astra|taf','TAF','#e51b23','#263a78'], ['suzuki','SFI','#e4252d','#15549a'], ['radana','RADANA','#f58220','#245ba4'],
+    ['smart finance|smart multi','SMF','#148b4b','#f0b51d'], ['sms finance','SMS','#15559b','#e52a31'],
+    ['trihamas','TRIHAMAS','#136b43','#eaaa22'], ['verena','VERENA','#115598','#e52a2e'], ['woka','WOKA','#65359f','#22a8a0'],
+    ['wom','WOM','#e31d2b','#13589b']
+  ];
+  const match = brands.find(([terms]) => terms.split('|').some(term => value.includes(term)));
+  if (match) return { label:match[1], color:match[2], accent:match[3] };
+  const label = String(provider || 'MF').replace(/\b(PT|FINANCE|MULTI|INDONESIA|ANGSURAN|PEMBAYARAN)\b/gi,' ').trim().split(/\s+/).slice(0,3).map(word => word[0]).join('').toUpperCase() || 'MF';
+  return { label, color:'#176d68', accent:'#71d5b5' };
+}
+
 function providerLogoMarkup(provider, type, className = '') {
   const providerKey = String(provider || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
+  if (canonicalProductType(type) === 'Multifinance') {
+    const brand = financeBrandIdentity(provider);
+    return `<span class="provider-logo-shell provider-logo-finance ${className}" role="img" aria-label="${escapeText(provider)}" style="--finance-color:${brand.color};--finance-accent:${brand.accent}"><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="2" y="2" width="60" height="60" rx="17"/><path d="M12 17h40"/><circle cx="49" cy="15" r="5"/><text x="32" y="39" text-anchor="middle">${escapeText(brand.label)}</text><path d="M15 49h34"/></svg></span>`;
+  }
   if (providerKey.includes('biznet') || providerKey.includes('bizznet')) {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
