@@ -287,6 +287,27 @@ function providerDomain(name) {
   const normalized = String(name || '').toLowerCase().replace(/[^a-z0-9. ]/g,'').trim();
   return providerDomains[normalized] || '';
 }
+function financeProviderDomain(name) {
+  const value = String(name || '').toLowerCase();
+  const aliases = [
+    ['acc finance|astra credit','acc.co.id'], ['adira','adira.co.id'], ['aeon','aeon.co.id'],
+    ['al ijarah','alijarahindonesia.com'], ['artha prima','ap-finance.com'], ['arthasia','arthasiafinance.co.id'],
+    ['bca finance|bcaf','bcafinance.co.id'], ['bfi','bfi.co.id'], ['blibli','blibli.com'],
+    ['btn kpr','btn.co.id'], ['buana finance','buanafinance.co.id'], ['bussan|busan|baf','baf.id'],
+    ['capella','capellamultidana.co.id'], ['cimb niaga auto|cnaf','cnaf.co.id'], ['clipan','clipan.co.id'],
+    ['columbia','columbia.co.id'], ['fif','fifgroup.co.id'], ['home credit','homecredit.co.id'],
+    ['indomobil','indomobilfinance.com'], ['jaccs|mpm finance','jaccs-mpmfinance.com'],
+    ['kredit plus|kreditplus|finansia','kreditplus.com'], ['kredivo','kredivo.com'],
+    ['mandala','mandalafinance.com'], ['mandiri tunas|mtf','mtf.co.id'], ['mandiri utama','muf.co.id'],
+    ['maybank finance','maybankfinance.co.id'], ['mega auto|maf','maf.co.id'], ['mega central|mcf','mcf.co.id'],
+    ['mnc finance','mncfinance.com'], ['nusa surya|nsc finance','nscfinance.com'],
+    ['oto kredit|summit oto','oto.co.id'], ['pegadaian','pegadaian.co.id'],
+    ['toyota astra|taf','taf.co.id'], ['suzuki finance','sfi.co.id'], ['radana','radanafinance.co.id'],
+    ['smart finance|smart multi','smartfinance.co.id'], ['trihamas','trihamas.co.id'],
+    ['verena','verenamultifinance.com'], ['wom','wom.co.id']
+  ];
+  return aliases.find(([terms]) => terms.split('|').some(term => value.includes(term)))?.[1] || providerDomain(name);
+}
 function pdamLookupKey(value) {
   return String(value || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '')
     .replace(/^(?:pdam|pam|perumdam|perumda|ptair)/, '')
@@ -305,19 +326,17 @@ function providerLogoMarkup(provider, type, className = '') {
   if (providerKey.includes('biznet') || providerKey.includes('bizznet')) {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
-  const domain = providerDomain(provider);
+  const domain = canonicalProductType(type) === 'Multifinance' ? financeProviderDomain(provider) : providerDomain(provider);
   // Every regional PDAM uses one clear water-utility mark. This keeps the
   // catalogue consistent and avoids a mix of crests and initial placeholders.
   const source = canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
-    : canonicalProductType(type) === 'Multifinance'
-      ? '/assets/finance/provider-multifinance-generic.svg'
-      : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
+    : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
   const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
   if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
-  const providerClass = source.includes('/assets/finance/') ? 'provider-logo-finance' : source.includes('/assets/insurance/') ? 'provider-logo-insurance' : source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
+  const providerClass = canonicalProductType(type) === 'Multifinance' ? 'provider-logo-finance' : source.includes('/assets/insurance/') ? 'provider-logo-insurance' : source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"/><span class="provider-logo-initials-fallback" hidden>${escapeText(initials)}</span></span>`;
 }
 function txRow(tx, detailed = false) {
