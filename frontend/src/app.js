@@ -33,7 +33,7 @@ if ('serviceWorker' in navigator) {
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
-const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', electricityMode: 'token', balanceVisible: true, returnPage: 'dashboard' };
+const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', autoDetectedBank: '', electricityMode: 'token', balanceVisible: true, returnPage: 'dashboard' };
 const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
 const CAPITAL_APPLICATION_KEY = 'antarapulsa-capital-applications-v1';
 const CAPITAL_MONITOR_KEY = 'antarapulsa-capital-monitor-v1';
@@ -357,6 +357,43 @@ function detectOperator(value) {
   return operatorPrefixes.find(([, prefixes]) => prefixes.some(prefix => phone.startsWith(prefix)))?.[0] || '';
 }
 
+// Indonesian account numbers alone do not contain a universal bank prefix.
+// Detect only an explicit 3-digit transfer code followed by a separator, so a
+// normal account number can never be silently routed to the wrong bank.
+const bankCodeProviders = {
+  '002':'BRI', '008':'Mandiri', '009':'BNI', '011':'Danamon', '013':'Permata', '014':'BCA',
+  '016':'Maybank', '019':'Panin', '022':'CIMB Niaga', '023':'UOB', '028':'OCBC NISP',
+  '031':'Citibank', '037':'Bank Artha Graha', '046':'Bank DBS', '054':'Bank Capital',
+  '076':'Bank Bumi Arta', '110':'BJB', '111':'Bank DKI', '112':'Bank DIY', '113':'Bank Jateng',
+  '114':'Bank Jatim', '115':'Bank Jambi', '116':'Bank Aceh', '117':'Bank Sumut',
+  '118':'Bank Nagari', '119':'Bank Riau Kepri', '120':'Bank Sumsel Babel', '121':'Bank Lampung',
+  '122':'Bank Kalsel', '123':'Bank Kalbar', '124':'Bank Kaltim', '125':'Bank Kalteng',
+  '126':'Bank Sulselbar', '127':'Bank Sulut', '128':'Bank NTB', '129':'BPD Bali', '130':'Bank NTT',
+  '131':'Bank Maluku Malut', '132':'Bank Papua', '133':'Bank Bengkulu', '134':'Bank Sulteng',
+  '135':'Bank Sultra', '137':'Bank Banten', '147':'Muamalat', '151':'Bank Mestika',
+  '153':'Sinarmas', '157':'Bank Maspion', '161':'Bank Ganesha', '167':'Bank QNB',
+  '200':'BTN', '212':'Bank Woori Saudara', '213':'BTPN', '426':'Mega', '441':'Bukopin',
+  '451':'BSI', '484':'Bank Hana', '485':'Bank MNC', '490':'Neo Commerce',
+  '494':'Bank Raya (BRI Agro)', '501':'Blu (BCA Digital)', '503':'Bank Nobu',
+  '513':'Bank Ina Perdana', '523':'Bank Sahabat Sampoerna', '535':'Sea Bank',
+  '542':'Bank Jago', '555':'Bank Index', '562':'Superbank', '564':'Bank Mandiri Taspen',
+  '566':'Bank Victoria', '567':'Allo Bank', '945':'Bank IBK', '947':'Bank Aladin Syariah',
+  '950':'Commonwealth'
+};
+
+function detectBankFromAccount(value) {
+  const match = String(value || '').trim().match(/^(\d{3})[\s.-]+\d/);
+  if (!match) return '';
+  const expected = bankCodeProviders[match[1]];
+  if (!expected) return '';
+  const key = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const expectedKey = key(expected);
+  return availableProviders(state.selectedType).find(provider => {
+    const providerKey = key(provider);
+    return providerKey === expectedKey || providerKey.includes(expectedKey) || expectedKey.includes(providerKey);
+  }) || '';
+}
+
 function availableProviders(type) {
   const canonicalType = canonicalProductType(type);
   return [...new Set(state.products
@@ -455,12 +492,19 @@ function restoreTransactionDraft() {
 function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
+  const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
   $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow);
   $('.product-finder').classList.toggle('pdam-provider-selected', pdamFlow && !!provider);
-  $('#detectedProvider').innerHTML = pdamFlow && provider ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>Masukkan nomor pelanggan untuk cek tagihan air</em></span>` : escapeText(provider || 'Pilih provider di atas');
+  $('.product-finder').classList.toggle('bank-transfer-flow', bankFlow);
+  $('.product-finder').classList.toggle('bank-provider-selected', bankFlow && !!provider);
+  $('#detectedProvider').innerHTML = pdamFlow && provider
+    ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>Masukkan nomor pelanggan untuk cek tagihan air</em></span>`
+    : bankFlow && provider
+      ? `${providerLogoMarkup(provider,state.selectedType,'bank-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>${state.autoDetectedBank === provider ? 'Terdeteksi dari kode bank' : 'Bank tujuan dipilih'}</em></span>`
+      : escapeText(provider || (bankFlow ? 'Bank belum terdeteksi — pilih dari daftar' : 'Pilih provider di atas'));
   if (pdamFlow && provider) $('#targetLabel').before($('.provider-detection'));
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
-  $('#detectionStatus').textContent = pdamFlow && provider ? 'Ganti provider' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
+  $('#detectionStatus').textContent = pdamFlow && provider ? 'Ganti provider' : bankFlow && provider ? 'Ganti bank' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
   saveTransactionDraft();
@@ -482,11 +526,12 @@ function renderProviderChoices(query = '') {
   $('#providerChoices').innerHTML = visible.length
     ? visible.map(provider => {
       const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && productMatchesProvider(product, provider, state.selectedType)).length;
-      const pdamArrow = canonicalProductType(state.selectedType) === 'PDAM' ? '<i class="pdam-provider-arrow" aria-hidden="true">›</i>' : '';
-      return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small>${pdamArrow}</button>`;
+      const listArrow = ['PDAM','Transfer Bank'].includes(canonicalProductType(state.selectedType)) ? '<i class="pdam-provider-arrow" aria-hidden="true">›</i>' : '';
+      return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small>${listArrow}</button>`;
     }).join('')
     : '<p class="provider-empty">Provider tidak ditemukan.</p>';
   $$('#providerChoices button').forEach(button => button.onclick = () => {
+    state.autoDetectedBank = '';
     updateProviderDetection(button.dataset.provider);
     $('#targetInput').focus();
   });
@@ -501,6 +546,7 @@ function prepareProductFinder(type) {
   if (heading) heading.textContent = state.selectedType;
   $('#electricityModes').classList.toggle('hidden', canonicalProductType(state.selectedType) !== 'Token PLN');
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
+  const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
   const providerHead = $('.provider-picker-head');
   if (pdamFlow) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
@@ -527,9 +573,18 @@ function prepareProductFinder(type) {
     $('#targetLabel').textContent = '2 · ID pelanggan PDAM';
     $('#targetInput').placeholder = 'Masukkan nomor pelanggan PDAM';
   }
+  if (bankFlow) {
+    $('.provider-choice-label').textContent = '2 Â· PILIH BANK TUJUAN';
+    $('#providerSearch').placeholder = 'Cari nama bank';
+    $('#providerSearch').setAttribute('aria-label', 'Cari nama bank');
+    $('#targetLabel').textContent = '1 Â· Nomor rekening tujuan';
+    $('#targetInput').placeholder = 'Contoh: 014 1234567890';
+    $('#transactionPage .simple-head p').textContent = 'Masukkan nomor rekening. Sertakan kode bank untuk deteksi otomatis, atau pilih bank dari daftar.';
+  }
   $('#providerSearch').value = '';
   hideProductSelection();
   $('#targetInput').value = '';
+  state.autoDetectedBank = '';
   renderProviderChoices();
   updateProviderDetection('');
   saveTransactionDraft();
@@ -689,6 +744,15 @@ $('#targetInput').addEventListener('input', event => {
     const detected = matchingAvailableProvider(detectOperator(event.target.value));
     if (detected) updateProviderDetection(detected);
     else saveTransactionDraft();
+  } else if (canonicalProductType(state.selectedType) === 'Transfer Bank') {
+    const detected = detectBankFromAccount(event.target.value);
+    if (detected && detected !== state.selectedProvider) {
+      state.autoDetectedBank = detected;
+      updateProviderDetection(detected);
+    } else if (!detected && state.autoDetectedBank) {
+      state.autoDetectedBank = '';
+      updateProviderDetection('');
+    } else saveTransactionDraft();
   } else saveTransactionDraft();
 });
 
