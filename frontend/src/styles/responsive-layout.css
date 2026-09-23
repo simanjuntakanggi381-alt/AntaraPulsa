@@ -267,7 +267,7 @@
 .product-finder .filter-tabs { display: none !important; }
 .product-finder .filter-tabs button { height: 34px; padding: 0 13px; flex: 0 0 auto; border-radius: 17px; }
 .product-finder .filter-tabs button.active { background: #08785e; color: #fff; }
-.finder-label { display: block; margin: 0 0 7px !important; color: #5d746b; font-size: 10px !important; font-weight: 800 !important; }
+.finder-label { display: block; margin: 2px 0 7px !important; color: #5d746b; font-size: 10px !important; font-weight: 800 !important; }
 .finder-input { box-sizing: border-box; height: 52px; padding: 0 10px 0 13px; display: grid; grid-template-columns: 34px minmax(0,1fr) 31px; align-items: center; border: 1px solid #d9e7e1; border-radius: 13px; background: #fbfdfc; }
 .finder-input:focus-within { border-color: #76bba7; box-shadow: 0 0 0 3px rgba(8,120,94,.08); }
 .finder-input > span { color: #60776e; font-size: 11px; font-weight: 800; }
@@ -279,7 +279,7 @@
 .provider-detection small, .provider-choice-label, .product-results-head small { display: block; color: #879a92; font-size: 7px; font-weight: 800; letter-spacing: .8px; }
 .provider-detection b { display: block; margin-top: 4px; overflow: hidden; color: #24473d; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .provider-detection > span { padding: 5px 8px; border-radius: 10px; background: #e2f4ec; color: #08785e; font-size: 7px; font-weight: 800; }
-.provider-picker-head { margin-top: 14px; display:flex; align-items:flex-end; justify-content:space-between; gap:10px; }
+.provider-picker-head { margin-top: 17px; padding-top: 14px; border-top: 1px solid #edf2ef; display:flex; align-items:flex-end; justify-content:space-between; gap:10px; }
 .provider-picker-head b { display:block; margin-top:4px; color:#28483e; font-size:10px; }
 .provider-picker-head > span { padding:5px 8px; border-radius:10px; background:#eee9ff; color:#7655c7; font-size:7px; font-weight:800; white-space:nowrap; }
 .provider-choices { margin-top: 10px; padding-bottom: 4px; display: grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap: 8px; overflow: visible; }

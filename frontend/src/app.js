@@ -474,7 +474,7 @@ function prepareProductFinder(type) {
   if (heading) heading.textContent = state.selectedType;
   $('#electricityModes').classList.toggle('hidden', canonicalProductType(state.selectedType) !== 'Token PLN');
   const inputConfig = transactionInputConfig(state.selectedType);
-  $('#targetLabel').textContent = inputConfig.label;
+  $('#targetLabel').textContent = `1 · ${inputConfig.label}`;
   $('#targetPrefix').textContent = inputConfig.prefix;
   $('#targetInput').placeholder = inputConfig.placeholder;
   $('#targetInput').autocomplete = inputConfig.autocomplete;
@@ -594,7 +594,11 @@ function renderServiceCategories() {
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 $('.filter-tabs').insertAdjacentHTML('beforebegin', '<div id="electricityModes" class="electricity-modes hidden"><button type="button" class="active" data-electricity-mode="token"><b>⚡ Beli Token Listrik</b><small>Isi token prabayar PLN</small></button><button type="button" data-electricity-mode="bill"><b>▤ Bayar Tagihan PLN</b><small>Cek tagihan pascabayar</small></button></div>');
-$$('[data-electricity-mode]').forEach(button => button.onclick = () => { state.electricityMode = button.dataset.electricityMode; $$('[data-electricity-mode]').forEach(item => item.classList.toggle('active', item === button)); state.selectedProvider = 'PLN'; hideProductSelection(); updateProviderDetection('PLN'); $('#targetLabel').textContent = 'Nomor meter / ID pelanggan PLN'; $('#showProductsBtn span').textContent = state.electricityMode === 'bill' ? '3 · Cek tagihan PLN' : '3 · Lihat token tersedia'; });
+const providerPickerHead = $('.provider-picker-head');
+providerPickerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
+$('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
+$('#transactionPage .simple-head p').textContent = 'Masukkan nomor tujuan terlebih dahulu, lalu pilih provider dan produk yang tersedia.';
+$$('[data-electricity-mode]').forEach(button => button.onclick = () => { state.electricityMode = button.dataset.electricityMode; $$('[data-electricity-mode]').forEach(item => item.classList.toggle('active', item === button)); state.selectedProvider = 'PLN'; hideProductSelection(); updateProviderDetection('PLN'); $('#targetLabel').textContent = '1 · Nomor meter / ID pelanggan PLN'; $('#showProductsBtn span').textContent = state.electricityMode === 'bill' ? '3 · Cek tagihan PLN' : '3 · Lihat token tersedia'; });
 $('#selectedProduct .price-row').insertAdjacentHTML('beforebegin', '<label id="openAmountRow" class="open-amount-row hidden" for="openAmountInput"><span>Nominal transaksi (Rp)</span><input id="openAmountInput" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="Masukkan nominal"></label>');
 const isPLNInquiry = product => /CEK PLN/i.test(product?.name || '');
 function updateCheckoutAmount() {
