@@ -138,6 +138,12 @@ func catalogProducts(items []h2hr.Product) []model.Product {
 		// Pulsa24Jam is authoritative: retain its category/provider hierarchy.
 		provider := displayProvider(item.Brand, item.Category, sku, name)
 		category := strings.TrimSpace(item.Category)
+		// Some upstream game SKUs that sell "tokens" are incorrectly tagged as
+		// PLN. Electricity products must explicitly mention PLN; otherwise derive
+		// their real service from the product name/group.
+		if strings.EqualFold(category, "PLN") && !strings.Contains(strings.ToUpper(name), "PLN") {
+			category = normalizeCategory("", item.Group, name)
+		}
 		if provider == "" {
 			provider = "Pulsa24Jam"
 		}
@@ -187,7 +193,7 @@ func normalizeCategory(category, group, name string) string {
 		{"Paket Data", []string{"paket data", "internet", "kuota"}},
 		{"Token PLN", []string{"token pln", "pln prepaid", "listrik prabayar"}},
 		{"E-Wallet", []string{"e-wallet", "e-money", "dana", "gopay", "ovo", "linkaja", "shopeepay", "astrapay"}},
-		{"Game", []string{"game", "diamond", "mobile legends", "free fire", "pubg"}},
+		{"Game", []string{"game", "diamond", "mobile legends", "free fire", "pubg", "honor of king", "growtopia", "ace reacer", "ace racer"}},
 		{"Voucher Digital", []string{"voucher", "gift card"}},
 		{"TV & Streaming", []string{"streaming", "netflix", "vidio", "spotify", "wetv", "viu", "tv kabel"}},
 		{"Telepon & SMS", []string{"telepon", "telpon", "sms"}},

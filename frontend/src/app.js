@@ -335,7 +335,7 @@ $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter')
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || productMatchesProvider(p, provider, filter)) && (canonicalProductType(filter) !== 'Token PLN' || (state.electricityMode === 'bill' ? /CEK PLN/i.test(p.name) : /TOKEN/i.test(p.name))));
+  const list = state.products.filter(p => productBelongsToService(p, filter) && (!provider || productMatchesProvider(p, provider, filter)));
   $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${/CEK PLN/i.test(p.name) ? 'Cek tagihan' : p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
@@ -402,7 +402,7 @@ function detectBankFromAccount(value) {
 function availableProviders(type) {
   const canonicalType = canonicalProductType(type);
   const providers = [...new Set(state.products
-    .filter(product => canonicalProductType(product.type) === canonicalType)
+    .filter(product => productBelongsToService(product, canonicalType))
     .map(product => product.provider)
     .filter(provider => !(canonicalType === 'Pulsa' && provider.toLowerCase() === 'xl/axis'))
     .filter(provider => !(canonicalType === 'Game' && provider.toLowerCase() === 'garena')))];
@@ -449,6 +449,23 @@ function canonicalProductType(type) {
   if (normalized === 'pembayaran') return 'PPOB';
   if (normalized === 'tv' || normalized === 'tvstreaming') return 'TV & Streaming';
   return String(type || 'Lainnya');
+}
+
+function productBelongsToService(product, requestedType) {
+  const service = canonicalProductType(requestedType);
+  if (service === 'all') return true;
+  if (canonicalProductType(product.type) !== service) return false;
+  if (service !== 'Token PLN') return true;
+
+  // The upstream catalogue incorrectly labels several game token SKUs as PLN.
+  // PLN products must explicitly identify the electricity service in their
+  // name and use the PLN provider; a generic word such as "tokens" is unsafe.
+  const provider = String(product.provider || '').trim().toUpperCase();
+  const name = String(product.name || '').trim().toUpperCase();
+  if (provider !== 'PLN' || !/\bPLN\b|PLNPOSTPAID/.test(name)) return false;
+  return state.electricityMode === 'bill'
+    ? /(CEK|POSTPAID|PASKABAYAR|NON\s*TAGLIS|PEMBAYARAN)/.test(name)
+    : /(TOKEN|PREPAID|PRABAYAR)/.test(name);
 }
 
 function matchingAvailableProvider(provider) {
@@ -582,6 +599,9 @@ function prepareProductFinder(type) {
   $('#electricityModes').classList.toggle('hidden', canonicalProductType(state.selectedType) !== 'Token PLN');
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
+  const plnFlow = canonicalProductType(state.selectedType) === 'Token PLN';
+  $('.product-finder').classList.toggle('pln-service-flow', plnFlow);
+  $('.pln-trust-strip').classList.toggle('hidden', !plnFlow);
   const providerHead = $('.provider-picker-head');
   if (pdamFlow) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
@@ -621,7 +641,7 @@ function prepareProductFinder(type) {
   $('#targetInput').value = '';
   state.autoDetectedBank = '';
   renderProviderChoices();
-  updateProviderDetection('');
+  updateProviderDetection(plnFlow ? 'PLN' : '');
   saveTransactionDraft();
 }
 
@@ -733,6 +753,7 @@ function renderServiceCategories() {
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
 $('.filter-tabs').insertAdjacentHTML('beforebegin', '<div id="electricityModes" class="electricity-modes hidden"><button type="button" class="active" data-electricity-mode="token"><b>⚡ Beli Token Listrik</b><small>Isi token prabayar PLN</small></button><button type="button" data-electricity-mode="bill"><b>▤ Bayar Tagihan PLN</b><small>Cek tagihan pascabayar</small></button></div>');
+$('.product-finder').insertAdjacentHTML('afterend', '<div class="pln-trust-strip hidden"><span><b>⚡ Proses instan</b><small>Diproses otomatis</small></span><span><b>▣ Data aman</b><small>Terenkripsi</small></span><span><b>◷ Aktif 24 jam</b><small>Setiap hari</small></span></div>');
 const providerPickerHead = $('.provider-picker-head');
 providerPickerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
 $('.provider-choice-label').textContent = '2 · PILIH PROVIDER';

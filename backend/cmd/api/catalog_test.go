@@ -78,6 +78,23 @@ func TestCatalogProductsKeepsOpenAmountAndRejectsDuplicates(t *testing.T) {
 	}
 }
 
+func TestCatalogProductsSeparatesGameTokensFromPLN(t *testing.T) {
+	got := catalogProducts([]h2hr.Product{
+		{SKU: "HOK1200", Name: "HONOR OF KING 1200 TOKENS", Category: "PLN", Brand: "PLN", Group: "PULSA"},
+		{SKU: "PLN20", Name: "PLN TOKEN 20.000", Category: "PLN", Brand: "PLN", Group: "PULSA"},
+	})
+	bySKU := map[string]model.Product{}
+	for _, product := range got {
+		bySKU[product.ID] = product
+	}
+	if bySKU["HOK1200"].Type != "Game" {
+		t.Fatalf("game token leaked into PLN: %+v", bySKU["HOK1200"])
+	}
+	if bySKU["PLN20"].Type != "PLN" {
+		t.Fatalf("real PLN token was reclassified: %+v", bySKU["PLN20"])
+	}
+}
+
 func TestNormalizeCategories(t *testing.T) {
 	cases := map[string]string{
 		"Kuota internet Telkomsel": "Paket Data",
@@ -120,7 +137,11 @@ func TestCatalogHasSpecificProvidersForEveryH2HRProduct(t *testing.T) {
 		if !ok {
 			t.Fatalf("upstream SKU %s missing from retail catalog", item.SKU)
 		}
-		if product.Name != item.Name || product.Type != item.Category || product.PriceType != item.PriceType {
+		expectedType := item.Category
+		if strings.EqualFold(expectedType, "PLN") && !strings.Contains(strings.ToUpper(item.Name), "PLN") {
+			expectedType = normalizeCategory("", item.Group, item.Name)
+		}
+		if product.Name != item.Name || product.Type != expectedType || product.PriceType != item.PriceType {
 			t.Fatalf("upstream fields changed for SKU %s: %+v", item.SKU, product)
 		}
 		if item.PriceType == "OPEN_AMOUNT" {
