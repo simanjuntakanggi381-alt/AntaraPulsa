@@ -85,6 +85,7 @@
         <section id="dashboardPage" class="page active-page">
           <div class="mobile-welcome">
             <div><p id="greeting">Halo, Mikael 👋</p><h1>Selamat datang kembali!</h1></div>
+            <div class="welcome-balance" aria-label="Saldo utama"><small>SALDO UTAMA</small><span>Rp <strong id="balance">0</strong></span></div>
             <button class="scan-button" aria-label="Pindai QR"><svg viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4M9 9h6v6H9z"/></svg></button>
           </div>
           <div class="quick-services" aria-label="Layanan cepat">
@@ -121,14 +122,6 @@
             </div>
             <button data-page="transaction">Mulai Transaksi <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
           </section>
-          <div class="wallet-card" aria-label="Ringkasan saldo utama">
-            <div class="wallet-orbit orbit-a"></div><div class="wallet-orbit orbit-b"></div>
-            <div class="wallet-visual" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
-            <div class="wallet-head"><div><span>SALDO UTAMA</span><b><i></i> Siap digunakan</b></div></div>
-            <div class="wallet-value"><small>Rp</small><strong id="balance">2.847.500</strong><button id="hideBalance" aria-label="Sembunyikan saldo"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button></div>
-            <div class="wallet-detail"><div><span>Saldo utama</span><strong id="mainBalanceDetail">Rp 2.847.500</strong></div><div><span>Saldo bonus</span><strong>Rp 0</strong></div><div class="member-detail"><b>♛ &nbsp; GOLD</b><span>Member sejak<br>12 Jan 2024</span></div></div>
-            <div class="wallet-actions"><button id="walletTopupBtn" class="wallet-topup">Isi Saldo <b>＋</b></button><button class="wallet-history" type="button" data-page="history">Riwayat</button></div>
-          </div>
           <div class="cashback-card ready-card">
             <div><span>PULSA &amp; PAKET DATA</span><h2>Isi kebutuhan<br>internetmu.</h2><p>Pilih operator dan nominal yang tersedia.</p><button class="service-card" data-type="Paket Data">Lihat produk <b>→</b></button></div>
             <div class="ready-symbol data-symbol" aria-hidden="true"><svg viewBox="0 0 120 120"><rect x="40" y="25" width="40" height="70" rx="10"/><path d="M49 36h22M56 84h8M28 59a32 32 0 0 1 64 0M36 59a24 24 0 0 1 48 0"/><circle cx="60" cy="59" r="3"/></svg></div>

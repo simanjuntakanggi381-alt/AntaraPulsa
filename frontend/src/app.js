@@ -87,7 +87,8 @@ function renderAccountMenu(user) {
 function setUser(user) {
   state.user = user;
   $('#balance').textContent = money(user.balance); $('#miniName').textContent = user.name;
-  $('#mainBalanceDetail').textContent = `Rp ${money(user.balance)}`;
+  const mainBalanceDetail = $('#mainBalanceDetail');
+  if (mainBalanceDetail) mainBalanceDetail.textContent = `Rp ${money(user.balance)}`;
   $('#profileName').textContent = user.name; $('#profileNameInput').value = user.name;
   $('#profilePhone').value = user.phone; $('#profileEmail').value = user.email;
   $('#accountHandle').textContent = user.level || 'Agen terpercaya';
@@ -706,7 +707,7 @@ $('#confirmPayBtn').onclick = async () => {
 $('#closeModal').onclick = () => $('#modal').classList.remove('show');
 $('#doneBtn').onclick = () => { $('#modal').classList.remove('show'); showPage(state.returnPage || 'transaction'); };
 $('#profileForm').addEventListener('submit', async e => { e.preventDefault(); try { const user = await api('/api/me', {method:'PATCH',body:JSON.stringify({Name:$('#profileNameInput').value,Email:$('#profileEmail').value})}); setUser(user); showToast('Profil tersimpan', 'Informasi akun berhasil diperbarui.'); } catch(err) { showToast('Gagal menyimpan', err.message); } });
-$('#hideBalance').onclick = () => { state.balanceVisible = !state.balanceVisible; $('#balance').textContent = state.balanceVisible ? money(state.user.balance) : '••••••••'; $('#mainBalanceDetail').textContent = state.balanceVisible ? `Rp ${money(state.user.balance)}` : 'Rp ••••••••'; };
+if ($('#hideBalance')) $('#hideBalance').onclick = () => { state.balanceVisible = !state.balanceVisible; $('#balance').textContent = state.balanceVisible ? money(state.user.balance) : '••••••••'; const detail = $('#mainBalanceDetail'); if (detail) detail.textContent = state.balanceVisible ? `Rp ${money(state.user.balance)}` : 'Rp ••••••••'; };
 const updateTopupSummary = () => {
   const amount = Number($('#topupAmount').value.replace(/\D/g, '')) || 0;
   $('#topupAmount').value = amount ? money(amount) : '';
@@ -739,7 +740,7 @@ $('#accountMenu').addEventListener('click', event => {
     showPage('capital');
   }
 });
-$('#walletTopupBtn').onclick = () => showPage('topup');
+if ($('#walletTopupBtn')) $('#walletTopupBtn').onclick = () => showPage('topup');
 
 const capitalStorageKey = () => `${CAPITAL_APPLICATION_KEY}:${state.user?.phone || state.user?.id || 'agent'}`;
 const getCapitalApplications = () => {
