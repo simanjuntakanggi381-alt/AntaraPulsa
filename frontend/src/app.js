@@ -310,12 +310,14 @@ function providerLogoMarkup(provider, type, className = '') {
   // catalogue consistent and avoids a mix of crests and initial placeholders.
   const source = canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
-    : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
+    : canonicalProductType(type) === 'Multifinance'
+      ? '/assets/finance/provider-multifinance-generic.svg'
+      : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
   const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
   if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
   const tvProviderKeys = ['indovision','mncplay','myrepublik','telkomvision','toptv','transvision','yestv'];
-  const providerClass = source.includes('/assets/insurance/') ? 'provider-logo-insurance' : source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
+  const providerClass = source.includes('/assets/finance/') ? 'provider-logo-finance' : source.includes('/assets/insurance/') ? 'provider-logo-insurance' : source.includes('/assets/streaming/') ? 'provider-logo-streaming' : source.includes('provider-game-pubg-official') ? 'provider-logo-game provider-logo-pubg' : source.includes('/assets/games/') ? 'provider-logo-game' : source.includes('/assets/pdam/') ? 'provider-logo-pdam' : providerKey === 'pgn' ? 'provider-logo-pgn' : providerKey.includes('indihome') ? 'provider-logo-indihome' : tvProviderKeys.includes(providerKey) ? 'provider-logo-tv' : '';
   return `<span class="provider-logo-shell ${bankClass} ${providerClass} ${className}" style="--provider-color:${providerColor(provider)}"><img src="${source}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true;this.nextElementSibling.hidden=false"/><span class="provider-logo-initials-fallback" hidden>${escapeText(initials)}</span></span>`;
 }
 function txRow(tx, detailed = false) {
@@ -548,25 +550,26 @@ function updateProviderDetection(provider = '') {
   state.selectedProvider = provider;
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
-  $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow);
-  $('.product-finder').classList.toggle('pdam-provider-selected', pdamFlow && !!provider);
+  const financeFlow = canonicalProductType(state.selectedType) === 'Multifinance';
+  $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow || financeFlow);
+  $('.product-finder').classList.toggle('pdam-provider-selected', (pdamFlow || financeFlow) && !!provider);
   $('.product-finder').classList.toggle('bank-transfer-flow', bankFlow);
   $('.product-finder').classList.toggle('bank-provider-selected', bankFlow && !!provider);
-  $('#detectedProvider').innerHTML = pdamFlow && provider
-    ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>Masukkan nomor pelanggan untuk cek tagihan air</em></span>`
+  $('#detectedProvider').innerHTML = (pdamFlow || financeFlow) && provider
+    ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>${financeFlow ? 'Masukkan nomor kontrak pelanggan' : 'Masukkan nomor pelanggan untuk cek tagihan air'}</em></span>`
     : bankFlow && provider
       ? `${providerLogoMarkup(provider,state.selectedType,'bank-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>${state.autoDetectedBank === provider ? 'Terdeteksi dari kode bank' : 'Bank tujuan dipilih'}</em></span>`
       : escapeText(provider || (bankFlow ? 'Bank belum terdeteksi — pilih dari daftar' : 'Pilih provider di atas'));
-  if (pdamFlow && provider) $('#targetLabel').before($('.provider-detection'));
+  if ((pdamFlow || financeFlow) && provider) $('#targetLabel').before($('.provider-detection'));
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
-  $('#detectionStatus').textContent = pdamFlow && provider ? 'Ganti provider' : bankFlow && provider ? 'Ganti bank' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
+  $('#detectionStatus').textContent = (pdamFlow || financeFlow) && provider ? 'Ganti provider' : bankFlow && provider ? 'Ganti bank' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
   saveTransactionDraft();
 }
 
 $('#detectionStatus').onclick = () => {
-  if (canonicalProductType(state.selectedType) === 'PDAM' && state.selectedProvider) {
+  if (['PDAM','Multifinance'].includes(canonicalProductType(state.selectedType)) && state.selectedProvider) {
     updateProviderDetection('');
     renderProviderChoices();
     $('#providerSearch').focus();
@@ -581,7 +584,7 @@ function renderProviderChoices(query = '') {
   $('#providerChoices').innerHTML = visible.length
     ? visible.map(provider => {
       const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && productMatchesProvider(product, provider, state.selectedType)).length;
-      const listArrow = ['PDAM','Transfer Bank'].includes(canonicalProductType(state.selectedType)) ? '<i class="pdam-provider-arrow" aria-hidden="true">›</i>' : '';
+      const listArrow = ['PDAM','Transfer Bank','Multifinance'].includes(canonicalProductType(state.selectedType)) ? '<i class="pdam-provider-arrow" aria-hidden="true">›</i>' : '';
       return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small>${listArrow}</button>`;
     }).join('')
     : '<p class="provider-empty">Provider tidak ditemukan.</p>';
@@ -603,19 +606,20 @@ function prepareProductFinder(type) {
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
   const plnFlow = canonicalProductType(state.selectedType) === 'Token PLN';
+  const financeFlow = canonicalProductType(state.selectedType) === 'Multifinance';
   const insuranceFlow = canonicalProductType(state.selectedType) === 'Asuransi';
   $('.product-finder').classList.toggle('pln-service-flow', plnFlow);
   $('.product-finder').classList.toggle('insurance-service-flow', insuranceFlow);
   $('.pln-trust-strip').classList.toggle('hidden', !plnFlow);
   const providerHead = $('.provider-picker-head');
-  if (pdamFlow) {
+  if (pdamFlow || financeFlow) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
-    $('.provider-choice-label').textContent = 'CARI & PILIH PDAM';
+    $('.provider-choice-label').textContent = financeFlow ? 'CARI & PILIH MULTIFINANCE' : 'CARI & PILIH PDAM';
     $('#showProductsBtn span').textContent = 'Cek Tagihan';
-    $('#providerSearch').placeholder = 'Cari nama PDAM atau daerah';
-    $('#providerSearch').setAttribute('aria-label', 'Cari nama PDAM atau daerah');
-    if (heading) heading.textContent = 'Cari PDAM';
-    $('#transactionPage .simple-head p').textContent = 'Pilih daerah dari katalog H2HR, lalu masukkan ID pelanggan.';
+    $('#providerSearch').placeholder = financeFlow ? 'Cari perusahaan pembiayaan' : 'Cari nama PDAM atau daerah';
+    $('#providerSearch').setAttribute('aria-label', financeFlow ? 'Cari perusahaan pembiayaan' : 'Cari nama PDAM atau daerah');
+    if (heading) heading.textContent = financeFlow ? 'Pilih Multifinance' : 'Cari PDAM';
+    $('#transactionPage .simple-head p').textContent = financeFlow ? 'Pilih perusahaan pembiayaan, lalu masukkan nomor kontrak pelanggan.' : 'Pilih daerah dari katalog H2HR, lalu masukkan ID pelanggan.';
   } else {
     providerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
     $('#providerSearch').placeholder = 'Cari nama provider';
@@ -632,6 +636,11 @@ function prepareProductFinder(type) {
   if (pdamFlow) {
     $('#targetLabel').textContent = 'ID pelanggan PDAM';
     $('#targetInput').placeholder = 'Masukkan nomor pelanggan PDAM';
+  }
+  if (financeFlow) {
+    $('#targetLabel').textContent = 'Nomor kontrak pelanggan';
+    $('#targetInput').placeholder = 'Masukkan nomor kontrak pelanggan';
+    $('#targetPrefix').textContent = 'ID';
   }
   if (bankFlow) {
     $('.provider-choice-label').textContent = 'PILIH BANK TUJUAN';
