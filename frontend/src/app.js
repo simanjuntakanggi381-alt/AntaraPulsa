@@ -267,6 +267,22 @@ const providerAssets = {
   ovo:'/assets/provider-ovo.png', sakuku:'/assets/provider-sakuku.png', shopeepay:'/assets/provider-shopeepay.png',
   tapcash:'/assets/provider-tapcash.png'
 };
+const gameProviderAssets = {
+  '8ballpool':'/assets/games/provider-game-8-ball-pool.png', ageofempiresmobile:'/assets/games/provider-game-age-of-empires-mobile.png', arenabreakout:'/assets/games/provider-game-arena-breakout.png', arenaofvalor:'/assets/games/provider-game-arena-of-valor.png',
+  au2mobile:'/assets/games/provider-game-au2-mobile.png', blackcloverm:'/assets/games/provider-game-black-clover-m.png', bloodstrike:'/assets/games/provider-game-blood-strike.png', callofdutymobile:'/assets/games/provider-game-call-of-duty-mobile.png',
+  cloudsongsagaofskywalk:'/assets/games/provider-game-cloud-song-saga-of-skywalk.png', crystalofaltlan:'/assets/games/provider-game-crystal-of-atlan.png', deltaforcegarena:'/assets/games/provider-game-delta-force.png', deltaforcesteam:'/assets/games/provider-game-delta-force.png',
+  dragonraja:'/assets/games/provider-game-dragon-raja.png', farlight84:'/assets/games/provider-game-farlight-84.png', fcmobile:'/assets/games/provider-game-fc-mobile.png', footballmaster2:'/assets/games/provider-game-football-master-2.png',
+  freefire:'/assets/games/provider-game-free-fire.png', freefiremax:'/assets/games/provider-game-free-fire-max.png', genshinimpact:'/assets/games/provider-game-genshin-impact.png', growtopia:'/assets/games/provider-game-growtopia.png',
+  hago:'/assets/games/provider-game-hago.png', honkaiimpact3:'/assets/games/provider-game-honkai-impact-3.png', honkaistarrail:'/assets/games/provider-game-honkai-star-rail.png', honorofking:'/assets/games/provider-game-honor-of-kings.png',
+  identityv:'/assets/games/provider-game-identity-v.png', lightofthelnewera:'/assets/games/provider-game-light-of-thel-new-era.png', lineage2m:'/assets/games/provider-game-lineage2m.png', lordsmobile:'/assets/games/provider-game-lords-mobile.png',
+  lyssagoddessofrage:'/assets/games/provider-game-lyssa-goddess-of-rage.png', madtaleidlerpg:'/assets/games/provider-game-madtale-idle-rpg.png', magicchessgogo:'/assets/games/provider-game-magic-chess-go-go.png',
+  marvelrivals:'/assets/games/provider-game-marvel-rivals.png', marvelsnap:'/assets/games/provider-game-marvel-snap.png', marvelsuperwar:'/assets/games/provider-game-marvel-super-war.png', metalslugawakening:'/assets/games/provider-game-metal-slug-awakening.png',
+  mobilelegend:'/assets/games/provider-game-mobile-legend.png', narutoshippuden:'/assets/games/provider-game-naruto-shippuden.png', omegalegends:'/assets/games/provider-game-omega-legends.png', onmyojiarena:'/assets/games/provider-game-onmyoji-arena.png',
+  pointblank:'/assets/games/provider-game-point-blank.svg', pointblankcash:'/assets/games/provider-game-point-blank.svg', pokemonunite:'/assets/games/provider-game-pokemon-unite.png', pubgmobile:'/assets/games/provider-game-pubg-mobile.png',
+  pubgmobilelite:'/assets/games/provider-game-pubg-mobile.png', pubgnewstatemobile:'/assets/games/provider-game-pubg-new-state-mobile.png', racingmaster:'/assets/games/provider-game-racing-master.png', roblox:'/assets/games/provider-game-roblox.png',
+  robloxidr:'/assets/games/provider-game-roblox.png', sausageman:'/assets/games/provider-game-sausage-man.png', speeddrifters:'/assets/games/provider-game-speed-drifters.png', stateofsurvival:'/assets/games/provider-game-state-of-survival.png',
+  supersus:'/assets/games/provider-game-super-sus.png', undawn:'/assets/games/provider-game-undawn.png', valorant:'/assets/games/provider-game-valorant.svg', wutheringwaves:'/assets/games/provider-game-wuthering-waves.png', zenlesszonezero:'/assets/games/provider-game-zenless-zone-zero.png'
+};
 const bankProviderKeys = new Set([
   'allobank','bca','bjb','bni','bpdbali','bri','bsi','btn','btpn','bankaceh','bankaladinsyariah','bankarthagraha','bankbanten','bankbengkulu','bankbumiarta','bankctbc','bankcapital','bankchinaconstruction','bankdbs','bankdiy','bankdki','bankganesha','bankhana','bankibk','bankinaperdana','bankindex','bankjago','bankjambi','bankjateng','bankjatim','bankkalbar','bankkalsel','bankkalteng','bankkaltim','banklampung','bankmnc','bankmalukumalut','bankmandiritaspen','bankmaspion','bankmayora','bankmestika','bankntb','bankntt','banknagari','banknobu','bankpapua','bankqnb','bankrayabriagro','bankresonaperdania','bankriaukepri','banksahabatsampoerna','bankshinhan','banksulselbar','banksulteng','banksultra','banksulut','banksumselbabel','banksumut','bankvictoria','bankwoorisaudara','blubcadigital','bukopin','cimbniaga','citibank','commonwealth','danamon','hsbc','hibank','mandiri','maybank','mega','muamalat','neocommerce','ocbcnisp','panin','permata','seabank','sinarmas','superbank','uob'
 ]);
@@ -406,7 +422,9 @@ function providerLogoMarkup(provider, type, className = '') {
   const domain = canonicalProductType(type) === 'Multifinance' ? financeProviderDomain(provider) : providerDomain(provider);
   // Every regional PDAM uses one clear water-utility mark. This keeps the
   // catalogue consistent and avoids a mix of crests and initial placeholders.
-  const source = canonicalProductType(type) === 'PDAM'
+  const source = canonicalProductType(type) === 'Game'
+    ? gameProviderAssets[providerKey] || '/assets/service-category-14.png'
+    : canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
     : canonicalProductType(type) === 'Pajak'
       ? taxProviderAsset(provider) || '/assets/service-category-08.png'
