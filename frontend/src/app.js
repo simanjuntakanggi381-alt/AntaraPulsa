@@ -298,7 +298,11 @@ function providerLogoMarkup(provider, type, className = '') {
     return `<span class="provider-logo-shell provider-logo-biznet ${className}" role="img" aria-label="Biznet"></span>`;
   }
   const domain = providerDomain(provider);
-  const source = localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
+  // Every regional PDAM uses one clear water-utility mark. This keeps the
+  // catalogue consistent and avoids a mix of crests and initial placeholders.
+  const source = canonicalProductType(type) === 'PDAM'
+    ? '/assets/pdam/provider-pdam-generic.png'
+    : localProviderAsset(provider) || (domain ? `https://www.google.com/s2/favicons?domain_url=https://${encodeURIComponent(domain)}&sz=128` : '');
   const initials = String(provider || '?').trim().split(/\s+/).slice(0, 2).map(word => word[0] || '').join('').toUpperCase();
   if (!source) return `<span class="provider-logo-shell provider-logo-initials ${className}" style="--provider-color:${providerColor(provider)}" role="img" aria-label="${escapeText(provider)}">${escapeText(initials)}</span>`;
   const bankClass = source.includes('/assets/banks/') ? 'provider-logo-bank' : '';
