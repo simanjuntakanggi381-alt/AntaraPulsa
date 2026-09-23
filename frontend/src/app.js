@@ -614,18 +614,21 @@ function updateProviderDetection(provider = '') {
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   const bankFlow = canonicalProductType(state.selectedType) === 'Transfer Bank';
   const financeFlow = canonicalProductType(state.selectedType) === 'Multifinance';
+  const gasFlow = canonicalProductType(state.selectedType) === 'Gas';
   $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow || financeFlow);
   $('.product-finder').classList.toggle('pdam-provider-selected', (pdamFlow || financeFlow) && !!provider);
   $('.product-finder').classList.toggle('bank-transfer-flow', bankFlow);
   $('.product-finder').classList.toggle('bank-provider-selected', bankFlow && !!provider);
-  $('#detectedProvider').innerHTML = (pdamFlow || financeFlow) && provider
+  $('#detectedProvider').innerHTML = gasFlow && provider
+    ? `${providerLogoMarkup('PGN',state.selectedType,'gas-selected-logo')}<span><strong>Tagihan PGN</strong><em>Periksa tagihan gas pelanggan</em></span>`
+    : (pdamFlow || financeFlow) && provider
     ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>${financeFlow ? 'Masukkan nomor kontrak pelanggan' : 'Masukkan nomor pelanggan untuk cek tagihan air'}</em></span>`
     : bankFlow && provider
       ? `${providerLogoMarkup(provider,state.selectedType,'bank-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>${state.autoDetectedBank === provider ? 'Terdeteksi dari kode bank' : 'Bank tujuan dipilih'}</em></span>`
       : escapeText(provider || (bankFlow ? 'Bank belum terdeteksi — pilih dari daftar' : 'Pilih provider di atas'));
   if ((pdamFlow || financeFlow) && provider) $('#targetLabel').before($('.provider-detection'));
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
-  $('#detectionStatus').textContent = (pdamFlow || financeFlow) && provider ? 'Ganti provider' : bankFlow && provider ? 'Ganti bank' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
+  $('#detectionStatus').textContent = gasFlow ? '' : (pdamFlow || financeFlow) && provider ? 'Ganti provider' : bankFlow && provider ? 'Ganti bank' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
   hideProductSelection();
   saveTransactionDraft();
@@ -671,8 +674,10 @@ function prepareProductFinder(type) {
   const plnFlow = canonicalProductType(state.selectedType) === 'Token PLN';
   const financeFlow = canonicalProductType(state.selectedType) === 'Multifinance';
   const insuranceFlow = canonicalProductType(state.selectedType) === 'Asuransi';
+  const gasFlow = canonicalProductType(state.selectedType) === 'Gas';
   $('.product-finder').classList.toggle('pln-service-flow', plnFlow);
   $('.product-finder').classList.toggle('insurance-service-flow', insuranceFlow);
+  $('.product-finder').classList.toggle('gas-service-flow', gasFlow);
   $('.pln-trust-strip').classList.toggle('hidden', !plnFlow);
   const providerHead = $('.provider-picker-head');
   if (pdamFlow || financeFlow) {
@@ -713,12 +718,21 @@ function prepareProductFinder(type) {
     $('#targetInput').placeholder = 'Contoh: 014 1234567890';
     $('#transactionPage .simple-head p').textContent = 'Masukkan nomor rekening. Sertakan kode bank untuk deteksi otomatis, atau pilih bank dari daftar.';
   }
+  if (gasFlow) {
+    providerHead.before($('.provider-detection'), $('#targetLabel'), $('.finder-input'));
+    if (heading) heading.textContent = 'Tagihan PGN';
+    $('#targetLabel').textContent = 'Nomor pelanggan PGN';
+    $('#targetInput').placeholder = 'Masukkan nomor pelanggan';
+    $('#targetPrefix').textContent = 'ID';
+    $('#showProductsBtn span').textContent = 'Cek Tagihan';
+    $('#transactionPage .simple-head p').textContent = 'Masukkan nomor pelanggan untuk memeriksa tagihan gas PGN.';
+  }
   $('#providerSearch').value = '';
   hideProductSelection();
   $('#targetInput').value = '';
   state.autoDetectedBank = '';
   renderProviderChoices();
-  updateProviderDetection(plnFlow ? 'PLN' : '');
+  updateProviderDetection(plnFlow ? 'PLN' : gasFlow ? 'PGN' : '');
   saveTransactionDraft();
 }
 
