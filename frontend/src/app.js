@@ -478,7 +478,8 @@ function renderProviderChoices(query = '') {
   $('#providerChoices').innerHTML = visible.length
     ? visible.map(provider => {
       const total = state.products.filter(product => canonicalProductType(product.type) === canonicalProductType(state.selectedType) && productMatchesProvider(product, provider, state.selectedType)).length;
-      return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small></button>`;
+      const pdamArrow = canonicalProductType(state.selectedType) === 'PDAM' ? '<i class="pdam-provider-arrow" aria-hidden="true">›</i>' : '';
+      return `<button type="button" class="${state.selectedProvider === provider ? 'active' : ''}" data-provider="${escapeText(provider)}">${providerLogoMarkup(provider,state.selectedType,'picker-provider-logo')}<b>${escapeText(provider)}</b><small>${total} produk</small>${pdamArrow}</button>`;
     }).join('')
     : '<p class="provider-empty">Provider tidak ditemukan.</p>';
   $$('#providerChoices button').forEach(button => button.onclick = () => {
@@ -501,10 +502,14 @@ function prepareProductFinder(type) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
     $('.provider-choice-label').textContent = '1 · CARI & PILIH PDAM';
     $('#showProductsBtn span').textContent = 'Cek Tagihan';
+    $('#providerSearch').placeholder = 'Cari nama PDAM atau daerah';
+    $('#providerSearch').setAttribute('aria-label', 'Cari nama PDAM atau daerah');
     if (heading) heading.textContent = 'Cari PDAM';
     $('#transactionPage .simple-head p').textContent = 'Pilih daerah dari katalog H2HR, lalu masukkan ID pelanggan.';
   } else {
     providerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
+    $('#providerSearch').placeholder = 'Cari nama provider';
+    $('#providerSearch').setAttribute('aria-label', 'Cari nama provider');
     $('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
     $('#showProductsBtn span').textContent = '3 · Lihat produk tersedia';
     $('#transactionPage .simple-head p').textContent = 'Masukkan nomor tujuan terlebih dahulu, lalu pilih provider dan produk yang tersedia.';
@@ -530,7 +535,7 @@ function openTransaction(type) {
   state.returnPage = showPage.current();
   showPage('transaction');
   prepareProductFinder(type);
-  setTimeout(() => $('#targetInput').focus(), 0);
+  setTimeout(() => (canonicalProductType(type) === 'PDAM' ? $('#providerSearch') : $('#targetInput')).focus(), 0);
 }
 
 const serviceSymbols = {
