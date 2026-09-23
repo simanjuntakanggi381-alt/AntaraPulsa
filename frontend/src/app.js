@@ -283,6 +283,15 @@ const gameProviderAssets = {
   robloxidr:'/assets/games/provider-game-roblox.png', sausageman:'/assets/games/provider-game-sausage-man.png', speeddrifters:'/assets/games/provider-game-speed-drifters.png', stateofsurvival:'/assets/games/provider-game-state-of-survival.png',
   supersus:'/assets/games/provider-game-super-sus.png', undawn:'/assets/games/provider-game-undawn.png', valorant:'/assets/games/provider-game-valorant.svg', wutheringwaves:'/assets/games/provider-game-wuthering-waves.png', zenlesszonezero:'/assets/games/provider-game-zenless-zone-zero.png'
 };
+const streamingProviderAssets = {
+  beinsports:'/assets/streaming/provider-streaming-beinsports.png', biznet:'/assets/streaming/provider-streaming-biznet.png', bnetfit:'/assets/streaming/provider-streaming-bnetfit.png',
+  bstation:'/assets/streaming/provider-streaming-bstation.png', cbn:'/assets/streaming/provider-streaming-cbn.png', centrin:'/assets/streaming/provider-streaming-centrin.png',
+  cometinternet:'/assets/streaming/provider-streaming-cometinternet.png', firstmedia:'/assets/streaming/provider-streaming-firstmedia.png', globalxtreme:'/assets/streaming/provider-streaming-globalxtreme.png',
+  iconnet:'/assets/streaming/provider-streaming-iconnet.png', jawaravision:'/assets/streaming/provider-streaming-jawaravision.png', kvision:'/assets/streaming/provider-streaming-kvision.png',
+  mncplay:'/assets/streaming/provider-streaming-mncplay.png', mncvision:'/assets/streaming/provider-streaming-mncvision.png', myrepublic:'/assets/streaming/provider-streaming-myrepublic.png',
+  nexparabola:'/assets/streaming/provider-streaming-nexparabola.png', oxygen:'/assets/streaming/provider-streaming-oxygen.png', transvision:'/assets/streaming/provider-streaming-transvision.png',
+  wetv:'/assets/streaming/provider-streaming-wetv.png', xlhome:'/assets/streaming/provider-streaming-xlhome.png'
+};
 const bankProviderKeys = new Set([
   'allobank','bca','bjb','bni','bpdbali','bri','bsi','btn','btpn','bankaceh','bankaladinsyariah','bankarthagraha','bankbanten','bankbengkulu','bankbumiarta','bankctbc','bankcapital','bankchinaconstruction','bankdbs','bankdiy','bankdki','bankganesha','bankhana','bankibk','bankinaperdana','bankindex','bankjago','bankjambi','bankjateng','bankjatim','bankkalbar','bankkalsel','bankkalteng','bankkaltim','banklampung','bankmnc','bankmalukumalut','bankmandiritaspen','bankmaspion','bankmayora','bankmestika','bankntb','bankntt','banknagari','banknobu','bankpapua','bankqnb','bankrayabriagro','bankresonaperdania','bankriaukepri','banksahabatsampoerna','bankshinhan','banksulselbar','banksulteng','banksultra','banksulut','banksumselbabel','banksumut','bankvictoria','bankwoorisaudara','blubcadigital','bukopin','cimbniaga','citibank','commonwealth','danamon','hsbc','hibank','mandiri','maybank','mega','muamalat','neocommerce','ocbcnisp','panin','permata','seabank','sinarmas','superbank','uob'
 ]);
@@ -422,7 +431,9 @@ function providerLogoMarkup(provider, type, className = '') {
   const domain = canonicalProductType(type) === 'Multifinance' ? financeProviderDomain(provider) : providerDomain(provider);
   // Every regional PDAM uses one clear water-utility mark. This keeps the
   // catalogue consistent and avoids a mix of crests and initial placeholders.
-  const source = canonicalProductType(type) === 'Game'
+  const source = canonicalProductType(type) === 'TV & Streaming'
+    ? streamingProviderAssets[providerKey] || '/assets/service-category-15.png'
+    : canonicalProductType(type) === 'Game'
     ? gameProviderAssets[providerKey] || '/assets/service-category-14.png'
     : canonicalProductType(type) === 'PDAM'
     ? '/assets/pdam/provider-pdam-generic.png'
@@ -898,12 +909,6 @@ function renderServiceCategories() {
       { label:'Pendidikan', category:'Pendidikan', sprite:20 }, { label:'Kesehatan', category:'Kesehatan', sprite:21 }
     ]}
   ];
-  const declared = new Set(serviceGroups.flatMap(group => group.services.map(service => service.category)));
-  const extras = Object.keys(counts)
-    .filter(category => !dashboardServices.has(category) && !declared.has(category))
-    .sort((a,b) => a.localeCompare(b,'id'))
-    .map(category => ({ label:category, category }));
-  if (extras.length) serviceGroups.push({ title:'Layanan Lainnya', services:extras });
   const activeGroups = serviceGroups
     .map(group => ({ ...group, services: group.services.filter(service => (counts[service.category] || 0) > 0) }))
     .filter(group => group.services.length > 0);

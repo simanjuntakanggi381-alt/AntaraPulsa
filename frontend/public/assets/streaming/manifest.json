@@ -1,0 +1,162 @@
+{
+  "Biznet": {
+    "asset": "/assets/streaming/provider-streaming-biznet.png",
+    "domain": "biznetnetworks.com",
+    "size": [
+      64,
+      64
+    ]
+  },
+  "Bnetfit": {
+    "asset": "/assets/streaming/provider-streaming-bnetfit.png",
+    "domain": "bnetfit.id",
+    "size": [
+      256,
+      256
+    ]
+  },
+  "Bstation": {
+    "asset": "/assets/streaming/provider-streaming-bstation.png",
+    "domain": "bilibili.tv",
+    "size": [
+      256,
+      256
+    ]
+  },
+  "CBN": {
+    "asset": "/assets/streaming/provider-streaming-cbn.png",
+    "domain": "cbn.id",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "Centrin": {
+    "asset": "/assets/streaming/provider-streaming-centrin.png",
+    "domain": "centrin.net.id",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "Comet Internet": {
+    "asset": "/assets/streaming/provider-streaming-cometinternet.png",
+    "domain": "comet.net.id",
+    "size": [
+      192,
+      192
+    ]
+  },
+  "First Media": {
+    "asset": "/assets/streaming/provider-streaming-firstmedia.png",
+    "domain": "firstmedia.com",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "GlobalXtreme": {
+    "asset": "/assets/streaming/provider-streaming-globalxtreme.png",
+    "domain": "globalxtreme.net",
+    "size": [
+      100,
+      100
+    ]
+  },
+  "Iconnet": {
+    "asset": "/assets/streaming/provider-streaming-iconnet.png",
+    "domain": "iconnet.id",
+    "size": [
+      180,
+      180
+    ]
+  },
+  "Jawara Vision": {
+    "asset": "/assets/streaming/provider-streaming-jawaravision.png",
+    "domain": "jawaravision.com",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "K-Vision": {
+    "asset": "/assets/streaming/provider-streaming-kvision.png",
+    "domain": "k-vision.tv",
+    "size": [
+      256,
+      251
+    ]
+  },
+  "MNC Play": {
+    "asset": "/assets/streaming/provider-streaming-mncplay.png",
+    "domain": "mncplay.id",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "MNC Vision": {
+    "asset": "/assets/streaming/provider-streaming-mncvision.png",
+    "domain": "mncvision.id",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "MyRepublic": {
+    "asset": "/assets/streaming/provider-streaming-myrepublic.png",
+    "domain": "myrepublic.co.id",
+    "size": [
+      256,
+      256
+    ]
+  },
+  "Nex Parabola": {
+    "asset": "/assets/streaming/provider-streaming-nexparabola.png",
+    "domain": "nexparabola.com",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "Oxygen": {
+    "asset": "/assets/streaming/provider-streaming-oxygen.png",
+    "domain": "oxygen.id",
+    "size": [
+      180,
+      180
+    ]
+  },
+  "Transvision": {
+    "asset": "/assets/streaming/provider-streaming-transvision.png",
+    "domain": "transvision.co.id",
+    "size": [
+      64,
+      64
+    ]
+  },
+  "WeTV": {
+    "asset": "/assets/streaming/provider-streaming-wetv.png",
+    "domain": "wetv.vip",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "XL Home": {
+    "asset": "/assets/streaming/provider-streaming-xlhome.png",
+    "domain": "xlhome.co.id",
+    "size": [
+      512,
+      512
+    ]
+  },
+  "beIN Sports": {
+    "asset": "/assets/streaming/provider-streaming-beinsports.png",
+    "domain": "beinsports.com",
+    "size": [
+      152,
+      152
+    ]
+  }
+}
