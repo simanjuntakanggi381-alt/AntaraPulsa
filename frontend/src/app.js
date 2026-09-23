@@ -443,7 +443,8 @@ function updateProviderDetection(provider = '') {
   const pdamFlow = canonicalProductType(state.selectedType) === 'PDAM';
   $('.product-finder').classList.toggle('pdam-provider-first', pdamFlow);
   $('.product-finder').classList.toggle('pdam-provider-selected', pdamFlow && !!provider);
-  $('#detectedProvider').textContent = provider || 'Pilih provider di atas';
+  $('#detectedProvider').innerHTML = pdamFlow && provider ? `${providerLogoMarkup(provider,state.selectedType,'pdam-selected-logo')}<span><strong>${escapeText(provider)}</strong><em>Masukkan nomor pelanggan untuk cek tagihan air</em></span>` : escapeText(provider || 'Pilih provider di atas');
+  if (pdamFlow && provider) $('#targetLabel').before($('.provider-detection'));
   $('#providerIndicator').innerHTML = provider ? providerLogoMarkup(provider,state.selectedType,'indicator-provider-logo') : '?';
   $('#detectionStatus').textContent = pdamFlow && provider ? 'Ganti provider' : provider ? 'Terpilih' : (['Pulsa','Paket Data'].includes(state.selectedType) ? 'Deteksi prefix' : 'Pilih manual');
   $$('#providerChoices button').forEach(button => button.classList.toggle('active', button.dataset.provider === provider));
@@ -490,10 +491,13 @@ function prepareProductFinder(type) {
     $('#electricityModes').after(providerHead, $('#providerSearch'), $('#providerChoices'), $('#targetLabel'), $('.finder-input'), $('.provider-detection'));
     $('.provider-choice-label').textContent = '1 · CARI & PILIH PDAM';
     $('#showProductsBtn span').textContent = 'Cek Tagihan';
+    if (heading) heading.textContent = 'Cari PDAM';
+    $('#transactionPage .simple-head p').textContent = 'Pilih daerah dari katalog H2HR, lalu masukkan ID pelanggan.';
   } else {
     providerHead.before($('#targetLabel'), $('.finder-input'), $('.provider-detection'));
     $('.provider-choice-label').textContent = '2 · PILIH PROVIDER';
     $('#showProductsBtn span').textContent = '3 · Lihat produk tersedia';
+    $('#transactionPage .simple-head p').textContent = 'Masukkan nomor tujuan terlebih dahulu, lalu pilih provider dan produk yang tersedia.';
   }
   const inputConfig = transactionInputConfig(state.selectedType);
   $('#targetLabel').textContent = `1 · ${inputConfig.label}`;
