@@ -33,7 +33,7 @@ if ('serviceWorker' in navigator) {
 const $ = (q, root = document) => root.querySelector(q);
 const $$ = (q, root = document) => [...root.querySelectorAll(q)];
 const escapeHTML = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
-const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', balanceVisible: true, returnPage: 'dashboard' };
+const state = { user: null, products: [], transactions: [], selected: null, selectedType: 'Pulsa', selectedProvider: '', electricityMode: 'token', balanceVisible: true, returnPage: 'dashboard' };
 const TRANSACTION_DRAFT_KEY = 'antarapulsa-transaction-draft-v1';
 const CAPITAL_APPLICATION_KEY = 'antarapulsa-capital-applications-v1';
 const CAPITAL_MONITOR_KEY = 'antarapulsa-capital-monitor-v1';
@@ -326,8 +326,8 @@ $('#historySearch').addEventListener('input', renderHistory); $('#statusFilter')
 $$('[data-history-status]').forEach(btn => btn.onclick = () => { $$('.history-statuses button').forEach(item => item.classList.remove('active')); btn.classList.add('active'); $('#statusFilter').value = btn.dataset.historyStatus; renderHistory(); });
 
 function renderProducts(filter = state.selectedType, provider = state.selectedProvider) {
-  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || productMatchesProvider(p, provider, filter)));
-  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
+  const list = state.products.filter(p => (filter === 'all' || canonicalProductType(p.type) === canonicalProductType(filter)) && (!provider || productMatchesProvider(p, provider, filter)) && (canonicalProductType(filter) !== 'Token PLN' || (state.electricityMode === 'bill' ? /CEK PLN/i.test(p.name) : /TOKEN/i.test(p.name))));
+  $('#productGrid').innerHTML = list.map(p => `<button class="product ${state.selected?.id === p.id ? 'selected':''}" data-product="${p.id}">${providerLogoMarkup(p.provider,p.type,'product-provider-logo')}<small>${escapeText(p.provider)}</small><b>${escapeText(p.name)}</b><strong>${/CEK PLN/i.test(p.name) ? 'Cek tagihan' : p.price_type === 'OPEN_AMOUNT' ? `Isi nominal · admin Rp ${money(p.fee)}` : p.price <= 0 ? 'Harga belum tersedia' : `Rp ${money(p.price)}`}</strong></button>`).join('');
   $$('[data-product]').forEach(btn => btn.onclick = () => selectProduct(btn.dataset.product));
   $('#productResultCount').textContent = `${list.length} produk`;
   $('#productResultsTitle').textContent = provider ? `${filter} ${provider}` : filter;
@@ -472,6 +472,7 @@ function prepareProductFinder(type) {
   $$('.filter-tabs button').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === state.selectedType));
   const heading = $('#transactionPage .simple-head h1');
   if (heading) heading.textContent = state.selectedType;
+  $('#electricityModes').classList.toggle('hidden', canonicalProductType(state.selectedType) !== 'Token PLN');
   const inputConfig = transactionInputConfig(state.selectedType);
   $('#targetLabel').textContent = inputConfig.label;
   $('#targetPrefix').textContent = inputConfig.prefix;
@@ -592,16 +593,20 @@ function renderServiceCategories() {
   grid.innerHTML = activeGroups.map(group => `<section class="service-group"><div class="service-group-head"><h2>${group.title}</h2><span>${group.services.length} layanan</span></div><div class="service-group-grid">${group.services.map(service => `<button class="service-category-card" data-service-category="${escapeText(service.category)}">${serviceCategoryVisual(service)}<b>${escapeText(service.label)}</b><small>${counts[service.category]} produk</small></button>`).join('')}</div></section>`).join('');
   $$('[data-service-category]', grid).forEach(button => button.onclick = () => openTransaction(button.dataset.serviceCategory));
 }
+$('.filter-tabs').insertAdjacentHTML('beforebegin', '<div id="electricityModes" class="electricity-modes hidden"><button type="button" class="active" data-electricity-mode="token"><b>⚡ Beli Token Listrik</b><small>Isi token prabayar PLN</small></button><button type="button" data-electricity-mode="bill"><b>▤ Bayar Tagihan PLN</b><small>Cek tagihan pascabayar</small></button></div>');
+$$('[data-electricity-mode]').forEach(button => button.onclick = () => { state.electricityMode = button.dataset.electricityMode; $$('[data-electricity-mode]').forEach(item => item.classList.toggle('active', item === button)); state.selectedProvider = 'PLN'; hideProductSelection(); updateProviderDetection('PLN'); $('#targetLabel').textContent = 'Nomor meter / ID pelanggan PLN'; $('#showProductsBtn span').textContent = state.electricityMode === 'bill' ? '3 · Cek tagihan PLN' : '3 · Lihat token tersedia'; });
 $('#selectedProduct .price-row').insertAdjacentHTML('beforebegin', '<label id="openAmountRow" class="open-amount-row hidden" for="openAmountInput"><span>Nominal transaksi (Rp)</span><input id="openAmountInput" type="number" inputmode="numeric" min="1" max="1000000000" step="1" placeholder="Masukkan nominal"></label>');
+const isPLNInquiry = product => /CEK PLN/i.test(product?.name || '');
 function updateCheckoutAmount() {
   if (!state.selected) return;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
   const qty = Number($('#openAmountInput').value);
   const validQty = Number.isSafeInteger(qty) && qty > 0 && qty <= 1_000_000_000;
-  const unavailable = openAmount ? !validQty : state.selected.price <= 0;
-  $('#selectedPrice').textContent = openAmount ? (validQty ? `Rp ${money(qty + state.selected.fee)} (termasuk admin Rp ${money(state.selected.fee)})` : 'Isi nominal untuk melihat total') : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
+  const inquiry = isPLNInquiry(state.selected);
+  const unavailable = inquiry ? false : openAmount ? !validQty : state.selected.price <= 0;
+  $('#selectedPrice').textContent = inquiry ? 'Cek tagihan tanpa potong saldo' : openAmount ? (validQty ? `Rp ${money(qty + state.selected.fee)} (termasuk admin Rp ${money(state.selected.fee)})` : 'Isi nominal untuk melihat total') : unavailable ? 'Harga belum tersedia' : `Rp ${money(state.selected.price)}`;
   $('#payBtn').disabled = unavailable;
-  $('#payBtn').firstChild.textContent = unavailable ? (openAmount ? 'Isi nominal dahulu ' : 'Harga belum tersedia ') : 'Lanjut Pembayaran ';
+  $('#payBtn').firstChild.textContent = inquiry ? 'Cek Tagihan PLN ' : unavailable ? (openAmount ? 'Isi nominal dahulu ' : 'Harga belum tersedia ') : 'Lanjut Pembayaran ';
 }
 $('#openAmountInput').addEventListener('input', updateCheckoutAmount);
 function selectProduct(id) {
@@ -677,7 +682,7 @@ $('#payBtn').onclick = () => {
   if (!state.selected) return;
   const openAmount = state.selected.price_type === 'OPEN_AMOUNT';
   const qty = openAmount ? Number($('#openAmountInput').value) : 0;
-  if (openAmount ? !Number.isSafeInteger(qty) || qty <= 0 || qty > 1_000_000_000 : state.selected.price <= 0) return;
+  if (!isPLNInquiry(state.selected) && (openAmount ? !Number.isSafeInteger(qty) || qty <= 0 || qty > 1_000_000_000 : state.selected.price <= 0)) return;
   const target = $('#targetInput').value.trim(); if (!target) { showToast('Nomor belum diisi', 'Masukkan nomor tujuan atau ID pelanggan.'); return; }
   $('#checkoutSheetTarget').value = target;
   refreshCheckoutSheet();
@@ -691,6 +696,15 @@ $('#confirmPayBtn').onclick = async () => {
   if (checkoutTotal() > Number(state.user?.balance || 0)) { refreshCheckoutSheet(); return; }
   const btn = $('#confirmPayBtn'); btn.disabled = true; btn.textContent = 'Memproses...';
   try {
+    if (isPLNInquiry(state.selected)) {
+      const result = await api('/api/h2hr/inquiry', {method:'POST', body:JSON.stringify({ProductID:state.selected.id, Target:target})});
+      const detail = result.transaksi_member || {};
+      $('#modal .success-ring').textContent = '⚡';
+      $('#modal h2').textContent = 'Hasil cek tagihan PLN';
+      $('#modal .modal-card > p').textContent = result.msg || detail.keterangan || 'Hasil pengecekan diterima dari Pulsa24Jam.';
+      $('#modalDetail').innerHTML = `<div><span>ID pelanggan</span><b>${escapeText(target)}</b></div><div><span>Produk</span><b>${escapeText(state.selected.name)}</b></div><div><span>Status</span><b>${escapeText(detail.keterangan || result.msg || 'Diterima')}</b></div>`;
+      closeCheckoutSheet(); $('#modal').classList.add('show'); return;
+    }
     const tx = await api('/api/purchase', {method:'POST', body:JSON.stringify({ProductID:state.selected.id, Target:target, Qty:qty})});
     state.transactions.unshift(tx); setUser(await api('/api/me')); renderRecent(); renderHistory();
     const refunded = tx.status === 'Dana dikembalikan';

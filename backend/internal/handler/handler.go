@@ -54,6 +54,7 @@ func (h *Handler) Routes() http.Handler {
 	mux.HandleFunc("POST /api/downlines", h.withAuth(h.createDownline))
 	mux.HandleFunc("GET /api/h2hr/saldo", h.withAuth(h.h2hrSaldo))
 	mux.HandleFunc("GET /api/h2hr/products", h.withAuth(h.h2hrProducts))
+	mux.HandleFunc("POST /api/h2hr/inquiry", h.withAuth(h.h2hrInquiry))
 	mux.HandleFunc("POST /api/h2hr/callback/{token}", h.h2hrCallback)
 	mux.HandleFunc("GET /api/v1/webhooks/pulsa24jam", h.h2hrWebhook)
 	mux.HandleFunc("POST /api/v1/webhooks/pulsa24jam", h.h2hrWebhook)
@@ -181,6 +182,30 @@ func (h *Handler) h2hrSaldo(w http.ResponseWriter, r *http.Request, _ int64) {
 
 func (h *Handler) h2hrProducts(w http.ResponseWriter, r *http.Request, _ int64) {
 	result, err := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PRODUK", Product: strings.TrimSpace(r.URL.Query().Get("product"))})
+	if err != nil {
+		respond(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
+		return
+	}
+	respond(w, http.StatusOK, result)
+}
+
+func (h *Handler) h2hrInquiry(w http.ResponseWriter, r *http.Request, _ int64) {
+	var in struct{ ProductID, Target string }
+	if decode(r, &in) != nil {
+		respond(w, http.StatusBadRequest, map[string]string{"error": "Data tidak valid"})
+		return
+	}
+	product, ok := h.store.Product(strings.ToUpper(strings.TrimSpace(in.ProductID)))
+	if !ok || !strings.Contains(strings.ToUpper(product.Name), "CEK PLN") {
+		respond(w, http.StatusBadRequest, map[string]string{"error": "Produk cek tagihan PLN tidak valid"})
+		return
+	}
+	target := strings.TrimSpace(in.Target)
+	if target == "" {
+		respond(w, http.StatusBadRequest, map[string]string{"error": "Nomor meter / ID pelanggan wajib diisi"})
+		return
+	}
+	result, err := h.h2hr.Call(r.Context(), h2hr.Request{Commands: "PAY", Product: product.ID, Dest: target, RefID: "CEK-" + strconv.FormatInt(time.Now().UnixMilli(), 10)})
 	if err != nil {
 		respond(w, http.StatusBadGateway, map[string]string{"error": err.Error()})
 		return
