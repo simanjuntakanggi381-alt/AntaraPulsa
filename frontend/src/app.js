@@ -428,6 +428,16 @@ function restoreTransactionDraft() {
   const draft = readTransactionDraft();
   prepareProductFinder(draft?.type || 'Pulsa');
   if (!draft) return;
+  // PDAM must always reopen on the searchable provider catalogue. Restoring
+  // the previous provider skips the first step and makes an old area look
+  // permanently selected after a refresh or a new login.
+  if (canonicalProductType(state.selectedType) === 'PDAM') {
+    $('#targetInput').value = '';
+    updateProviderDetection('');
+    renderProviderChoices();
+    saveTransactionDraft();
+    return;
+  }
   $('#targetInput').value = draft.target || '';
   const provider = availableProviders(state.selectedType).find(item => item.toLowerCase() === String(draft.provider || '').toLowerCase()) || '';
   updateProviderDetection(provider);
